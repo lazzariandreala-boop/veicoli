@@ -101,3 +101,14 @@ a { text-decoration: none; color: inherit; }
   padding-bottom: calc(var(--nav-height) + var(--safe-bottom) + 16px);
   -webkit-overflow-scrolling: touch;
 }
+
+/* ─── Desktop layout ─────────────────────────────────────────────────────── */
+@media (min-width: 1024px) {
+  :root {
+    --nav-height: 0px;
+    --safe-bottom: 0px;
+  }
+  body { overflow: hidden; }
+  .app-main { overflow-y: auto; }
+  .page { min-height: 100dvh; }
+}

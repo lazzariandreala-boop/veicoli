@@ -4,6 +4,7 @@ import ScadenzeView from '../views/ScadenzeView.vue'
 import NotificheView from '../views/NotificheView.vue'
 import AddVehicleView from '../views/AddVehicleView.vue'
 import VehicleDetailView from '../views/VehicleDetailView.vue'
+import SettingsView from '../views/SettingsView.vue'
 
 const routes = [
   {
@@ -41,6 +42,12 @@ const routes = [
     name: 'vehicle-detail',
     component: VehicleDetailView,
     meta: { transition: 'slide' }
+  },
+  {
+    path: '/impostazioni',
+    name: 'settings',
+    component: SettingsView,
+    meta: { transition: 'fade' }
   }
 ]
 

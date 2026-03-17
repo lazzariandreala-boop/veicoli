@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { Preferences } from '@capacitor/preferences'
 import { scheduleVehicleNotifications, cancelVehicleNotifications } from '../composables/useNotifications'
+import { pullFromGist, pushToGist } from '../composables/useGistSync'
+import { useSettingsStore } from './settings'
 
 const STORAGE_KEY = 'veicoli_app_vehicles'
 
@@ -73,21 +75,69 @@ export const useVehiclesStore = defineStore('vehicles', () => {
 
   // ─── Persistence ────────────────────────────────────────────────────────────
 
+  async function saveLocal() {
+    try {
+      await Preferences.set({ key: STORAGE_KEY, value: JSON.stringify(vehicles.value) })
+    } catch (e) {
+      console.warn('Errore salvataggio locale:', e)
+    }
+  }
+
   async function load() {
+    // 1. Load from local storage first (fast)
     try {
       const { value } = await Preferences.get({ key: STORAGE_KEY })
       if (value) vehicles.value = JSON.parse(value)
     } catch (e) {
-      console.warn('Errore caricamento veicoli:', e)
+      console.warn('Errore caricamento locale:', e)
     }
+
+    // 2. Try Gist sync (merge: use newer data)
+    const settings = useSettingsStore()
+    if (settings.gistToken && settings.gistId) {
+      try {
+        settings.syncStatus = 'syncing'
+        const remote = await pullFromGist(settings.gistToken, settings.gistId)
+        if (remote && Array.isArray(remote.vehicles)) {
+          const localMax = vehicles.value.reduce((max, v) => {
+            const d = new Date(v.updatedAt || v.createdAt || 0).getTime()
+            return d > max ? d : max
+          }, 0)
+          const remoteUpdated = remote.updatedAt ? new Date(remote.updatedAt).getTime() : 0
+          if (remoteUpdated > localMax || vehicles.value.length === 0) {
+            vehicles.value = remote.vehicles
+            await saveLocal()
+          }
+        }
+        settings.syncStatus = 'ok'
+        settings.lastSync = new Date().toISOString()
+        await settings.save()
+      } catch (e) {
+        settings.syncStatus = 'error'
+        settings.lastError = e.message
+        console.warn('Errore Gist sync:', e)
+      }
+    }
+
     loaded.value = true
   }
 
   async function save() {
-    try {
-      await Preferences.set({ key: STORAGE_KEY, value: JSON.stringify(vehicles.value) })
-    } catch (e) {
-      console.warn('Errore salvataggio veicoli:', e)
+    await saveLocal()
+    // Push to Gist in background
+    const settings = useSettingsStore()
+    if (settings.gistToken && settings.gistId) {
+      try {
+        settings.syncStatus = 'syncing'
+        await pushToGist(settings.gistToken, settings.gistId, vehicles.value)
+        settings.syncStatus = 'ok'
+        settings.lastSync = new Date().toISOString()
+        await settings.save()
+      } catch (e) {
+        settings.syncStatus = 'error'
+        settings.lastError = e.message
+        console.warn('Errore push Gist:', e)
+      }
     }
   }
 
@@ -132,6 +182,7 @@ export const useVehiclesStore = defineStore('vehicles', () => {
     upcomingDeadlines,
     stats,
     load,
+    save,
     addVehicle,
     updateVehicle,
     deleteVehicle,

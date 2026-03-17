@@ -13,6 +13,10 @@
       <span class="nav-icon">🔔</span>
       <span class="nav-label">Notifiche</span>
     </router-link>
+    <router-link to="/impostazioni" class="nav-item" active-class="active">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-label">Impostazioni</span>
+    </router-link>
   </nav>
 </template>
 
