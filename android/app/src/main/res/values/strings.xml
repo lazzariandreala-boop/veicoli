@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Veicoli</string>
+    <string name="title_activity_main">Veicoli</string>
+    <string name="package_name">it.andrea.veicoliapp</string>
+    <string name="custom_url_scheme">it.andrea.veicoliapp</string>
+</resources>

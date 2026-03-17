@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ISTRUZIONI: Questo file è un RIFERIMENTO per le permission extra da aggiungere
+  al file android/app/src/main/AndroidManifest.xml generato da Capacitor.
+
+  Dopo aver eseguito "npx cap add android", apri AndroidManifest.xml e
+  assicurati che queste permission siano presenti dentro <manifest>:
+-->
+<manifest>
+
+    <!-- Notifiche (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
+    <!-- Allarmi esatti per notifiche programmate precise -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
+
+    <!-- Mantieni il processor attivo per le notifiche -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
+    <!-- Notifiche al boot del dispositivo -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
+</manifest>
