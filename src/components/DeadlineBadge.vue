@@ -24,26 +24,28 @@ const badgeClass = computed(() => `badge-${status.value}`)
 const label = computed(() => {
   const d = props.days
   if (d === null || d === undefined) return '—'
-  if (d < 0) return 'Scaduto'
-  if (d === 0) return 'Oggi'
-  if (d === 1) return '1 giorno'
-  return `${d} giorni`
+  if (d < 0) return `Scaduto`
+  if (d === 0) return 'Oggi!'
+  if (d === 1) return '1g'
+  return `${d}g`
 })
 </script>
 
 <style scoped>
 .badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   font-size: 11px;
-  font-weight: 600;
-  padding: 3px 9px;
-  border-radius: 20px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 99px;
   white-space: nowrap;
+  letter-spacing: 0.2px;
 }
-.badge-ok      { background: var(--ok-bg);    color: var(--ok-text); }
-.badge-warn    { background: var(--warn-bg);   color: var(--warn-text); }
-.badge-alert   { background: var(--alert-bg);  color: var(--alert-text); }
+.badge-ok      { background: var(--ok-bg);     color: var(--ok); }
+.badge-warn    { background: var(--warn-bg);   color: var(--warn); }
+.badge-alert   { background: var(--alert-bg);  color: var(--alert); }
 .badge-danger,
-.badge-expired { background: var(--danger-bg); color: var(--danger-text); }
+.badge-expired { background: var(--danger-bg); color: var(--danger); }
 .badge-none    { background: var(--bg-input);  color: var(--text-tertiary); }
 </style>

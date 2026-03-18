@@ -1,8 +1,11 @@
 <template>
   <aside class="sidebar">
     <div class="sidebar-brand">
-      <span class="sidebar-brand-icon">🚗</span>
-      <span class="sidebar-brand-name">Veicoli</span>
+      <div class="brand-icon">🏎️</div>
+      <div>
+        <div class="brand-name">Veicoli</div>
+        <div class="brand-tagline">Il tuo garage digitale</div>
+      </div>
     </div>
 
     <nav class="sidebar-nav">
@@ -26,9 +29,9 @@
     </nav>
 
     <div class="sidebar-footer">
-      <div class="sync-status" :class="syncStatusClass" :title="syncLabel">
+      <div class="sync-pill" :class="syncClass">
         <span class="sync-dot" />
-        <span class="sync-text">{{ syncLabel }}</span>
+        <span class="sync-label">{{ syncLabel }}</span>
       </div>
     </div>
   </aside>
@@ -46,18 +49,18 @@ const urgentCount = computed(() =>
   store.upcomingDeadlines.filter(d => d.days <= 30 && d.days >= 0).length
 )
 
-const syncStatusClass = computed(() => {
+const syncClass = computed(() => {
   if (!settings.gistToken || !settings.gistId) return 'sync-none'
   return `sync-${settings.syncStatus}`
 })
 
 const syncLabel = computed(() => {
-  if (!settings.gistToken || !settings.gistId) return 'Sync non configurato'
+  if (!settings.gistToken || !settings.gistId) return 'Sync non attivo'
   if (settings.syncStatus === 'syncing') return 'Sincronizzazione...'
   if (settings.syncStatus === 'error') return 'Errore sync'
   if (settings.syncStatus === 'ok' && settings.lastSync) {
     const d = new Date(settings.lastSync)
-    return `Sync: ${d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}`
+    return `Sync ${d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}`
   }
   return 'Sync attivo'
 })
@@ -74,22 +77,37 @@ const syncLabel = computed(() => {
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  padding: 0;
   z-index: 50;
 }
 
 .sidebar-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 24px 20px 20px;
+  gap: 11px;
+  padding: 24px 16px 20px;
   border-bottom: 1px solid var(--border);
 }
-.sidebar-brand-icon { font-size: 24px; }
-.sidebar-brand-name {
-  font-size: 18px;
-  font-weight: 700;
+.brand-icon {
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  background: var(--accent-grad);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.brand-name {
+  font-size: 16px;
+  font-weight: 800;
   color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+.brand-tagline {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-top: 1px;
 }
 
 .sidebar-nav {
@@ -103,13 +121,13 @@ const syncLabel = computed(() => {
 .sidebar-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
+  gap: 10px;
+  padding: 9px 10px;
   border-radius: var(--radius-md);
   color: var(--text-secondary);
   font-size: 14px;
   font-weight: 500;
-  transition: background 0.15s, color 0.15s;
+  transition: all 0.15s ease;
   position: relative;
 }
 .sidebar-item:hover {
@@ -119,19 +137,20 @@ const syncLabel = computed(() => {
 .sidebar-item.active {
   background: var(--accent-light);
   color: var(--accent);
+  font-weight: 600;
 }
 
-.sidebar-icon { font-size: 18px; line-height: 1; }
+.sidebar-icon { font-size: 17px; line-height: 1; }
 .sidebar-label { flex: 1; }
 
 .sidebar-badge {
   min-width: 18px;
   height: 18px;
-  background: var(--danger);
+  background: var(--danger-grad);
   color: #fff;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  border-radius: 9px;
+  border-radius: 99px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -139,41 +158,38 @@ const syncLabel = computed(() => {
 }
 
 .sidebar-footer {
-  padding: 16px 12px;
+  padding: 12px 10px;
   border-top: 1px solid var(--border);
 }
 
-.sync-status {
+.sync-pill {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  border-radius: var(--radius-sm);
+  gap: 7px;
+  padding: 7px 10px;
+  border-radius: 99px;
   background: var(--bg-page);
 }
 .sync-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   flex-shrink: 0;
   background: var(--text-tertiary);
 }
-.sync-none .sync-dot { background: var(--text-tertiary); }
-.sync-idle .sync-dot { background: var(--ok); }
-.sync-syncing .sync-dot {
-  background: var(--warn);
-  animation: pulse-dot 1s ease infinite;
-}
-.sync-ok .sync-dot { background: var(--ok); }
+.sync-syncing .sync-dot { background: var(--warn); animation: pulse-dot 1s ease infinite; }
+.sync-ok .sync-dot    { background: var(--ok); }
 .sync-error .sync-dot { background: var(--danger); }
+.sync-none .sync-dot  { background: var(--text-tertiary); }
 
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+  50%       { opacity: 0.3; }
 }
 
-.sync-text {
+.sync-label {
   font-size: 11px;
+  font-weight: 500;
   color: var(--text-tertiary);
   white-space: nowrap;
   overflow: hidden;

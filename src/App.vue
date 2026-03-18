@@ -45,15 +45,15 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  overflow: hidden;
+  overflow-x: hidden; /* solo orizzontale, mai bloccare lo scroll verticale */
 }
 
 /* Mobile: sidebar nascosta, bottom nav visibile */
-.desktop-only { display: none; }
+.desktop-only { display: none !important; }
 .mobile-only  { display: flex; }
 
 @media (min-width: 1024px) {
-  .desktop-only { display: flex; }
+  .desktop-only { display: flex !important; }
   .mobile-only  { display: none !important; }
 }
 

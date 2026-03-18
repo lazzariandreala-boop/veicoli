@@ -18,7 +18,7 @@ import { computed } from 'vue'
 
 const props = defineProps({
   label: { type: String, required: true },
-  date: { type: String, default: null }
+  date:  { type: String, default: null }
 })
 
 const today = new Date(); today.setHours(0, 0, 0, 0)
@@ -44,34 +44,23 @@ const status = computed(() => {
   return 'ok'
 })
 
-const barClass = computed(() => ({
-  'bar-ok': status.value === 'ok',
-  'bar-warn': status.value === 'warn',
-  'bar-alert': status.value === 'alert',
-  'bar-danger': status.value === 'danger' || status.value === 'expired'
-}))
-
-const daysClass = computed(() => ({
-  'days-ok': status.value === 'ok',
-  'days-warn': status.value === 'warn',
-  'days-alert': status.value === 'alert',
-  'days-danger': status.value === 'danger' || status.value === 'expired'
-}))
+const barClass = computed(() => `bar-${status.value === 'expired' ? 'danger' : status.value}`)
+const daysClass = computed(() => `days-${status.value === 'expired' ? 'danger' : status.value}`)
 
 const barWidth = computed(() => {
   const d = days.value
   if (d === null) return 0
   if (d < 0) return 100
-  return Math.max(4, Math.min(100, 100 - (d / 365) * 100))
+  return Math.max(5, Math.min(100, 100 - (d / 365) * 100))
 })
 
 const daysLabel = computed(() => {
   const d = days.value
   if (d === null) return '—'
-  if (d < 0) return `Scaduto da ${Math.abs(d)}gg`
+  if (d < 0) return `Scaduto da ${Math.abs(d)}g`
   if (d === 0) return 'Scade oggi!'
   if (d === 1) return 'Domani'
-  return `${d} giorni`
+  return `${d}g`
 })
 </script>
 
@@ -79,18 +68,18 @@ const daysLabel = computed(() => {
 .deadline-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 9px 0;
+  gap: 12px;
+  padding: 7px 0;
 }
 .dl-left {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  min-width: 108px;
+  gap: 1px;
+  min-width: 110px;
 }
 .dl-label {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--text-primary);
 }
 .dl-date {
@@ -106,27 +95,30 @@ const daysLabel = computed(() => {
 }
 .dl-bar-wrap {
   width: 100%;
-  height: 5px;
+  height: 6px;
   background: var(--border);
-  border-radius: 3px;
+  border-radius: 99px;
   overflow: hidden;
 }
 .dl-bar {
   height: 100%;
-  border-radius: 3px;
-  transition: width 0.4s ease;
+  border-radius: 99px;
+  transition: width 0.5s cubic-bezier(.32,.72,0,1);
 }
-.bar-ok    { background: var(--ok); }
-.bar-warn  { background: var(--warn); }
-.bar-alert { background: var(--alert); }
-.bar-danger{ background: var(--danger); }
+.bar-ok     { background: var(--ok-grad); }
+.bar-warn   { background: var(--warn-grad); }
+.bar-alert  { background: var(--alert-grad); }
+.bar-danger { background: var(--danger-grad); }
+.bar-none   { background: var(--border); }
 
 .dl-days {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
 }
-.days-ok    { color: var(--ok-text); }
-.days-warn  { color: var(--warn-text); }
-.days-alert { color: var(--alert-text); }
-.days-danger{ color: var(--danger-text); }
+.days-ok     { color: var(--ok); }
+.days-warn   { color: var(--warn); }
+.days-alert  { color: var(--alert); }
+.days-danger { color: var(--danger); }
+.days-none   { color: var(--text-tertiary); }
 </style>

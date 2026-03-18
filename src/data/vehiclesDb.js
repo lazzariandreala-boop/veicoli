@@ -9,6 +9,15 @@ export const vehiclesDb = [
   // ─── AUTOMOBILI ────────────────────────────────────────────────────────────
 
   {
+    brand: 'Abarth', type: 'car', models: [
+      { name: '500', versions: ['500 135CV', '500 145CV esseesse', '500 165CV Record Monza'] },
+      { name: '595', versions: ['595 145CV', '595 Turismo 165CV', '595 Pista 165CV', '595 Competizione 180CV'] },
+      { name: '695', versions: ['695 180CV', '695 Rivale 180CV', '695 Tributo Ferrari 180CV', '695 XSR Yamaha 180CV'] },
+      { name: '500e', versions: ['500e Electric 155CV', '500e Cabrio Electric 155CV'] },
+    ]
+  },
+
+  {
     brand: 'Alfa Romeo', type: 'car', models: [
       { name: '147', versions: ['1.6 TS', '1.9 JTD', '2.0 TS', '3.2 GTA'] },
       { name: '156', versions: ['1.6 TS', '1.8 TS', '1.9 JTD', '2.0 JTS', '2.5 V6', '3.2 GTA'] },
@@ -18,6 +27,14 @@ export const vehiclesDb = [
       { name: 'Stelvio', versions: ['2.0 Turbo 200CV', '2.0 Turbo 280CV', '2.2 JTD 160CV', '2.2 JTD 210CV', '2.9 V6 Quadrifoglio'] },
       { name: 'Tonale', versions: ['1.5 VGT Hybrid 160CV', '1.6 JTD 130CV', 'PHEV Q4 280CV'] },
       { name: 'MiTo', versions: ['1.4 78CV', '1.4 TB 135CV', '1.4 TB Quadrifoglio', '1.3 JTDm'] },
+    ]
+  },
+
+  {
+    brand: 'Alpine', type: 'car', models: [
+      { name: 'A110', versions: ['A110 1.8T 252CV', 'A110 Pure 1.8T 252CV', 'A110 Légende 1.8T 252CV', 'A110 Color Edition 1.8T 252CV'] },
+      { name: 'A110 S', versions: ['A110 S 1.8T 300CV'] },
+      { name: 'A110 GT', versions: ['A110 GT 1.8T 300CV'] },
     ]
   },
 
@@ -52,6 +69,15 @@ export const vehiclesDb = [
   },
 
   {
+    brand: 'BYD', type: 'car', models: [
+      { name: 'Atto 3', versions: ['Atto 3 Electric 204CV 60kWh', 'Atto 3 Electric Extended Range 204CV 77kWh'] },
+      { name: 'Seal', versions: ['Seal Standard Range RWD 204CV', 'Seal Long Range RWD 313CV', 'Seal AWD Performance 530CV'] },
+      { name: 'Dolphin', versions: ['Dolphin Comfort Electric 95CV 44kWh', 'Dolphin Design Electric 177CV 60kWh'] },
+      { name: 'Han', versions: ['Han Electric AWD 517CV', 'Han Electric RWD 314CV'] },
+    ]
+  },
+
+  {
     brand: 'Chevrolet', type: 'car', models: [
       { name: 'Aveo', versions: ['1.2 70CV', '1.4 100CV', '1.3 VCDI 95CV'] },
       { name: 'Cruze', versions: ['1.4 140CV', '1.6 115CV', '1.7 CDTi 130CV', '2.0 CDTi 163CV'] },
@@ -72,6 +98,15 @@ export const vehiclesDb = [
   },
 
   {
+    brand: 'Cupra', type: 'car', models: [
+      { name: 'Formentor', versions: ['1.5 TSI 150CV', '2.0 TSI 190CV', '2.0 TSI 245CV', '2.0 TSI 310CV 4Drive', 'VZ 2.0 TSI 245CV', 'e-Hybrid PHEV 204CV', 'e-Hybrid PHEV 245CV'] },
+      { name: 'Born', versions: ['Born Electric 150CV 45kWh', 'Born Electric 204CV 58kWh', 'Born Electric 231CV 77kWh', 'Born VZ Electric 231CV 77kWh'] },
+      { name: 'Leon', versions: ['1.5 TSI 130CV', '2.0 TSI 190CV', '2.0 TSI 245CV', 'e-Hybrid PHEV 204CV', 'e-Hybrid PHEV 245CV', 'Sportstourer 2.0 TSI 245CV'] },
+      { name: 'Ateca', versions: ['2.0 TSI 190CV', '2.0 TSI 221CV 4Drive', '2.0 TSI 300CV 4Drive'] },
+    ]
+  },
+
+  {
     brand: 'Dacia', type: 'car', models: [
       { name: 'Sandero', versions: ['1.0 SCe 75CV', '1.0 TCe 90CV', '1.0 TCe 100CV Bi-fuel', '1.5 Blue dCi 95CV', 'Stepway 1.0 TCe 90CV', 'Stepway 1.0 TCe 100CV'] },
       { name: 'Duster', versions: ['1.0 TCe 90CV', '1.3 TCe 130CV', '1.3 TCe 150CV 4x4', '1.5 Blue dCi 95CV', '1.5 Blue dCi 115CV 4x4'] },
@@ -79,6 +114,27 @@ export const vehiclesDb = [
       { name: 'Logan MCV', versions: ['1.0 SCe 75CV', '1.5 Blue dCi 95CV'] },
       { name: 'Spring', versions: ['Electric 45CV', 'Electric Extreme 65CV'] },
       { name: 'Jogger', versions: ['1.0 TCe 110CV', '1.0 TCe 110CV Bi-fuel', 'Hybrid 140CV'] },
+    ]
+  },
+
+  {
+    brand: 'DS Automobiles', type: 'car', models: [
+      { name: 'DS 3', versions: ['1.2 PureTech 100CV', '1.2 PureTech 130CV', '1.5 BlueHDI 100CV', 'E-Tense Electric 136CV'] },
+      { name: 'DS 4', versions: ['1.2 PureTech 130CV', '1.6 PureTech 180CV', '1.5 BlueHDI 130CV', 'E-Tense PHEV 225CV', 'E-Tense 4x4 PHEV 300CV'] },
+      { name: 'DS 7', versions: ['1.2 PureTech 130CV', '1.6 PureTech 180CV', '1.5 BlueHDI 130CV', '2.0 BlueHDI 180CV', 'E-Tense PHEV 225CV', 'E-Tense 4x4 PHEV 300CV', 'E-Tense 4x4 360 PHEV 360CV'] },
+      { name: 'DS 9', versions: ['1.6 PureTech 225CV', 'E-Tense PHEV 225CV', 'E-Tense 4x4 PHEV 360CV'] },
+    ]
+  },
+
+  {
+    brand: 'Ferrari', type: 'car', models: [
+      { name: 'Roma', versions: ['Roma 3.9 V8 Turbo 620CV', 'Roma Spider 3.9 V8 Turbo 620CV'] },
+      { name: 'Portofino M', versions: ['Portofino M 3.9 V8 Turbo 620CV'] },
+      { name: '296 GTB', versions: ['296 GTB 3.0 V6 PHEV 830CV', '296 GTS 3.0 V6 PHEV 830CV', '296 GT3'] },
+      { name: 'F8 Tributo', versions: ['F8 Tributo 3.9 V8 Turbo 720CV', 'F8 Spider 3.9 V8 Turbo 720CV'] },
+      { name: 'SF90 Stradale', versions: ['SF90 Stradale PHEV 1000CV', 'SF90 Spider PHEV 1000CV', 'SF90 XX Stradale PHEV 1030CV', 'SF90 XX Spider PHEV 1030CV'] },
+      { name: '812 Superfast', versions: ['812 Superfast 6.5 V12 800CV', '812 GTS 6.5 V12 800CV', '812 Competizione 6.5 V12 830CV'] },
+      { name: 'Purosangue', versions: ['Purosangue 6.5 V12 725CV'] },
     ]
   },
 
@@ -114,6 +170,21 @@ export const vehiclesDb = [
   },
 
   {
+    brand: 'Genesis', type: 'car', models: [
+      { name: 'GV60', versions: ['GV60 Standard RWD 228CV', 'GV60 Long Range RWD 228CV', 'GV60 Long Range AWD 320CV', 'GV60 Performance AWD 490CV'] },
+      { name: 'GV70', versions: ['GV70 2.0T 304CV AWD', 'GV70 2.5T 304CV AWD', 'GV70 3.5T 380CV AWD', 'GV70 PHEV AWD 442CV', 'GV70 Electrified AWD 490CV'] },
+      { name: 'GV80', versions: ['GV80 2.5T 304CV AWD', 'GV80 3.5T 380CV AWD', 'GV80 3.5T Sport 380CV AWD'] },
+    ]
+  },
+
+  {
+    brand: 'GWM Ora', type: 'car', models: [
+      { name: '03', versions: ['03 Electric Standard Range 143CV', '03 Electric Long Range 171CV'] },
+      { name: 'Funky Cat', versions: ['Funky Cat Electric 171CV 48kWh', 'Funky Cat Electric Extended Range 171CV 63kWh'] },
+    ]
+  },
+
+  {
     brand: 'Honda', type: 'car', models: [
       { name: 'Jazz', versions: ['1.3 i-VTEC 102CV', '1.5 i-MMD Hybrid 109CV', '1.5 i-MMD Hybrid Crosstar 109CV'] },
       { name: 'Civic', versions: ['1.0 VTEC 129CV', '1.5 VTEC 182CV', '1.6 i-DTEC 120CV', 'e:HEV 184CV', 'Type R 2.0 VTEC 330CV'] },
@@ -133,6 +204,17 @@ export const vehiclesDb = [
       { name: 'Santa Fe', versions: ['1.6 T-GDI Hybrid 230CV AWD', '1.6 T-GDI PHEV 265CV AWD', '2.0 CRDi 186CV 4WD'] },
       { name: 'IONIQ 5', versions: ['RWD 170CV', 'RWD 217CV', 'AWD 305CV', 'N AWD 650CV'] },
       { name: 'IONIQ 6', versions: ['RWD 151CV', 'RWD 228CV', 'AWD 325CV'] },
+    ]
+  },
+
+  {
+    brand: 'Jaguar', type: 'car', models: [
+      { name: 'E-Pace', versions: ['E-Pace 1.5 PHEV 300CV', 'E-Pace P200 2.0 200CV AWD', 'E-Pace P250 2.0 249CV AWD', 'E-Pace D165 2.0 165CV', 'E-Pace D200 2.0 204CV AWD'] },
+      { name: 'F-Pace', versions: ['F-Pace P250 2.0 249CV AWD', 'F-Pace P300 2.0 300CV AWD', 'F-Pace P400e PHEV 404CV AWD', 'F-Pace D165 2.0 165CV', 'F-Pace D200 2.0 204CV AWD', 'F-Pace D300 3.0 300CV AWD'] },
+      { name: 'F-Pace SVR', versions: ['F-Pace SVR 5.0 V8 550CV AWD'] },
+      { name: 'I-Pace', versions: ['I-Pace EV400 AWD 400CV', 'I-Pace HSE EV400 AWD 400CV', 'I-Pace S EV400 AWD 400CV'] },
+      { name: 'XE', versions: ['XE P200 2.0 200CV', 'XE P250 2.0 250CV AWD', 'XE D180 2.0 180CV', 'XE D200 2.0 204CV AWD'] },
+      { name: 'XF', versions: ['XF P250 2.0 250CV', 'XF P300 2.0 300CV AWD', 'XF D200 2.0 204CV', 'XF D300 3.0 300CV AWD'] },
     ]
   },
 
@@ -160,10 +242,60 @@ export const vehiclesDb = [
   },
 
   {
+    brand: 'Lamborghini', type: 'car', models: [
+      { name: 'Huracán EVO', versions: ['Huracán EVO 5.2 V10 640CV', 'Huracán EVO Spyder 5.2 V10 640CV', 'Huracán EVO RWD 5.2 V10 610CV', 'Huracán EVO RWD Spyder 5.2 V10 610CV'] },
+      { name: 'Huracán STO', versions: ['Huracán STO 5.2 V10 640CV'] },
+      { name: 'Urus', versions: ['Urus 4.0 V8 Biturbo 650CV', 'Urus S 4.0 V8 Biturbo 666CV'] },
+      { name: 'Urus Performante', versions: ['Urus Performante 4.0 V8 Biturbo 666CV'] },
+      { name: 'Revuelto', versions: ['Revuelto V12 PHEV 1015CV'] },
+    ]
+  },
+
+  {
     brand: 'Lancia', type: 'car', models: [
       { name: 'Ypsilon', versions: ['1.0 FireFly Hybrid 70CV', '1.2 69CV', '0.9 TwinAir 85CV', '1.3 MultiJet 75CV', '1.3 MultiJet 95CV'] },
       { name: 'Delta', versions: ['1.4 MultiAir 140CV', '1.4 MultiAir 165CV', '1.6 MultiJet 120CV', '1.9 MultiJet 190CV', '2.0 MultiJet 165CV'] },
       { name: 'Musa', versions: ['1.3 MultiJet 90CV', '1.4 95CV'] },
+    ]
+  },
+
+  {
+    brand: 'Land Rover', type: 'car', models: [
+      { name: 'Defender 90', versions: ['Defender 90 P300 2.0 300CV', 'Defender 90 P400 3.0 400CV AWD', 'Defender 90 D200 2.0 200CV AWD', 'Defender 90 D250 3.0 249CV AWD', 'Defender 90 D300 3.0 300CV AWD', 'Defender 90 P400e PHEV 404CV AWD', 'Defender 90 V8 5.0 525CV AWD'] },
+      { name: 'Defender 110', versions: ['Defender 110 P300 2.0 300CV', 'Defender 110 P400 3.0 400CV AWD', 'Defender 110 D200 2.0 200CV AWD', 'Defender 110 D250 3.0 249CV AWD', 'Defender 110 D300 3.0 300CV AWD', 'Defender 110 P400e PHEV 404CV AWD', 'Defender 110 V8 5.0 525CV AWD'] },
+      { name: 'Discovery Sport', versions: ['D165 2.0 165CV', 'D200 2.0 200CV AWD', 'P200 2.0 200CV', 'P250 2.0 250CV AWD', 'P300e PHEV 309CV AWD'] },
+      { name: 'Discovery 5', versions: ['D250 3.0 249CV AWD', 'D300 3.0 300CV AWD', 'P360 3.0 360CV AWD', 'P360e PHEV 440CV AWD'] },
+      { name: 'Range Rover Evoque', versions: ['D165 2.0 165CV', 'D200 2.0 200CV AWD', 'P200 2.0 200CV', 'P250 2.0 250CV AWD', 'P300e PHEV 309CV AWD'] },
+      { name: 'Range Rover Velar', versions: ['D200 2.0 200CV AWD', 'D300 3.0 300CV AWD', 'P250 2.0 250CV AWD', 'P380 3.0 380CV AWD', 'P400e PHEV 404CV AWD'] },
+      { name: 'Range Rover Sport', versions: ['D250 3.0 249CV AWD', 'D300 3.0 300CV AWD', 'P360 3.0 360CV AWD', 'P400 3.0 400CV AWD', 'P510e PHEV 510CV AWD', 'SVR 5.0 V8 575CV AWD'] },
+      { name: 'Range Rover', versions: ['D250 3.0 249CV AWD', 'D300 3.0 300CV AWD', 'D350 3.0 350CV AWD', 'P400 3.0 400CV AWD', 'P530 4.4 V8 530CV AWD', 'P510e PHEV 510CV AWD', 'P616 SV 4.4 V8 616CV AWD'] },
+    ]
+  },
+
+  {
+    brand: 'Lexus', type: 'car', models: [
+      { name: 'UX', versions: ['UX 250h Hybrid 184CV', 'UX 250h AWD Hybrid 184CV', 'UX 300e Electric 204CV'] },
+      { name: 'NX', versions: ['NX 250 2.5 204CV', 'NX 350 2.4T 279CV AWD', 'NX 350h Hybrid 243CV AWD', 'NX 450h+ PHEV 309CV AWD'] },
+      { name: 'RX', versions: ['RX 350h Hybrid 246CV AWD', 'RX 450h+ PHEV 309CV AWD', 'RX 500h F Sport PHEV 371CV AWD'] },
+      { name: 'ES', versions: ['ES 300h Hybrid 218CV'] },
+      { name: 'IS', versions: ['IS 300h Hybrid 223CV', 'IS 300 AWD 241CV', 'IS 350 AWD 316CV'] },
+      { name: 'LC', versions: ['LC 500h 3.5 V6 Hybrid 359CV', 'LC 500 5.0 V8 477CV'] },
+    ]
+  },
+
+  {
+    brand: 'Lynk & Co', type: 'car', models: [
+      { name: '01', versions: ['01 PHEV 1.5T 262CV AWD', '01 2.0T 190CV AWD'] },
+    ]
+  },
+
+  {
+    brand: 'Maserati', type: 'car', models: [
+      { name: 'Ghibli', versions: ['Ghibli 2.0 Mild Hybrid 330CV', 'Ghibli 3.0 V6 350CV', 'Ghibli 3.0 V6 430CV Q4 AWD', 'Ghibli Trofeo 3.8 V8 580CV'] },
+      { name: 'Levante', versions: ['Levante 2.0 Mild Hybrid 330CV', 'Levante 3.0 V6 350CV', 'Levante 3.0 V6 430CV Q4 AWD', 'Levante Trofeo 3.8 V8 580CV'] },
+      { name: 'Grecale', versions: ['Grecale 2.0 MHEV 300CV AWD', 'Grecale GT 2.0 MHEV 300CV AWD', 'Grecale Modena 2.0 MHEV 330CV AWD', 'Grecale Trofeo 3.0 V6 530CV AWD', 'Grecale Folgore Electric AWD 557CV'] },
+      { name: 'GranTurismo', versions: ['GranTurismo Modena 3.0 V6 490CV', 'GranTurismo Trofeo 3.0 V6 550CV', 'GranTurismo Folgore Electric AWD 761CV'] },
+      { name: 'MC20', versions: ['MC20 3.0 V6 Nettuno 630CV', 'MC20 Cielo 3.0 V6 Nettuno 630CV', 'MC20 Folgore Electric AWD 761CV'] },
     ]
   },
 
@@ -194,11 +326,28 @@ export const vehiclesDb = [
   },
 
   {
+    brand: 'MG', type: 'car', models: [
+      { name: 'ZS EV', versions: ['ZS EV Standard Range 177CV', 'ZS EV Long Range 177CV'] },
+      { name: 'HS PHEV', versions: ['HS PHEV 258CV AWD'] },
+      { name: 'MG4', versions: ['MG4 Electric Standard 170CV 51kWh', 'MG4 Electric Long Range 204CV 64kWh', 'MG4 Electric XPower AWD 435CV 64kWh'] },
+      { name: 'MG5', versions: ['MG5 Electric Standard Range 156CV', 'MG5 Electric Long Range 156CV'] },
+    ]
+  },
+
+  {
     brand: 'Mini', type: 'car', models: [
       { name: 'Cooper', versions: ['One 102CV', 'One D 95CV', 'Cooper 136CV', 'Cooper D 116CV', 'Cooper S 178CV', 'Cooper SD 150CV', 'John Cooper Works 231CV', 'Electric 184CV'] },
       { name: 'Cooper Cabrio', versions: ['One 102CV', 'Cooper 136CV', 'Cooper S 178CV', 'JCW 231CV'] },
       { name: 'Countryman', versions: ['One 102CV', 'Cooper 136CV', 'Cooper D 116CV', 'Cooper S 178CV', 'Cooper SD 150CV', 'Cooper SE ALL4 PHEV 224CV', 'JCW 306CV'] },
       { name: 'Clubman', versions: ['One D 95CV', 'Cooper 136CV', 'Cooper D 116CV', 'Cooper S 178CV', 'Cooper SD 150CV', 'JCW ALL4 306CV'] },
+    ]
+  },
+
+  {
+    brand: 'Mitsubishi', type: 'car', models: [
+      { name: 'ASX', versions: ['ASX 1.0 T 100CV', 'ASX 1.3 MHEV 140CV', 'ASX 1.6 Hybrid 143CV', 'ASX 1.3 PHEV 158CV'] },
+      { name: 'Eclipse Cross', versions: ['Eclipse Cross 1.5 T 163CV AWD', 'Eclipse Cross PHEV 188CV AWD'] },
+      { name: 'Outlander PHEV', versions: ['Outlander PHEV 2.4 PHEV 224CV AWD', 'Outlander PHEV 2.4 PHEV 248CV AWD'] },
     ]
   },
 
@@ -237,6 +386,25 @@ export const vehiclesDb = [
   },
 
   {
+    brand: 'Polestar', type: 'car', models: [
+      { name: 'Polestar 2', versions: ['Polestar 2 Standard Range RWD 231CV', 'Polestar 2 Long Range RWD 299CV', 'Polestar 2 Long Range AWD 408CV', 'Polestar 2 BST Edition 476CV AWD'] },
+      { name: 'Polestar 3', versions: ['Polestar 3 Long Range AWD 489CV', 'Polestar 3 Long Range AWD Plus Pack 489CV'] },
+    ]
+  },
+
+  {
+    brand: 'Porsche', type: 'car', models: [
+      { name: '911 Carrera', versions: ['911 Carrera 3.0 385CV', '911 Carrera Cabriolet 3.0 385CV', '911 Carrera S 3.0 450CV', '911 Carrera S Cabriolet 3.0 450CV', '911 Carrera 4S 3.0 450CV AWD', '911 Carrera GTS 3.0 480CV', '911 Carrera GTS Cabriolet 3.0 480CV', '911 Turbo 3.8 580CV AWD', '911 Turbo Cabriolet 3.8 580CV AWD', '911 Turbo S 3.8 650CV AWD', '911 GT3 4.0 510CV', '911 GT3 RS 4.0 525CV', '911 GT3 Touring 4.0 510CV'] },
+      { name: 'Cayenne', versions: ['Cayenne 3.0 353CV AWD', 'Cayenne S 2.9 V6 440CV AWD', 'Cayenne GTS 4.0 V8 460CV AWD', 'Cayenne Turbo 4.0 V8 550CV AWD', 'Cayenne Turbo GT 4.0 V8 640CV AWD'] },
+      { name: 'Cayenne E-Hybrid', versions: ['Cayenne E-Hybrid 3.0 PHEV 470CV AWD', 'Cayenne S E-Hybrid 2.9 PHEV 519CV AWD', 'Cayenne Turbo S E-Hybrid 4.0 PHEV 700CV AWD'] },
+      { name: 'Macan', versions: ['Macan 2.0 265CV AWD', 'Macan S 2.9 V6 380CV AWD', 'Macan GTS 2.9 V6 440CV AWD', 'Macan Turbo 2.9 V6 440CV AWD'] },
+      { name: 'Macan Electric', versions: ['Macan Electric RWD 408CV', 'Macan 4 Electric AWD 516CV', 'Macan Turbo Electric AWD 639CV'] },
+      { name: 'Panamera', versions: ['Panamera 2.9 V6 330CV', 'Panamera S 2.9 V6 440CV', 'Panamera GTS 4.0 V8 480CV', 'Panamera Turbo S 4.0 V8 630CV', 'Panamera 4S E-Hybrid 2.9 PHEV 560CV', 'Panamera Turbo S E-Hybrid 4.0 PHEV 700CV'] },
+      { name: 'Taycan', versions: ['Taycan RWD 408CV', 'Taycan 4S AWD 530CV', 'Taycan GTS AWD 598CV', 'Taycan Turbo AWD 680CV', 'Taycan Turbo S AWD 761CV', 'Taycan Cross Turismo 4S AWD 530CV', 'Taycan Sport Turismo GTS AWD 598CV'] },
+    ]
+  },
+
+  {
     brand: 'Renault', type: 'car', models: [
       { name: 'Twingo', versions: ['1.0 SCe 65CV', '1.0 SCe 75CV', 'Electric 82CV'] },
       { name: 'Clio', versions: ['1.0 SCe 65CV', '1.0 TCe 90CV', '1.0 TCe 100CV', '1.5 Blue dCi 85CV', '1.5 Blue dCi 100CV', 'E-Tech Hybrid 140CV', 'R.S. Line 1.0 TCe 90CV'] },
@@ -269,6 +437,13 @@ export const vehiclesDb = [
       { name: 'Karoq', versions: ['1.0 TSI 115CV', '1.5 TSI 150CV', '2.0 TSI 190CV 4x4', '1.6 TDI 116CV', '2.0 TDI 150CV', '2.0 TDI 190CV 4x4'] },
       { name: 'Kodiaq', versions: ['1.5 TSI 150CV', '2.0 TSI 190CV 4x4', '2.0 TSI 245CV 4x4', '2.0 TDI 150CV', '2.0 TDI 200CV 4x4', 'RS 2.0 TSI 245CV 4x4'] },
       { name: 'Enyaq iV', versions: ['iV 60 177CV', 'iV 80 204CV', 'iV 80x 265CV 4x4', 'RS iV 299CV 4x4', 'Coupe RS iV 299CV 4x4'] },
+    ]
+  },
+
+  {
+    brand: 'Smart', type: 'car', models: [
+      { name: 'EQ fortwo', versions: ['EQ fortwo Electric 82CV', 'EQ fortwo Cabrio Electric 82CV', 'EQ fortwo Pulse 82CV'] },
+      { name: 'EQ forfour', versions: ['EQ forfour Electric 82CV', 'EQ forfour Pulse 82CV'] },
     ]
   },
 
@@ -348,6 +523,51 @@ export const vehiclesDb = [
   // ─── MOTOCICLI ─────────────────────────────────────────────────────────────
 
   {
+    brand: 'Aprilia', type: 'moto', models: [
+      { name: 'RS 660', versions: ['RS 660', 'RS 660 Extrema'] },
+      { name: 'Tuono 660', versions: ['Tuono 660', 'Tuono 660 Factory'] },
+      { name: 'RSV4', versions: ['RSV4 1100', 'RSV4 Factory 1100', 'RSV4 XTrenta'] },
+      { name: 'Tuono V4', versions: ['Tuono V4 1100', 'Tuono V4 Factory 1100'] },
+      { name: 'Dorsoduro', versions: ['Dorsoduro 900', 'Dorsoduro 1200'] },
+      { name: 'Shiver', versions: ['Shiver 900'] },
+    ]
+  },
+
+  {
+    brand: 'Benelli', type: 'moto', models: [
+      { name: 'TRK 502', versions: ['TRK 502 500cc', 'TRK 502 X 500cc', 'TRK 502 X ABS'] },
+      { name: 'TRK 702', versions: ['TRK 702 700cc', 'TRK 702 X 700cc'] },
+      { name: 'Leoncino 500', versions: ['Leoncino 500 ABS', 'Leoncino 500 Trail ABS'] },
+      { name: '302R', versions: ['302R 300cc ABS'] },
+      { name: '752S', versions: ['752S 750cc ABS'] },
+    ]
+  },
+
+  {
+    brand: 'BMW Motorrad', type: 'moto', models: [
+      { name: 'R 1250 GS', versions: ['R 1250 GS', 'R 1250 GS Adventure', 'R 1250 GS Triple Black'] },
+      { name: 'R 1250 RT', versions: ['R 1250 RT'] },
+      { name: 'R 1250 RS', versions: ['R 1250 RS', 'R 1250 RS Sport'] },
+      { name: 'R 1250 R', versions: ['R 1250 R', 'R 1250 R Roadster'] },
+      { name: 'S 1000 RR', versions: ['S 1000 RR', 'S 1000 RR M Sport'] },
+      { name: 'S 1000 R', versions: ['S 1000 R', 'S 1000 R Sport'] },
+      { name: 'S 1000 XR', versions: ['S 1000 XR'] },
+      { name: 'F 900 R', versions: ['F 900 R', 'F 900 XR'] },
+      { name: 'F 850 GS', versions: ['F 850 GS', 'F 850 GS Adventure'] },
+      { name: 'G 310 R', versions: ['G 310 R ABS', 'G 310 GS ABS'] },
+    ]
+  },
+
+  {
+    brand: 'CFMoto', type: 'moto', models: [
+      { name: '700CL-X', versions: ['700CL-X Sport 693cc', 'CL-X Heritage 693cc', 'CL-X Adventure 693cc'] },
+      { name: '800MT', versions: ['800MT Sport 799cc', '800MT Touring 799cc', '800MT Explore 799cc'] },
+      { name: '450SR', versions: ['450SR 449cc ABS'] },
+      { name: '300NK', versions: ['300NK 292cc ABS'] },
+    ]
+  },
+
+  {
     brand: 'Ducati', type: 'moto', models: [
       { name: 'Monster', versions: ['Monster 937', 'Monster 1200', 'Monster 821', 'Monster 696', 'Monster SP 937'] },
       { name: 'Panigale', versions: ['Panigale V2 955', 'Panigale V4 1103', 'Panigale V4 S', 'Panigale V4 R', 'Panigale V4 SP2'] },
@@ -356,6 +576,19 @@ export const vehiclesDb = [
       { name: 'Streetfighter', versions: ['V2 955', 'V4 1103', 'V4 S', 'V4 SP2'] },
       { name: 'Diavel', versions: ['Diavel V4 1158'] },
       { name: 'Hypermotard', versions: ['698 Mono', '950', '950 SP', '950 RVE'] },
+    ]
+  },
+
+  {
+    brand: 'Harley-Davidson', type: 'moto', models: [
+      { name: 'Sportster S', versions: ['Sportster S 1250cc 121CV'] },
+      { name: 'Nightster', versions: ['Nightster 975cc 90CV', 'Nightster Special 975cc 90CV'] },
+      { name: 'Pan America', versions: ['Pan America 1250 150CV', 'Pan America 1250 Special 150CV'] },
+      { name: 'Street Glide', versions: ['Street Glide 114ci 1868cc', 'Street Glide ST 117ci 1923cc', 'Street Glide CVO 121ci 1978cc'] },
+      { name: 'Road Glide', versions: ['Road Glide 114ci 1868cc', 'Road Glide ST 117ci 1923cc', 'Road Glide CVO 121ci 1978cc'] },
+      { name: 'Fat Boy', versions: ['Fat Boy 114ci 1868cc', 'Fat Boy 114ci Anniversary'] },
+      { name: 'Softail Standard', versions: ['Softail Standard 107ci 1745cc', 'Softail Standard 114ci 1868cc'] },
+      { name: 'Iron 883', versions: ['Iron 883 883cc 50CV'] },
     ]
   },
 
@@ -375,6 +608,25 @@ export const vehiclesDb = [
   },
 
   {
+    brand: 'Husqvarna', type: 'moto', models: [
+      { name: 'Svartpilen 401', versions: ['Svartpilen 401 373cc ABS'] },
+      { name: 'Svartpilen 801', versions: ['Svartpilen 801 799cc ABS'] },
+      { name: 'Vitpilen 401', versions: ['Vitpilen 401 373cc ABS'] },
+      { name: 'Vitpilen 701', versions: ['Vitpilen 701 693cc ABS'] },
+      { name: 'Norden 901', versions: ['Norden 901 889cc ABS', 'Norden 901 Expedition 889cc ABS'] },
+    ]
+  },
+
+  {
+    brand: 'Indian Motorcycle', type: 'moto', models: [
+      { name: 'Scout', versions: ['Scout 1133cc 100CV', 'Scout Bobber 1133cc 100CV', 'Scout Bobber Twenty 1133cc 100CV'] },
+      { name: 'Chief', versions: ['Chief 111ci 1811cc', 'Chief Dark Horse 111ci 1811cc', 'Chief Bobber 111ci 1811cc'] },
+      { name: 'Challenger', versions: ['Challenger 108ci 1769cc', 'Challenger Dark Horse 108ci 1769cc', 'Challenger Limited 108ci 1769cc'] },
+      { name: 'FTR', versions: ['FTR 1200 S 1203cc 123CV', 'FTR Rally 1203cc 123CV', 'FTR Sport 1203cc 123CV'] },
+    ]
+  },
+
+  {
     brand: 'Kawasaki', type: 'moto', models: [
       { name: 'Ninja 400', versions: ['Ninja 400 ABS', 'Ninja 400 KRT Edition'] },
       { name: 'Ninja 650', versions: ['Ninja 650 ABS', 'Ninja 650 KRT Edition'] },
@@ -385,6 +637,100 @@ export const vehiclesDb = [
       { name: 'Versys 1000', versions: ['Versys 1000 SE', 'Versys 1000 Grand Tourer SE'] },
       { name: 'Z650', versions: ['Z650 ABS', 'Z650RS'] },
       { name: 'Z1000', versions: ['Z1000 ABS', 'Z1000 SX'] },
+    ]
+  },
+
+  {
+    brand: 'KTM', type: 'moto', models: [
+      { name: 'Duke 125', versions: ['125 Duke ABS'] },
+      { name: 'Duke 390', versions: ['390 Duke ABS'] },
+      { name: 'Duke 790', versions: ['790 Duke', '890 Duke'] },
+      { name: 'Duke 1290', versions: ['1290 Super Duke R', '1290 Super Duke RR'] },
+      { name: 'RC 390', versions: ['RC 390 ABS'] },
+      { name: 'Adventure', versions: ['390 Adventure', '790 Adventure', '890 Adventure', '890 Adventure R', '1290 Super Adventure S', '1290 Super Adventure R'] },
+      { name: 'SMC R', versions: ['690 SMC R ABS', '690 Enduro R'] },
+    ]
+  },
+
+  {
+    brand: 'Kymco', type: 'moto', models: [
+      { name: 'AK 550', versions: ['AK 550 i ABS', 'AK 550 Premium ABS'] },
+      { name: 'Xciting S 400', versions: ['Xciting S 400 i ABS', 'Xciting S 400 TCS ABS'] },
+      { name: 'People GT 300i', versions: ['People GT 300i ABS'] },
+    ]
+  },
+
+  {
+    brand: 'MV Agusta', type: 'moto', models: [
+      { name: 'F3', versions: ['F3 675', 'F3 800', 'F3 RR 800'] },
+      { name: 'F4', versions: ['F4 1000 RC', 'F4 RR'] },
+      { name: 'Brutale', versions: ['Brutale 800 RR', 'Brutale 1000 RS', 'Brutale 1000 RR', 'Brutale 1000 Nürburgring'] },
+      { name: 'Turismo Veloce', versions: ['800 Rosso', '800 Lusso', '800 RC SCS'] },
+    ]
+  },
+
+  {
+    brand: 'Norton', type: 'moto', models: [
+      { name: 'Commando 961', versions: ['Commando 961 Sport 961cc 80CV', 'Commando 961 Café Racer 961cc 80CV', 'Commando 961 CR 961cc 80CV'] },
+      { name: 'Atlas', versions: ['Atlas Ranger 650cc 84CV', 'Atlas Nomad 650cc 84CV'] },
+      { name: 'V4CR', versions: ['V4CR 1200cc 185CV'] },
+    ]
+  },
+
+  {
+    brand: 'Piaggio', type: 'moto', models: [
+      { name: 'Liberty', versions: ['Liberty 50 iGet ABS', 'Liberty 125 iGet ABS 15CV', 'Liberty 125 S iGet ABS 15CV'] },
+      { name: 'MP3', versions: ['MP3 400 HPE Sport ABS 35CV', 'MP3 530 HPE Sport ABS 44CV', 'MP3 530 HPE Exclusive ABS 44CV'] },
+      { name: 'Beverly', versions: ['Beverly 300 HPE ABS 25CV', 'Beverly 400 HPE ABS 35CV', 'Beverly 400 HPE S ABS 35CV'] },
+    ]
+  },
+
+  {
+    brand: 'Royal Enfield', type: 'moto', models: [
+      { name: 'Meteor 350', versions: ['Meteor 350 Fireball 349cc 20CV', 'Meteor 350 Stellar 349cc 20CV', 'Meteor 350 Supernova 349cc 20CV'] },
+      { name: 'Classic 350', versions: ['Classic 350 349cc 20CV', 'Classic 350 Signals 349cc 20CV', 'Classic 350 Chrome 349cc 20CV'] },
+      { name: 'Himalayan 450', versions: ['Himalayan 452cc 40CV'] },
+      { name: 'Continental GT 650', versions: ['Continental GT 650 648cc 47CV', 'Continental GT 650 Chrome 648cc 47CV'] },
+      { name: 'Interceptor 650', versions: ['Interceptor 650 648cc 47CV', 'Interceptor 650 Chrome 648cc 47CV'] },
+      { name: 'Hunter 350', versions: ['Hunter 350 349cc 20CV Metro', 'Hunter 350 349cc 20CV Dapper', 'Hunter 350 349cc 20CV Rebel'] },
+    ]
+  },
+
+  {
+    brand: 'Suzuki', type: 'moto', models: [
+      { name: 'GSX-R600', versions: ['GSX-R600 599cc 120CV'] },
+      { name: 'GSX-R750', versions: ['GSX-R750 750cc 150CV'] },
+      { name: 'GSX-R1000', versions: ['GSX-R1000 999cc 199CV', 'GSX-R1000R 999cc 202CV'] },
+      { name: 'Hayabusa', versions: ['Hayabusa 1340cc 190CV'] },
+      { name: 'V-Strom 650', versions: ['V-Strom 650 ABS', 'V-Strom 650XT ABS'] },
+      { name: 'V-Strom 1050', versions: ['V-Strom 1050 ABS', 'V-Strom 1050XT ABS', 'V-Strom 1050DE ABS'] },
+      { name: 'SV650', versions: ['SV650 645cc 76CV ABS', 'SV650X 645cc 76CV ABS'] },
+      { name: 'GSX-S750', versions: ['GSX-S750 749cc 114CV ABS'] },
+      { name: 'GSX-S1000', versions: ['GSX-S1000 999cc 150CV ABS', 'GSX-S1000GT 999cc 150CV ABS', 'GSX-S1000GX 999cc 150CV ABS'] },
+      { name: 'Katana', versions: ['Katana 1000 999cc 150CV ABS'] },
+    ]
+  },
+
+  {
+    brand: 'Triumph', type: 'moto', models: [
+      { name: 'Street Triple', versions: ['Street Triple 765 R 765cc 118CV', 'Street Triple 765 RS 765cc 130CV', 'Street Triple 765 Moto2 Edition 130CV'] },
+      { name: 'Tiger 900', versions: ['Tiger 900 888cc 95CV', 'Tiger 900 GT Pro 888cc 95CV', 'Tiger 900 Rally Pro 888cc 95CV', 'Tiger 900 GT Low 888cc 95CV'] },
+      { name: 'Tiger 1200', versions: ['Tiger 1200 GT Explorer 1160cc 150CV', 'Tiger 1200 GT Pro 1160cc 150CV', 'Tiger 1200 Rally Explorer 1160cc 150CV', 'Tiger 1200 Rally Pro 1160cc 150CV'] },
+      { name: 'Bonneville T120', versions: ['Bonneville T120 1200cc 80CV', 'Bonneville T120 Black 1200cc 80CV'] },
+      { name: 'Thruxton RS', versions: ['Thruxton RS 1200cc 103CV'] },
+      { name: 'Trident 660', versions: ['Trident 660cc 81CV'] },
+      { name: 'Speed Triple 1200 RS', versions: ['Speed Triple 1200 RS 1160cc 180CV', 'Speed Triple 1200 RR 1160cc 180CV'] },
+      { name: 'Daytona Moto2 765', versions: ['Daytona Moto2 765 765cc 130CV'] },
+      { name: 'Speed Twin', versions: ['Speed Twin 1200 1200cc 100CV', 'Speed Twin 900 900cc 65CV'] },
+    ]
+  },
+
+  {
+    brand: 'Vespa', type: 'moto', models: [
+      { name: 'Primavera', versions: ['Primavera 50 3V iGet ABS', 'Primavera 125 iGet ABS 11CV', 'Primavera 150 iGet ABS 14CV', 'Primavera 125 S iGet ABS 11CV'] },
+      { name: 'GTS', versions: ['GTS 125 SuperTech HPE ABS 15CV', 'GTS 300 HPE ABS 24CV', 'GTS 300 Super HPE ABS 24CV', 'GTS 300 Supersport HPE ABS 24CV'] },
+      { name: 'Sprint', versions: ['Sprint 125 iGet ABS 11CV', 'Sprint 150 iGet ABS 13CV', 'Sprint 125 S iGet ABS 11CV'] },
+      { name: 'GTV', versions: ['GTV 300 HPE ABS 24CV'] },
     ]
   },
 
@@ -405,76 +751,29 @@ export const vehiclesDb = [
   },
 
   {
-    brand: 'KTM', type: 'moto', models: [
-      { name: 'Duke 125', versions: ['125 Duke ABS'] },
-      { name: 'Duke 390', versions: ['390 Duke ABS'] },
-      { name: 'Duke 790', versions: ['790 Duke', '890 Duke'] },
-      { name: 'Duke 1290', versions: ['1290 Super Duke R', '1290 Super Duke RR'] },
-      { name: 'RC 390', versions: ['RC 390 ABS'] },
-      { name: 'Adventure', versions: ['390 Adventure', '790 Adventure', '890 Adventure', '890 Adventure R', '1290 Super Adventure S', '1290 Super Adventure R'] },
-      { name: 'SMC R', versions: ['690 SMC R ABS', '690 Enduro R'] },
-    ]
-  },
-
-  {
-    brand: 'BMW Motorrad', type: 'moto', models: [
-      { name: 'R 1250 GS', versions: ['R 1250 GS', 'R 1250 GS Adventure', 'R 1250 GS Triple Black'] },
-      { name: 'R 1250 RT', versions: ['R 1250 RT'] },
-      { name: 'R 1250 RS', versions: ['R 1250 RS', 'R 1250 RS Sport'] },
-      { name: 'R 1250 R', versions: ['R 1250 R', 'R 1250 R Roadster'] },
-      { name: 'S 1000 RR', versions: ['S 1000 RR', 'S 1000 RR M Sport'] },
-      { name: 'S 1000 R', versions: ['S 1000 R', 'S 1000 R Sport'] },
-      { name: 'S 1000 XR', versions: ['S 1000 XR'] },
-      { name: 'F 900 R', versions: ['F 900 R', 'F 900 XR'] },
-      { name: 'F 850 GS', versions: ['F 850 GS', 'F 850 GS Adventure'] },
-      { name: 'G 310 R', versions: ['G 310 R ABS', 'G 310 GS ABS'] },
-    ]
-  },
-
-  {
-    brand: 'Aprilia', type: 'moto', models: [
-      { name: 'RS 660', versions: ['RS 660', 'RS 660 Extrema'] },
-      { name: 'Tuono 660', versions: ['Tuono 660', 'Tuono 660 Factory'] },
-      { name: 'RSV4', versions: ['RSV4 1100', 'RSV4 Factory 1100', 'RSV4 XTrenta'] },
-      { name: 'Tuono V4', versions: ['Tuono V4 1100', 'Tuono V4 Factory 1100'] },
-      { name: 'Dorsoduro', versions: ['Dorsoduro 900', 'Dorsoduro 1200'] },
-      { name: 'Shiver', versions: ['Shiver 900'] },
-    ]
-  },
-
-  {
-    brand: 'MV Agusta', type: 'moto', models: [
-      { name: 'F3', versions: ['F3 675', 'F3 800', 'F3 RR 800'] },
-      { name: 'F4', versions: ['F4 1000 RC', 'F4 RR'] },
-      { name: 'Brutale', versions: ['Brutale 800 RR', 'Brutale 1000 RS', 'Brutale 1000 RR', 'Brutale 1000 Nürburgring'] },
-      { name: 'Turismo Veloce', versions: ['800 Rosso', '800 Lusso', '800 RC SCS'] },
+    brand: 'Zero Motorcycles', type: 'moto', models: [
+      { name: 'SR/F', versions: ['SR/F Standard Electric 110CV', 'SR/F Premium Electric 110CV'] },
+      { name: 'SR/S', versions: ['SR/S Standard Electric 110CV', 'SR/S Premium Electric 110CV'] },
+      { name: 'DS', versions: ['DS Electric 70CV', 'DSR Electric 70CV', 'DSR/X Electric 80CV'] },
+      { name: 'FXE', versions: ['FXE Electric 46CV'] },
     ]
   },
 
   // ─── FURGONI ───────────────────────────────────────────────────────────────
 
   {
+    brand: 'Citroën', type: 'van', models: [
+      { name: 'Jumper', versions: ['2.0 BlueHDI 110CV', '2.0 BlueHDI 130CV', '2.0 BlueHDI 160CV', 'Electric 120CV'] },
+      { name: 'Dispatch', versions: ['1.5 BlueHDI 100CV', '2.0 BlueHDI 122CV', '2.0 BlueHDI 145CV', '2.0 BlueHDI 180CV', 'Electric 136CV'] },
+      { name: 'Berlingo Van', versions: ['1.2 PureTech 110CV', '1.5 BlueHDI 75CV', '1.5 BlueHDI 100CV', '1.5 BlueHDI 130CV', 'Electric e-Berlingo 136CV'] },
+    ]
+  },
+
+  {
     brand: 'Fiat', type: 'van', models: [
       { name: 'Ducato', versions: ['28 2.2 MultiJet 120CV', '30 2.2 MultiJet 140CV', '35 2.2 MultiJet 140CV', '35 2.3 MultiJet 150CV', '35 2.3 MultiJet 180CV', '35 Electric 122CV'] },
       { name: 'Scudo', versions: ['1.5 BlueHDI 100CV', '2.0 BlueHDI 145CV', '2.0 BlueHDI 180CV', 'Electric 136CV'] },
       { name: 'Doblo Cargo', versions: ['1.3 MultiJet 85CV', '1.6 MultiJet 105CV', '2.0 MultiJet 135CV'] },
-    ]
-  },
-
-  {
-    brand: 'Volkswagen', type: 'van', models: [
-      { name: 'Transporter T6', versions: ['2.0 TDI 84CV', '2.0 TDI 102CV', '2.0 TDI 150CV', '2.0 TDI 198CV 4Motion'] },
-      { name: 'Transporter T6.1', versions: ['2.0 TDI 90CV', '2.0 TDI 110CV', '2.0 TDI 150CV', '2.0 TDI 199CV 4Motion'] },
-      { name: 'Caddy', versions: ['2.0 TDI 75CV', '2.0 TDI 102CV', '2.0 TSI 114CV', '1.5 TSI 114CV', 'Electric 204CV'] },
-      { name: 'Crafter', versions: ['2.0 TDI 102CV', '2.0 TDI 140CV', '2.0 TDI 177CV'] },
-    ]
-  },
-
-  {
-    brand: 'Mercedes-Benz', type: 'van', models: [
-      { name: 'Sprinter', versions: ['314 CDI 143CV', '316 CDI 163CV', '319 CDI 190CV', '316 CDI e Electric'] },
-      { name: 'Vito', versions: ['111 CDI 114CV', '114 CDI 136CV', '116 CDI 163CV', '119 CDI 190CV', '116 e Electric'] },
-      { name: 'Citan', versions: ['108 CDI 75CV', '110 CDI 95CV', '112 CDI 116CV', '110 e Electric'] },
     ]
   },
 
@@ -487,10 +786,67 @@ export const vehiclesDb = [
   },
 
   {
+    brand: 'Iveco', type: 'van', models: [
+      { name: 'Daily 35S', versions: ['Daily 35S12 2.3 HPI 120CV', 'Daily 35S14 2.3 HPI 140CV', 'Daily 35S16 2.3 HPI 160CV', 'Daily 35S18 3.0 HPI 180CV', 'Daily 35S Electric 140CV'] },
+      { name: 'Daily 50C', versions: ['Daily 50C15 2.3 HPI 146CV', 'Daily 50C17 3.0 HPI 170CV', 'Daily 50C21 3.0 HPI 210CV'] },
+      { name: 'Daily 70C', versions: ['Daily 70C17 3.0 HPI 170CV', 'Daily 70C21 3.0 HPI 210CV'] },
+    ]
+  },
+
+  {
+    brand: 'Mercedes-Benz', type: 'van', models: [
+      { name: 'Sprinter', versions: ['314 CDI 143CV', '316 CDI 163CV', '319 CDI 190CV', '316 CDI e Electric'] },
+      { name: 'Vito', versions: ['111 CDI 114CV', '114 CDI 136CV', '116 CDI 163CV', '119 CDI 190CV', '116 e Electric'] },
+      { name: 'Citan', versions: ['108 CDI 75CV', '110 CDI 95CV', '112 CDI 116CV', '110 e Electric'] },
+    ]
+  },
+
+  {
+    brand: 'Nissan', type: 'van', models: [
+      { name: 'NV200', versions: ['NV200 1.5 dCi 90CV', 'NV200 1.5 dCi 110CV', 'e-NV200 Electric 109CV'] },
+      { name: 'NV300', versions: ['NV300 1.6 dCi 95CV', 'NV300 2.0 dCi 120CV', 'NV300 2.0 dCi 145CV', 'NV300 2.0 dCi 170CV'] },
+      { name: 'Interstar', versions: ['Interstar 2.3 dCi 110CV', 'Interstar 2.3 dCi 135CV', 'Interstar 2.3 dCi 150CV', 'Interstar 2.3 dCi 165CV'] },
+    ]
+  },
+
+  {
+    brand: 'Opel', type: 'van', models: [
+      { name: 'Movano', versions: ['Movano 2.3 CDTi 110CV', 'Movano 2.3 CDTi 135CV', 'Movano 2.3 CDTi 150CV', 'Movano 2.3 CDTi 165CV', 'Movano-e Electric 140CV'] },
+      { name: 'Vivaro', versions: ['Vivaro 1.5 D 100CV', 'Vivaro 2.0 D 120CV', 'Vivaro 2.0 D 145CV', 'Vivaro 2.0 D 180CV', 'Vivaro-e Electric 136CV'] },
+      { name: 'Combo Van', versions: ['Combo Cargo 1.2 T 110CV', 'Combo Cargo 1.5 D 75CV', 'Combo Cargo 1.5 D 100CV', 'Combo-e Cargo Electric 136CV'] },
+    ]
+  },
+
+  {
+    brand: 'Peugeot', type: 'van', models: [
+      { name: 'Boxer', versions: ['Boxer 2.0 BlueHDI 110CV', 'Boxer 2.0 BlueHDI 130CV', 'Boxer 2.0 BlueHDI 160CV', 'e-Boxer Electric 120CV'] },
+      { name: 'Expert', versions: ['Expert 1.5 BlueHDI 100CV', 'Expert 2.0 BlueHDI 122CV', 'Expert 2.0 BlueHDI 145CV', 'Expert 2.0 BlueHDI 180CV', 'e-Expert Electric 136CV'] },
+      { name: 'Partner Van', versions: ['Partner 1.2 PureTech 110CV', 'Partner 1.5 BlueHDI 75CV', 'Partner 1.5 BlueHDI 100CV', 'Partner 1.5 BlueHDI 130CV', 'e-Partner Electric 136CV'] },
+    ]
+  },
+
+  {
     brand: 'Renault', type: 'van', models: [
       { name: 'Trafic', versions: ['1.6 dCi 90CV', '1.6 dCi 120CV', '2.0 Blue dCi 120CV', '2.0 Blue dCi 145CV', '2.0 Blue dCi 170CV'] },
       { name: 'Master', versions: ['2.3 dCi 110CV', '2.3 dCi 135CV', '2.3 dCi 150CV', '2.3 dCi 165CV', 'E-TECH Electric'] },
       { name: 'Kangoo Express', versions: ['1.3 TCe 100CV', '1.5 Blue dCi 75CV', '1.5 Blue dCi 95CV', 'E-Tech Electric'] },
+    ]
+  },
+
+  {
+    brand: 'Toyota', type: 'van', models: [
+      { name: 'ProAce', versions: ['ProAce 1.5 D-4D 100CV', 'ProAce 2.0 D-4D 120CV', 'ProAce 2.0 D-4D 150CV', 'ProAce 2.0 D-4D 180CV', 'ProAce Electric 136CV'] },
+      { name: 'ProAce City', versions: ['ProAce City 1.2 T 110CV', 'ProAce City 1.5 D-4D 100CV', 'ProAce City Electric 136CV'] },
+      { name: 'Hiace', versions: ['Hiace 2.8 D-4D 150CV', 'Hiace 2.8 D-4D 150CV LWB', 'Hiace 2.8 D-4D 177CV 4WD'] },
+    ]
+  },
+
+  {
+    brand: 'Volkswagen', type: 'van', models: [
+      { name: 'Transporter T6', versions: ['2.0 TDI 84CV', '2.0 TDI 102CV', '2.0 TDI 150CV', '2.0 TDI 198CV 4Motion'] },
+      { name: 'Transporter T6.1', versions: ['2.0 TDI 90CV', '2.0 TDI 110CV', '2.0 TDI 150CV', '2.0 TDI 199CV 4Motion'] },
+      { name: 'Caddy', versions: ['2.0 TDI 75CV', '2.0 TDI 102CV', '2.0 TSI 114CV', '1.5 TSI 114CV', 'Electric 204CV'] },
+      { name: 'Crafter', versions: ['2.0 TDI 102CV', '2.0 TDI 140CV', '2.0 TDI 177CV'] },
     ]
   },
 
