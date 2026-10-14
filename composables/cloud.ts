@@ -14,6 +14,8 @@ export const FIREBASE_CONFIG = {
   messagingSenderId: '968907722695',
   appId: '1:968907722695:web:be94b7f34c926674c353e2',
 }
+// Il database creato dalla console si chiama "default" (non "(default)", quello predefinito dell'SDK)
+export const FIRESTORE_DB = 'default'
 
 const LINKED_KEY = 'veicoli.cloud' // uid dell'account collegato su questo telefono
 const TS_KEY = 'veicoli.cloud.ts' // ultima versione nota di ogni record
@@ -50,7 +52,7 @@ async function load() {
   const auth = Capacitor.isNativePlatform()
     ? a.initializeAuth(app, { persistence: a.indexedDBLocalPersistence })
     : a.initializeAuth(app, { persistence: [a.indexedDBLocalPersistence, a.browserLocalPersistence], popupRedirectResolver: a.browserPopupRedirectResolver })
-  const fs = f.initializeFirestore(app, { localCache: f.persistentLocalCache(), ignoreUndefinedProperties: true })
+  const fs = f.initializeFirestore(app, { localCache: f.persistentLocalCache(), ignoreUndefinedProperties: true }, FIRESTORE_DB)
   // Solo per le prove automatiche con l'emulatore Firebase
   const emu = localStorage.getItem('veicoli.cloud.emulator')
   if (emu) { a.connectAuthEmulator(auth, `http://${emu}:9099`, { disableWarnings: true }); f.connectFirestoreEmulator(fs, emu, 8080) }
@@ -86,7 +88,7 @@ function fail(e: unknown) {
   cloud.error = explain(e)
   // l'SDK con un database inesistente riprova all'infinito: lo chiedo direttamente al servizio
   if (/timeout|unavailable/i.test(String((e as any)?.code ?? e)) && !localStorage.getItem('veicoli.cloud.emulator')) {
-    fetch(`https://firestore.googleapis.com/v1/projects/${FIREBASE_CONFIG.projectId}/databases/(default)/documents/x/x?key=${FIREBASE_CONFIG.apiKey}`)
+    fetch(`https://firestore.googleapis.com/v1/projects/${FIREBASE_CONFIG.projectId}/databases/${FIRESTORE_DB}/documents/x/x?key=${FIREBASE_CONFIG.apiKey}`)
       .then((r) => r.text())
       .then((t) => { if (/does not exist/i.test(t)) cloud.error = explain({ code: 'not-found' }) })
       .catch(() => {})
@@ -174,10 +176,12 @@ async function startSync(u: string) {
   uid = u
   cloud.status = 'syncing'
   cloud.error = ''
+  if (localStorage.getItem('veicoli.cloud.db') !== FIRESTORE_DB) { localStorage.removeItem(TS_KEY); localStorage.setItem('veicoli.cloud.db', FIRESTORE_DB) }
   try { known = JSON.parse(localStorage.getItem(TS_KEY) ?? '{}') } catch { known = {} }
   const { f } = fb!
   // Primo collegamento su questo telefono: scarico tutto, poi invio solo quello che il cloud non ha ancora
-  const firstKey = `veicoli.cloud.linked.${u}`
+  // legato anche al nome del database: le versioni precedenti scrivevano su "(default)", che non esiste
+  const firstKey = `veicoli.cloud.linked.${FIRESTORE_DB}.${u}`
   if (!localStorage.getItem(firstKey)) {
     for (const t of SYNC_TABLES) {
       // dal server per forza: dalla cache locale vuota sembrerebbe un account senza dati
