@@ -5,16 +5,10 @@
       <NuxtLink to="/report" class="icon-btn" aria-label="Report"><ChartLine :size="20" /></NuxtLink>
     </header>
 
-    <div class="chips" style="margin-bottom: 12px">
-      <button class="chip-btn" :class="{ on: cat === 'all' }" @click="cat = 'all'">Tutte</button>
-      <button v-for="c in EXPENSE_CATS" :key="c.id" class="chip-btn" :class="{ on: cat === c.id }" @click="cat = c.id">{{ c.short }}</button>
-    </div>
-    <div v-if="vehicles.length > 1" class="chips" style="margin-bottom: 12px">
-      <button class="chip-btn" :class="{ on: vehicleId === 'all' }" @click="vehicleId = 'all'">Tutti i veicoli</button>
-      <button v-for="v in vehicles" :key="v.id" class="chip-btn" :class="{ on: vehicleId === v.id }" @click="vehicleId = v.id">{{ vehicleName(v) }}</button>
-    </div>
-    <div class="segmented" style="margin-bottom: 16px">
-      <button v-for="p in PERIODS" :key="p.id" :class="{ on: period === p.id }" @click="period = p.id">{{ p.label }}</button>
+    <div class="filters">
+      <FilterSelect v-model="cat" label="Categoria" default-value="all" :options="[{ value: 'all', label: 'Tutte' }, ...EXPENSE_CATS.map((c) => ({ value: c.id, label: c.short }))]" />
+      <FilterSelect v-model="period" label="Periodo" default-value="1a" :options="PERIODS.map((p) => ({ value: p.id, label: p.label }))" />
+      <FilterSelect v-if="vehicles.length > 1" v-model="vehicleId" class="span" label="Veicolo" default-value="all" :options="[{ value: 'all', label: 'Tutti i veicoli' }, ...vehicles.map((v) => ({ value: v.id, label: vehicleName(v) }))]" />
     </div>
 
     <div class="card total">
@@ -138,6 +132,8 @@ function goAdd(t: (typeof ADD_TYPES)[number]) {
 }
 </script>
 <style scoped>
+.filters { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.filters .span { grid-column: 1 / -1; }
 .total { display: flex; align-items: flex-end; gap: 12px; padding: 20px 20px 18px; }
 .t-lbl { font-size: 13.5px; font-weight: 500; color: var(--text-2); }
 .t-num { font-family: var(--font-display); font-size: 34px; font-weight: 700; color: var(--title); letter-spacing: -.02em; margin: 4px 0 6px; }
@@ -158,9 +154,7 @@ function goAdd(t: (typeof ADD_TYPES)[number]) {
 .amt span { font-size: 11.5px; color: var(--text-3); }
 .exp-ico { width: 44px; height: 44px; flex: none; border-radius: 14px; display: grid; place-items: center; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); border: 1px solid color-mix(in srgb, var(--c) 40%, transparent); box-shadow: 0 0 14px color-mix(in srgb, var(--c) 25%, transparent); }
 .add-btn { position: fixed; left: 16px; right: 16px; max-width: 520px; margin: 0 auto; bottom: calc(var(--nav-h) + var(--safe-bottom) + 20px); z-index: 20; display: flex; align-items: center; justify-content: center; gap: 8px; height: 54px; border-radius: 999px; color: #fff; font-weight: 600; font-size: 16px; cursor: pointer;
-  border: 1px solid rgba(120, 150, 255, .5);
-  background: radial-gradient(120% 200% at 20% 0%, rgba(124, 92, 255, .9), transparent 55%), radial-gradient(120% 200% at 90% 100%, rgba(255, 110, 200, .55), transparent 50%), linear-gradient(90deg, #262a6a, #1b1f50);
-  box-shadow: 0 0 24px -4px rgba(124, 92, 255, .8), 0 14px 26px -10px rgba(10, 10, 40, .6); }
+  border: 0; background: var(--grad-primary); box-shadow: var(--grad-primary-glow), 0 14px 26px -10px rgba(40, 20, 110, .5); }
 .add-btn:active { transform: scale(.98); }
 .scan-doc { margin-bottom: 14px; height: 54px; border-radius: 999px; }
 </style>

@@ -17,12 +17,12 @@ withDefaults(defineProps<{ glow?: 'violet' | 'cyan' | 'amber' | 'teal' | 'rose' 
 .holo-wrap.rose { --g: 255, 92, 138; --g2: 255, 140, 90; }
 .holo-wrap.blue { --g: 70, 120, 255; --g2: 124, 92, 255; }
 .holo-border { padding: 1.2px; background: linear-gradient(225deg, rgba(var(--g), 1) 0%, rgba(var(--g), .35) 22%, rgba(130, 140, 255, .14) 50%, rgba(130, 140, 255, .1) 100%); }
-.holo-in { position: relative; overflow: hidden; color: #eef0ff;
+.holo-in { position: relative; overflow: hidden; color: var(--holo-text);
   background:
     radial-gradient(70% 90% at 108% -8%, rgba(var(--g), .75), rgba(var(--g), .22) 38%, transparent 62%),
     radial-gradient(60% 60% at 0% 110%, rgba(var(--g2), .16), transparent 60%),
-    linear-gradient(165deg, #20255a 0%, #141842 50%, #0d1030 100%); }
-.soft .holo-in { background: radial-gradient(60% 80% at 105% -5%, rgba(var(--g), .45), transparent 60%), linear-gradient(165deg, #20255a 0%, #141842 50%, #0d1030 100%); }
+    var(--holo-base); }
+.soft .holo-in { background: radial-gradient(60% 80% at 105% -5%, rgba(var(--g), .45), transparent 60%), var(--holo-base); }
 /* angolo smussato: corner-shape dove c'è (Chrome 139+), altrimenti angoli arrotondati */
 .tr { border-radius: 18px; border-top-right-radius: var(--cut); corner-top-right-shape: bevel; }
 .both { border-radius: 18px; border-top-left-radius: var(--cut); border-bottom-right-radius: var(--cut); corner-top-left-shape: bevel; corner-bottom-right-shape: bevel; }

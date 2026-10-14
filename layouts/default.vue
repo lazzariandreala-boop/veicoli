@@ -4,8 +4,8 @@
     <nav v-if="showNav" class="nav">
       <svg class="nav-bg" viewBox="0 0 400 96" preserveAspectRatio="none" aria-hidden="true">
         <defs>
-          <linearGradient id="navfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c2148" /><stop offset="1" stop-color="#0b0e26" /></linearGradient>
-          <linearGradient id="navline" x1="0" x2="1"><stop offset="0" stop-color="#5b8cff" stop-opacity=".15" /><stop offset=".5" stop-color="#4fd2ff" /><stop offset="1" stop-color="#5b8cff" stop-opacity=".15" /></linearGradient>
+          <linearGradient id="navfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: var(--nav-1)" /><stop offset="1" style="stop-color: var(--nav-2)" /></linearGradient>
+          <linearGradient id="navline" x1="0" x2="1"><stop offset="0" style="stop-color: var(--nav-line); stop-opacity: .15" /><stop offset=".5" style="stop-color: var(--nav-line)" /><stop offset="1" style="stop-color: var(--nav-line); stop-opacity: .15" /></linearGradient>
         </defs>
         <path d="M0 26 Q0 16 12 16 L130 16 C160 16 165 2 200 2 C235 2 240 16 270 16 L388 16 Q400 16 400 26 L400 96 L0 96 Z" fill="url(#navfill)" />
         <path d="M6 18 L130 16 C160 16 165 2 200 2 C235 2 240 16 270 16 L394 18" fill="none" stroke="url(#navline)" stroke-width="1.6" vector-effect="non-scaling-stroke" />
@@ -41,9 +41,9 @@ const isOn = (to: string) => route.path === to || (to === '/spese' && route.path
   display: grid; grid-template-columns: repeat(5, 1fr); align-items: end;
   height: calc(var(--nav-h) + var(--safe-bottom)); padding: 0 6px calc(var(--safe-bottom) + 8px);
 }
-.nav-bg { position: absolute; left: 0; right: 0; bottom: 0; top: -14px; width: 100%; height: calc(100% + 14px); filter: drop-shadow(0 -6px 18px rgba(20, 30, 90, .35)) drop-shadow(0 -1px 8px rgba(79, 210, 255, .25)); pointer-events: none; }
-.nav-item { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; height: 58px; color: rgba(190, 198, 240, .55); font-size: 11px; font-weight: 600; transition: color .2s; }
+.nav-bg { position: absolute; left: 0; right: 0; bottom: 0; top: -14px; width: 100%; height: calc(100% + 14px); filter: drop-shadow(0 -6px 18px rgba(40, 20, 110, .22)) drop-shadow(0 -1px 8px var(--nav-on-glow)); pointer-events: none; }
+.nav-item { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; height: 58px; color: var(--nav-ico); font-size: 11px; font-weight: 600; transition: color .2s; }
 .ico { display: grid; place-items: center; width: 40px; height: 32px; border-radius: 12px; transition: background .2s, box-shadow .2s, color .2s; }
-.nav-item.on { color: #b9a8ff; }
-.nav-item.on .ico { color: #c3b5ff; background: radial-gradient(circle, rgba(124, 92, 255, .38), rgba(124, 92, 255, 0) 70%); filter: drop-shadow(0 0 8px rgba(140, 110, 255, .9)); }
+.nav-item.on { color: var(--nav-on); }
+.nav-item.on .ico { color: var(--nav-on); background: radial-gradient(circle, rgba(124, 92, 255, .3), rgba(124, 92, 255, 0) 70%); filter: drop-shadow(0 0 8px var(--nav-on-glow)); }
 </style>

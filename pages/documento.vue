@@ -212,11 +212,11 @@ function reset() {
 </script>
 
 <style scoped>
-.intro { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 14px 12px 12px; color: #fff; }
+.intro { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 14px 12px 12px; color: var(--holo-text); }
 .intro h2 { margin: 8px 0 0; font-size: 20px; }
-.intro .muted { color: rgba(225, 228, 255, .75); margin: 0; }
+.intro .muted { color: var(--holo-text-2); margin: 0; }
 .types { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-.type { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 999px; font-size: 12.5px; font-weight: 600; color: #dfe3ff; background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .12); }
+.type { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 999px; font-size: 12.5px; font-weight: 600; color: var(--holo-text-2); background: var(--surface-3); border: 1px solid var(--line-2); }
 .big { height: 58px; border-radius: 999px; font-size: 16.5px; }
 .err { display: flex; gap: 8px; align-items: flex-start; color: var(--danger); font-weight: 600; font-size: 14px; margin: 0; }
 .kinds, .cats { flex-wrap: wrap; overflow: visible; }

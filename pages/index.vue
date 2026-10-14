@@ -154,15 +154,15 @@ async function cloudLogin() {
 .scan { width: 100%; height: 60px; margin-top: 22px; font-size: 16.5px; border-radius: 999px; }
 .scan-hint { margin: 8px 0 0; text-align: center; font-size: 12.5px; color: var(--text-3); }
 .hero-row { position: relative; display: flex; align-items: stretch; min-height: 150px; }
-.stat-tile { position: relative; z-index: 1; width: 52%; padding: 22px 20px; color: #fff;
+.stat-tile { position: relative; z-index: 1; width: 52%; padding: 22px 20px; color: var(--stat-text);
   border-radius: 22px 46px 46px 22px; corner-top-right-shape: bevel; corner-bottom-right-shape: bevel;
-  background: linear-gradient(150deg, #1f7c86 0%, #1b3e66 45%, #1a1d48 100%);
+  background: var(--stat-bg);
   box-shadow: 0 18px 30px -14px rgba(20, 60, 110, .7), inset 0 1px 0 rgba(255, 255, 255, .18); }
 :root[data-theme='dark'] .stat-tile { background: linear-gradient(150deg, rgba(60, 40, 40, .55), rgba(20, 22, 54, .8)); border: 1.5px solid rgba(255, 150, 70, .55); box-shadow: 0 0 22px -6px rgba(255, 140, 60, .6), inset 0 1px 0 rgba(255, 255, 255, .08); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .stat-tile { background: linear-gradient(150deg, rgba(60, 40, 40, .55), rgba(20, 22, 54, .8)); border: 1.5px solid rgba(255, 150, 70, .55); box-shadow: 0 0 22px -6px rgba(255, 140, 60, .6), inset 0 1px 0 rgba(255, 255, 255, .08); } }
 .stat-num { font-family: var(--font-display); font-size: 50px; font-weight: 700; line-height: 1; }
-.stat-lbl { margin-top: 6px; font-size: 15px; color: rgba(235, 240, 255, .9); }
-.stat-sub { margin-top: 10px; font-size: 12px; color: #9ef0ff; font-weight: 600; }
+.stat-lbl { margin-top: 6px; font-size: 15px; opacity: .85; }
+.stat-sub { margin-top: 10px; font-size: 12px; color: var(--stat-sub); font-weight: 600; }
 .feat { position: absolute; right: -8px; top: -14px; bottom: -6px; width: 62%; z-index: 2; display: grid; place-items: center; }
 .feat-art { width: 100%; filter: drop-shadow(0 18px 18px rgba(20, 10, 60, .45)); }
 .feat-photo { width: 92%; margin-left: auto; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 18px; }

@@ -444,8 +444,9 @@ async function exportSheet() {
 
 <style scoped>
 .head-actions { display: inline-flex; gap: 6px; align-items: center; }
-.hero { position: relative; min-height: calc(var(--safe-top) + 300px); color: white; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;
-  background: radial-gradient(70% 55% at 50% 38%, rgba(124, 92, 255, .5), transparent 70%), radial-gradient(60% 40% at 85% 5%, rgba(79, 160, 255, .25), transparent), linear-gradient(180deg, #151a45, #070a1f); border-radius: 0 0 28px 28px; }
+.hero { position: relative; min-height: calc(var(--safe-top) + 300px); color: var(--hero-text); overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;
+  background: var(--hero-bg); border-radius: 0 0 28px 28px; }
+.hero.photo { color: #fff; }
 .hero::after { content: ''; position: absolute; left: 10%; right: 10%; bottom: 0; height: 2px; background: linear-gradient(90deg, transparent, #4fd2ff, #7c5cff, transparent); box-shadow: 0 0 14px #4fd2ff; }
 .hero .cover { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .hero .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(6, 8, 24, .5), transparent 30%, rgba(6, 8, 24, .2) 50%, rgba(6, 8, 24, .92)); }
@@ -455,11 +456,12 @@ async function exportSheet() {
 .hero-bar { position: relative; display: flex; justify-content: space-between; padding: calc(var(--safe-top) + 12px) 16px 0; }
 .glass-btn { width: 42px; height: 42px; border-radius: 14px; border: 1px solid rgba(160, 150, 255, .35); display: grid; place-items: center; color: white; background: rgba(14, 16, 44, .55); backdrop-filter: blur(12px); cursor: pointer; box-shadow: 0 0 12px rgba(124, 92, 255, .25); }
 .hero-info { position: relative; display: flex; align-items: flex-end; gap: 12px; padding: 20px 16px 22px; max-width: 760px; width: 100%; margin: 0 auto; }
-.hero-info h1 { font-size: 30px; font-weight: 700; line-height: 1.1; text-shadow: 0 0 18px rgba(124, 92, 255, .7); }
+.hero-info h1 { font-size: 30px; font-weight: 700; line-height: 1.1; text-shadow: var(--hero-shadow); }
+.hero.photo .hero-info h1 { text-shadow: 0 0 18px rgba(124, 92, 255, .7); }
 .hero-info p { margin: 6px 0 0; opacity: .85; font-size: 14px; }
 .pill { display: inline-flex; gap: 6px; align-items: center; padding: 5px 10px; border-radius: 99px; background: rgba(124, 92, 255, .25); border: 1px solid rgba(160, 150, 255, .45); backdrop-filter: blur(8px); font-size: 12px; font-weight: 700; }
 .pill.dark { background: rgba(0,0,0,.6); }
-.ring { --c: 25, 227, 177; position: relative; flex: none; width: 84px; height: 84px; border: 0; padding: 0; background: none; color: #fff; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ring { --c: 25, 227, 177; position: relative; flex: none; width: 84px; height: 84px; border: 0; padding: 0; background: none; color: inherit; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .ring.warn { --c: 255, 168, 32; }
 .ring.danger { --c: 255, 92, 138; }
 .ring svg { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 0 6px rgba(var(--c), .9)); }
@@ -473,14 +475,14 @@ async function exportSheet() {
 .last-svc { width: 100%; padding: 14px 16px; cursor: pointer; }
 .svc-line { font-size: 12.5px; font-weight: 600; color: var(--accent-2); margin-top: 3px; }
 .vstats { padding: 18px 18px 16px; }
-.vstats h3 { font-size: 17px; color: #fff; margin-bottom: 14px; }
+.vstats h3 { font-size: 17px; color: var(--holo-text); margin-bottom: 14px; }
 .vs-row { --c: 140, 110, 255; display: flex; align-items: center; gap: 14px; padding: 8px 0; }
 .vs-row.bollo { --c: 255, 168, 60; }
 .vs-row.assicurazione { --c: 46, 230, 168; }
 .vs-ico { width: 46px; height: 46px; flex: none; border-radius: 14px; display: grid; place-items: center; color: rgb(var(--c)); background: rgba(var(--c), .14); border: 1px solid rgba(var(--c), .45); box-shadow: 0 0 14px rgba(var(--c), .3); }
-.vs-top { display: flex; justify-content: space-between; gap: 10px; font-size: 14.5px; color: #eef0ff; margin-bottom: 7px; }
+.vs-top { display: flex; justify-content: space-between; gap: 10px; font-size: 14.5px; color: var(--holo-text); margin-bottom: 7px; }
 .vs-top b { font-size: 12.5px; color: rgba(var(--c), 1); font-weight: 700; }
-.vs-bar { height: 6px; border-radius: 99px; background: rgba(255, 255, 255, .1); overflow: hidden; }
+.vs-bar { height: 6px; border-radius: 99px; background: var(--surface-3); overflow: hidden; }
 .vs-bar i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, rgba(var(--c), .7), rgb(var(--c))); box-shadow: 0 0 10px rgba(var(--c), .8); }
 .tab .count { margin-left: 6px; font-size: 11.5px; padding: 1px 7px; border-radius: 99px; background: var(--surface-3); color: var(--text-2); }
 .stat { display: flex; flex-direction: column; gap: 2px; padding: 12px; color: var(--text-3); }

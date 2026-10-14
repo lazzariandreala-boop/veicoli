@@ -1,14 +1,14 @@
 /* Veicoli: palette del mockup (chiaro lavanda / scuro blu notte), vetro e neon. */
 :root {
   --bg: #060a1c;
-  --bg-glow-1: rgba(80, 70, 255, 0.22);
-  --bg-glow-2: rgba(30, 110, 255, 0.16);
-  --bg-glow-3: rgba(124, 92, 255, 0.10);
+  --bg-glow-1: rgba(124, 70, 255, 0.26);
+  --bg-glow-2: rgba(236, 72, 153, 0.16);
+  --bg-glow-3: rgba(20, 200, 190, 0.13);
   --surface: rgba(15, 21, 50, 0.78);
   --surface-solid: #0d1330;
   --surface-2: rgba(24, 32, 72, 0.7);
   --surface-3: rgba(70, 90, 180, 0.18);
-  --card-bg: linear-gradient(165deg, rgba(22, 30, 72, 0.92), rgba(10, 14, 38, 0.94));
+  --card-bg: linear-gradient(165deg, rgba(34, 28, 78, 0.92), rgba(12, 14, 40, 0.94) 60%, rgba(30, 14, 46, 0.94));
   --card-border: rgba(90, 120, 255, 0.22);
   --line: rgba(110, 135, 255, 0.12);
   --line-2: rgba(110, 135, 255, 0.24);
@@ -30,11 +30,18 @@
   --ok-soft: rgba(46, 230, 168, 0.14);
   --warn-soft: rgba(255, 176, 32, 0.15);
   --danger-soft: rgba(255, 92, 138, 0.15);
-  --grad-primary: linear-gradient(120deg, #3d5afe 0%, #5b4dff 55%, #8b5cf6 100%);
-  --grad-primary-glow: 0 0 22px -4px rgba(91, 77, 255, 0.9);
+  --grad-primary: linear-gradient(120deg, #4f5bff 0%, #7c4dff 50%, #d946ef 100%);
+  --grad-primary-glow: 0 0 22px -4px rgba(150, 77, 255, 0.85);
   --chip-bg: rgba(18, 26, 62, 0.85);
   --seg-bg: rgba(14, 20, 50, 0.85);
   --ink: linear-gradient(160deg, #1d2350 0%, #12163a 55%, #0c0f2a 100%);
+  /* schede "olografiche" (veicoli, riquadri in evidenza) e barra in basso */
+  --holo-base: linear-gradient(165deg, #2a2160 0%, #171845 50%, #1a0f35 100%);
+  --hero-bg: radial-gradient(70% 55% at 50% 38%, rgba(150, 92, 255, .55), transparent 70%), radial-gradient(60% 40% at 85% 5%, rgba(236, 72, 153, .28), transparent), radial-gradient(50% 40% at 5% 20%, rgba(20, 200, 190, .18), transparent), linear-gradient(180deg, #1b1650, #0a081f);
+  --hero-text: #fff; --hero-shadow: 0 0 18px rgba(124, 92, 255, .7);
+  --holo-text: #f1f0ff; --holo-text-2: rgba(225, 222, 255, .78);
+  --nav-1: #221c52; --nav-2: #0d0b26; --nav-line: #c56bff; --nav-ico: rgba(200, 192, 245, .55); --nav-on: #d3b8ff; --nav-on-glow: rgba(170, 100, 255, .9);
+  --stat-bg: linear-gradient(150deg, #7b3fe4 0%, #3b2a8f 45%, #1a1d48 100%); --stat-text: #fff; --stat-sub: #ffd6ff;
   --ink-border: rgba(120, 130, 255, 0.22);
   --glass-blur: blur(18px) saturate(1.4);
   --radius: 20px;
@@ -43,8 +50,9 @@
   --shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.85);
   --font: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-display: 'Sora Variable', var(--font);
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  /* su Android la WebView non sempre conosce env(): Capacitor passa i margini delle barre di sistema in --safe-area-inset-* */
+  --safe-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+  --safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
   --nav-h: 76px;
   --series-1: #8a7cf0; --series-2: #199e70; --series-3: #c98500; --series-4: #1f9fd0; --series-5: #d55181;
   color-scheme: dark;
@@ -61,6 +69,13 @@
     --chip-bg: #ebeafb; --seg-bg: #ebeafb;
     --ok: #10b981; --warn: #e89400; --danger: #e5466f;
     --series-1: #6250d6; --series-2: #1baf7a; --series-3: #eda100; --series-4: #2a78d6; --series-5: #e87ba4;
+    --holo-base: linear-gradient(165deg, #ffffff 0%, #f7f5ff 55%, #f1eeff 100%);
+    --hero-bg: radial-gradient(70% 55% at 50% 40%, rgba(150, 120, 255, .45), transparent 70%), radial-gradient(60% 40% at 90% 5%, rgba(255, 170, 220, .55), transparent), linear-gradient(180deg, #ece8ff, #f7f3ff);
+    --hero-text: #17183a; --hero-shadow: none;
+    --holo-text: #17183a; --holo-text-2: #5c6087;
+    --nav-1: #ffffff; --nav-2: #f4f2ff; --nav-line: #a78bfa; --nav-ico: #9096b8; --nav-on: #6d4dff; --nav-on-glow: rgba(124, 92, 255, .35);
+    --stat-bg: linear-gradient(150deg, #e9e4ff 0%, #dcecff 55%, #f6e8ff 100%); --stat-text: #1d1a4a; --stat-sub: #6d4dff;
+    --grad-primary: linear-gradient(120deg, #4f5bff 0%, #7c4dff 55%, #b44dff 100%);
     color-scheme: light;
   }
 }
@@ -74,6 +89,13 @@
   --chip-bg: #ebeafb; --seg-bg: #ebeafb;
   --ok: #10b981; --warn: #e89400; --danger: #e5466f;
   --series-1: #6250d6; --series-2: #1baf7a; --series-3: #eda100; --series-4: #2a78d6; --series-5: #e87ba4;
+  --holo-base: linear-gradient(165deg, #ffffff 0%, #f7f5ff 55%, #f1eeff 100%);
+  --hero-bg: radial-gradient(70% 55% at 50% 40%, rgba(150, 120, 255, .45), transparent 70%), radial-gradient(60% 40% at 90% 5%, rgba(255, 170, 220, .55), transparent), linear-gradient(180deg, #ece8ff, #f7f3ff);
+    --hero-text: #17183a; --hero-shadow: none;
+    --holo-text: #17183a; --holo-text-2: #5c6087;
+  --nav-1: #ffffff; --nav-2: #f4f2ff; --nav-line: #a78bfa; --nav-ico: #9096b8; --nav-on: #6d4dff; --nav-on-glow: rgba(124, 92, 255, .35);
+  --stat-bg: linear-gradient(150deg, #e9e4ff 0%, #dcecff 55%, #f6e8ff 100%); --stat-text: #1d1a4a; --stat-sub: #6d4dff;
+  --grad-primary: linear-gradient(120deg, #4f5bff 0%, #7c4dff 55%, #b44dff 100%);
   color-scheme: light;
 }
 

@@ -43,13 +43,15 @@ const meta = computed(() => {
 .thumb { width: 104px; height: 62px; flex: none; display: grid; place-items: center; }
 .thumb img { max-height: 100%; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .5)); }
 .thumb.photo img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
-.info h3 { font-size: 17px; font-weight: 700; color: #fff; letter-spacing: -0.01em; }
-.plate { margin-top: 4px; font-size: 14px; font-weight: 500; letter-spacing: .04em; color: rgba(225, 228, 255, .78); }
+.info h3 { font-size: 17px; font-weight: 700; color: var(--holo-text); letter-spacing: -0.01em; }
+.plate { margin-top: 4px; font-size: 14px; font-weight: 500; letter-spacing: .04em; color: var(--holo-text-2); }
 .foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 16px 14px; }
-.meta { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: rgba(225, 228, 255, .8); min-width: 0; }
+.meta { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: var(--holo-text-2); min-width: 0; }
 .badge { flex: none; display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 10px; font-size: 12px; font-weight: 700; border: 1px solid; }
 .badge.ok { color: #ffc062; border-color: rgba(255, 168, 60, .45); background: rgba(255, 150, 40, .16); }
 .badge.warn { color: #ff9d57; border-color: rgba(255, 120, 50, .6); background: rgba(255, 110, 40, .2); box-shadow: 0 0 12px rgba(255, 120, 50, .35); }
 .badge.danger { color: #ff8db0; border-color: rgba(255, 92, 138, .6); background: rgba(255, 92, 138, .18); box-shadow: 0 0 12px rgba(255, 92, 138, .35); }
 .badge.off { color: #c8c2ff; border-color: rgba(160, 150, 255, .4); background: rgba(124, 92, 255, .14); }
+@media (prefers-color-scheme: light) { :root:not([data-theme='dark']) .badge.ok { color: #b86a00; background: rgba(255, 160, 40, .14); } }
+:root[data-theme='light'] .badge.ok { color: #b86a00; background: rgba(255, 160, 40, .14); }
 </style>

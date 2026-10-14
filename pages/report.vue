@@ -5,12 +5,9 @@
       <NuxtLink to="/spese" class="icon-btn" aria-label="Spese"><ChevronLeft :size="22" /></NuxtLink>
     </header>
 
-    <div v-if="vehicles.length > 1" class="chips" style="margin-bottom: 12px">
-      <button class="chip-btn" :class="{ on: vehicleId === 'all' }" @click="vehicleId = 'all'">Tutti i veicoli</button>
-      <button v-for="v in vehicles" :key="v.id" class="chip-btn" :class="{ on: vehicleId === v.id }" @click="vehicleId = v.id">{{ vehicleName(v) }}</button>
-    </div>
-    <div class="segmented" style="margin-bottom: 16px">
-      <button v-for="p in PERIODS" :key="p.id" :class="{ on: period === p.id }" @click="period = p.id; sel = -1">{{ p.label }}</button>
+    <div class="filters">
+      <FilterSelect v-model="vehicleId" label="Veicolo" default-value="all" :options="[{ value: 'all', label: vehicles.length > 1 ? 'Tutti i veicoli' : 'Tutti' }, ...vehicles.map((v) => ({ value: v.id, label: vehicleName(v) }))]" />
+      <FilterSelect :model-value="period" label="Periodo" default-value="1a" :options="PERIODS.map((p) => ({ value: p.id, label: p.label }))" @update:model-value="(p: string) => { period = p as Period; sel = -1 }" />
     </div>
 
     <div class="card chart-card">
@@ -171,6 +168,7 @@ const slices = computed(() => {
 })
 </script>
 <style scoped>
+.filters { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
 .chart-card { padding: 18px 16px 14px 18px; }
 .t-lbl { font-size: 13.5px; font-weight: 500; color: var(--text-2); }
 .t-row { display: flex; align-items: baseline; gap: 10px; margin: 4px 0 10px; }

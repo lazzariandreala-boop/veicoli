@@ -22,7 +22,7 @@
         </svg>
         <NuxtLink v-for="o in orbs" :key="o.d.vehicleId + o.d.kind" :to="`/veicoli/${o.d.vehicleId}?tab=scadenze`" class="orb" :class="[o.d.kind, urgency(o.d.days)]"
           :style="{ left: o.x + '%', top: o.y + 'px', width: o.size + 'px', height: o.size + 'px' }">
-          <component :is="ICONS[o.d.kind]" :size="26" class="orb-ico" />
+          <component :is="ICONS[o.d.kind]" :size="19" class="orb-ico" />
           <strong>{{ o.d.label }}</strong>
           <span class="ellipsis">{{ shortName(o.d) }}</span>
           <em>{{ relativeDays(o.d.days) }}</em>
@@ -84,12 +84,12 @@ const shown = computed(() => deadlines.value.filter((d) => filter.value === 'tut
 const soonCount = computed(() => deadlines.value.filter((d) => d.days <= 30).length)
 
 // Posizioni a zig-zag (x in %, y in px) per le sfere collegate
-const SLOTS = [{ x: 68, y: 92 }, { x: 28, y: 196 }, { x: 68, y: 300 }, { x: 30, y: 400 }, { x: 70, y: 500 }]
+const SLOTS = [{ x: 66, y: 62 }, { x: 32, y: 134 }, { x: 66, y: 206 }, { x: 33, y: 276 }, { x: 67, y: 346 }]
 const orbs = computed(() => shown.value.slice(0, 5).map((d, i) => {
-  const size = d.days <= 7 ? 156 : d.days <= 30 ? 146 : d.days <= 90 ? 136 : 128
+  const size = d.days <= 7 ? 112 : d.days <= 30 ? 104 : d.days <= 90 ? 98 : 92
   return { d, size, ...SLOTS[i]! }
 }))
-const orbH = computed(() => (orbs.value.length ? SLOTS[orbs.value.length - 1]!.y + 86 : 0))
+const orbH = computed(() => (orbs.value.length ? SLOTS[orbs.value.length - 1]!.y + 62 : 0))
 const shortName = (d: DeadlineView) => d.vehicle.nickname || d.vehicle.libretto.modello || d.vehicle.plate
 
 const upcoming = computed(() => notificationState.upcoming.slice(0, 8))
@@ -105,10 +105,10 @@ async function enable() {
 onMounted(() => { checkPermission(); syncReminders() })
 </script>
 <style scoped>
-.orbs { position: relative; margin: 18px 0 6px; }
+.orbs { position: relative; margin: 10px 0 4px; }
 .links { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .links line { stroke: rgba(140, 150, 220, .55); stroke-width: 1.4; vector-effect: non-scaling-stroke; }
-.orb { --c: 140, 110, 255; --c2: 220, 210, 255; position: absolute; transform: translate(-50%, -50%); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-align: center; padding: 14px; color: #1b1d3a;
+.orb { --c: 140, 110, 255; --c2: 220, 210, 255; position: absolute; transform: translate(-50%, -50%); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; text-align: center; padding: 10px; color: #1b1d3a;
   background: radial-gradient(circle at 34% 28%, rgba(255, 255, 255, .95) 0%, rgba(var(--c2), .9) 34%, rgba(var(--c), .55) 78%, rgba(var(--c), .75) 100%);
   border: 1.5px solid rgba(255, 255, 255, .8);
   box-shadow: 0 0 30px rgba(var(--c), .55), 0 18px 30px -12px rgba(var(--c), .7), inset 0 -10px 24px rgba(var(--c), .45), inset 0 8px 16px rgba(255, 255, 255, .7);
@@ -118,9 +118,9 @@ onMounted(() => { checkPermission(); syncReminders() })
 .orb.assicurazione { --c: 60, 214, 240; --c2: 205, 247, 255; }
 .orb.revisione { --c: 150, 120, 255; --c2: 228, 220, 255; }
 .orb .orb-ico { color: rgb(var(--c)); filter: saturate(1.4) brightness(.85); }
-.orb strong { font-family: var(--font-display); font-size: 17px; line-height: 1.1; }
-.orb span { font-size: 11px; opacity: .7; max-width: 92%; }
-.orb em { font-style: normal; font-size: 11.5px; font-weight: 700; margin-top: 2px; opacity: .85; }
+.orb strong { font-family: var(--font-display); font-size: 13.5px; line-height: 1.1; }
+.orb span { font-size: 10px; opacity: .7; max-width: 88%; }
+.orb em { font-style: normal; font-size: 10.5px; font-weight: 700; margin-top: 1px; opacity: .85; }
 .orb.danger { box-shadow: 0 0 0 3px rgba(255, 92, 138, .7), 0 0 30px rgba(255, 92, 138, .7), inset 0 -10px 24px rgba(var(--c), .45), inset 0 8px 16px rgba(255, 255, 255, .7); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .orb { color: #fff; background: radial-gradient(circle at 34% 28%, rgba(var(--c), .32) 0%, rgba(14, 18, 44, .9) 62%, rgba(var(--c), .35) 100%); border-color: rgba(var(--c), .85); box-shadow: 0 0 26px rgba(var(--c), .55), inset 0 0 26px rgba(var(--c), .35); } }
 :root[data-theme='dark'] .orb { color: #fff; background: radial-gradient(circle at 34% 28%, rgba(var(--c), .32) 0%, rgba(14, 18, 44, .9) 62%, rgba(var(--c), .35) 100%); border-color: rgba(var(--c), .85); box-shadow: 0 0 26px rgba(var(--c), .55), inset 0 0 26px rgba(var(--c), .35); }
