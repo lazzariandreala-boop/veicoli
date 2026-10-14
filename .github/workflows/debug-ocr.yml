@@ -1,7 +1,9 @@
-name: Debug OCR in emulatore
+name: Prova libretto nell'emulatore Android
 on:
+  workflow_dispatch:
   push:
-    branches: [debug-ocr]
+    branches: [main]
+    paths: ['composables/ocr.ts', 'scripts/copy-ocr-assets.mjs', 'scripts/ci/webview-ocr.cjs', 'package-lock.json']
 jobs:
   emu:
     runs-on: ubuntu-latest
