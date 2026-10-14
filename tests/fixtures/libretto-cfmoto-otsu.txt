@@ -1,0 +1,56 @@
+i  j  la
+LI    i      "" "MO20903VI26 1 -FX74364 |
+| -  EE Se I SUE NI DEI ASSE TTT   (D.1) CFMOTO
+i     i       :       ii     pina        vi                                                                 :
+pi         ER Ii   (D.2) CF800-5H 00 A
+Cas ADI TURE A ZIO    Qu  a  ‘
+ Lia                                (D.3) 800MT                         |
+| M020903VI26 "7 FX74364_    (E) LCEPEYLM8S8018621
+vo               3                      (F.1)
+                     eee seem   (F.2)    413  (F.3)         (G)
+(B) 13.10.2026                          (I) 13.10.2026
+(5) L3e                             :
+(C.2.1) LAZZARI                         (5.1) MOTOCICLO PER TRASPORTO       '
+PERSONE -USO PROPRIO
+| (C.2.2) ANDREA
+(3.2) MO (MOTOCICLO)                |
+NATO IL 20.10.1993 (LZ2NDR93R20A459D)
+A ARZIGNANO (VI)
+(K) OALCE68ESTO1                    |
+(C.2.3) VIA RAFFAELLO 5                     e13*168/2013*02136*02           i
+|         VALDAGNO (VI)                   (L) 2       (N.1)        (N.2)
+(N.3)        (N.4)        (N.5)     :
+(0.1)            (0.2)              |
+(P.1) 799,00 (P.2) 067,00 (P.3) BENZ
+(P.5) 288MW
+(0) 0,1622 (sS.1)   2    (8.2)
+(U.1) 92,00    (U.2)   4625
+|                                         (Vv.1)           (Vv .2)
+(V.3)         (V.5)      i IMPOSTA
+(v.6)           (V.7) 120,0 | DUI O
+(V.9) 134/2014/UE        | SPIA
+Il VIRTLA LI
+e  M020903VI26 ‘ii   FX74364          °  MO20903VI26 ‘i.    Fx74364 |
+COSTRUTTORE: ZHEJIANG CFMOTO POWER
+CO. LTD.                                                                    i
+LUNGHEZZA 2,234 M LARGHEZZA 0,853 M
+ALIMENTAZIONE : BENZINA
+RAPPORTO POTENZA/TARA =   0,219 KW/KG                                       |
+| TIPO CAMBIO: MECCANICO
+| PNEUMATICI:
+A:110/80 R19M/C 59V;
+RISP IL REG 134/2014 (EURO 5+)
+SEGUE PNE:P:150/70 R17M/C 69V
+PNEUMATICI IN ALTERNATIVA:
+A:110/80 R19M/C 41U
+P:150/70 R17M/C 63U
+. SEGUE CATEGORIA INTERNAZIONALE
+| COMPLETA: L3E-A3
+|
+|
+|
+Il
+N. Progressivo PRA 26/0843193R
+Istanza Acquirente del 13-10-2026
+VI1141 i.      Vincoli/Gravami:No___ Foglio _1 di. 1
+

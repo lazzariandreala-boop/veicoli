@@ -1,151 +1,67 @@
-# Veicoli App
+# Veicoli
 
-App Android per la gestione delle scadenze dei veicoli (bollo, assicurazione, revisione)
-con notifiche automatiche 30gg, 15gg e 1gg prima della scadenza.
+App Android (Nuxt 3 + Vue + Capacitor) per gestire auto, moto e altri veicoli: dati del libretto letti in automatico, acquisto e vendita, lavori con foto e fatture, incidenti con foto/video, spese e promemoria delle scadenze.
 
-## Stack
+## Cosa fa
 
-- Vue 3 + Vite (SPA)
-- Pinia (state management)
-- Vue Router 4 (hash mode)
-- Capacitor 6 (wrapper Android)
-- @capacitor/local-notifications
-- @capacitor/preferences (storage persistente)
+- **Più veicoli**, anche venduti, distrutti, rottamati o rubati (restano in archivio con lo storico) e con **targhe precedenti** o vecchie targhe provinciali.
+- **Autocompilazione dal libretto**: fotografa la carta di circolazione o scegli il PDF. La lettura avviene sul telefono, offline (Tesseract OCR con due passaggi di pulizia dell'immagine), e riconosce i codici armonizzati (A, B, C.2.x, D.1–D.3, E, F, G, I, J, K, L, O, P, Q, S, U, V) più le note di pagina 3 (costruttore, misure, pneumatici, classe Euro, progressivo PRA). Facoltativa la *lettura avanzata* con Claude, inserendo una chiave API nelle Impostazioni.
+- **Acquisto** (data, prezzo, venditore, dove, km) e **fine del possesso** (vendita con prezzo e acquirente, distruzione, rottamazione, furto).
+- **Lavori** (tagliandi, gomme, carrozzeria…) con km, costo, officina, foto, video e PDF.
+- **Incidenti**: torto/ragione/concorso, luogo, controparte, CAI, n° sinistro, danni, rimborso, foto e video; se il veicolo è distrutto passa in archivio.
+- **Scadenze e notifiche** (sempre alle 9:00):
+  - **Bollo**: inserisci la data di pagamento, l'app calcola il mese del prossimo pagamento (stesso mese dell'anno dopo, o mese fisso se la tua regione lo prevede) e ti avvisa **il 1° di quel mese**.
+  - **Assicurazione**: avvisi **30 e 15 giorni prima, il giorno prima e il giorno stesso** della scadenza.
+  - **Revisione** (in più): 4 anni dalla prima immatricolazione, poi ogni 2 anni; avviso il 1° del mese e 15 giorni prima.
+- **Spese** per anno, per voce e per veicolo; bilancio completo di ogni veicolo.
+- **Backup** in un file .zip (dati + foto + video) da salvare su Drive o PC, e ripristino.
 
----
-
-## Setup iniziale (una sola volta)
-
-```bash
-# 1. Installa le dipendenze
-npm install
-
-# 2. Prima build
-npm run build
-
-# 3. Inizializza Capacitor (se non già fatto)
-npx cap init "Veicoli" "it.andrea.veicoliapp" --web-dir dist
-
-# 4. Aggiungi la piattaforma Android
-npx cap add android
-
-# 5. Sincronizza
-npx cap sync android
-```
-
----
-
-## Permessi Android
-
-Dopo `npx cap add android`, apri il file:
-
-  `android/app/src/main/AndroidManifest.xml`
-
-e aggiungi dentro `<manifest>` (prima di `<application>`):
-
-```xml
-<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-<uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
-<uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
-<uses-permission android:name="android.permission.WAKE_LOCK"/>
-<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-```
-
-Vedi anche il file `android-permissions-ref.xml` nella root del progetto.
-
----
+I dati restano sul telefono (IndexedDB); nessun server.
 
 ## Sviluppo
 
 ```bash
-# Dev server browser (senza notifiche native, tutto il resto funziona)
-npm run dev
-
-# Build + sync + apri Android Studio
-npm run android
+npm install          # copia anche i file dell'OCR in public/ocr
+npm run dev          # http://localhost:3000
+npm test             # test del lettore del libretto e del calcolo scadenze
 ```
 
----
+## Generare l'APK
 
-## Build APK in Android Studio
-
-1. Apri il progetto con `npx cap open android` oppure `npm run android`
-2. In Android Studio: **Build → Build Bundle(s) / APK(s) → Build APK(s)**
-3. L'APK si trova in `android/app/build/outputs/apk/debug/app-debug.apk`
-
-Per un APK firmato (release):
-- **Build → Generate Signed Bundle / APK**
-- Crea o usa un keystore esistente
-
----
-
-## Aggiornare l'app
-
-Ogni volta che modifichi il codice:
+Serve Android Studio (o l'SDK Android) e Java 21.
 
 ```bash
-npm run build        # rebuild Vite
-npx cap sync android # copia i file nell'Android project
-# poi ricompila da Android Studio
+npm install
+npm run apk:debug
+# APK: android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Oppure usa lo script unico:
+In alternativa `npm run cap:sync` e poi `npx cap open android` per aprire il progetto in Android Studio (Build ▸ Build APK).
 
-```bash
-npm run android
-```
+### APK firmato (release)
 
----
+1. Crea la chiave una volta sola (conservala bene: serve per tutti gli aggiornamenti):
+   `keytool -genkey -v -keystore android/app/veicoli.jks -alias veicoli -keyalg RSA -keysize 2048 -validity 10000`
+2. Crea `android/keystore.properties`:
+   ```
+   storeFile=veicoli.jks
+   storePassword=...
+   keyAlias=veicoli
+   keyPassword=...
+   ```
+3. `npm run apk:release` → `android/app/build/outputs/apk/release/app-release.apk`
 
-## Struttura del progetto
+### Con GitHub Actions
 
-```
-src/
-├── main.js                         # Entry point (+ init canale notifiche)
-├── App.vue                         # Root component + transizioni
-├── router/
-│   └── index.js                    # Vue Router (hash mode)
-├── stores/
-│   └── vehicles.js                 # Pinia store + persistenza Preferences
-├── composables/
-│   └── useNotifications.js         # Logica Capacitor LocalNotifications
-├── views/
-│   ├── HomeView.vue                 # Lista veicoli + stats
-│   ├── ScadenzeView.vue             # Scadenze filtrabili per urgenza
-│   ├── NotificheView.vue            # Preview notifiche pianificate
-│   ├── AddVehicleView.vue           # Form aggiunta/modifica veicolo
-│   └── VehicleDetailView.vue        # Scheda dettaglio veicolo
-├── components/
-│   ├── VehicleCard.vue              # Card veicolo con barre scadenza
-│   ├── DeadlineRow.vue              # Riga singola scadenza con barra
-│   ├── DeadlineBadge.vue            # Pill colorato giorni rimanenti
-│   └── BottomNav.vue                # Navigazione bottom tab
-└── assets/
-    └── main.css                     # Design system + CSS variables
-```
+Il workflow `.github/workflows/android.yml` costruisce l'APK a ogni push su `main` (o a mano da *Actions ▸ Run workflow*) e lo allega come artefatto `veicoli-apk`. Per l'APK firmato aggiungi i secret `ANDROID_KEYSTORE_BASE64` (`base64 -w0 veicoli.jks`), `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`.
 
----
+## Struttura
 
-## Logica notifiche
-
-Le notifiche vengono pianificate in tre momenti per ogni scadenza:
-
-| Trigger     | Orario  | Messaggio                              |
-|-------------|---------|----------------------------------------|
-| 30 giorni prima | 09:00 | "Scade tra 30 giorni (gg/mm/aaaa)"  |
-| 15 giorni prima | 09:00 | "Scade tra 15 giorni (gg/mm/aaaa)"  |
-| 1 giorno prima  | 09:00 | "⚠️ Scade domani! Assicurati di rinnovarlo" |
-
-Le notifiche vengono cancellate e ricreate ad ogni modifica del veicolo.
-È possibile forzare il ricalcolo dalla scheda dettaglio o dalla view Notifiche.
-
----
-
-## Note sul bollo
-
-Il bollo in Italia non ha una scadenza automaticamente calcolabile
-(dipende da regione, esenzioni, rateizzazioni). La data di scadenza
-va inserita manualmente dall'utente.
-
-Per la **revisione**: la prima è a 4 anni dall'immatricolazione, poi ogni 2 anni.
-È consigliabile aggiungere un calcolo automatico come futura feature.
+- `utils/libretto.ts` – lettura dei campi del libretto dal testo OCR (testata in `tests/`)
+- `utils/deadlines.ts` – calcolo di bollo, assicurazione, revisione e promemoria
+- `composables/ocr.ts` – OCR sul telefono (PDF e foto, binarizzazione globale e adattiva)
+- `composables/ai.ts` – lettura avanzata facoltativa con Claude
+- `composables/notifications.ts` – programmazione delle notifiche locali
+- `composables/db.ts` – archivio locale (Dexie / IndexedDB)
+- `pages/` – Garage, scheda veicolo, Scadenze, Spese, Impostazioni
+- `scripts/make-icons.mjs` – genera le immagini di icona e splash in `assets/` (poi `npx capacitor-assets generate --android`)

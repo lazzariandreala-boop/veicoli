@@ -1,27 +1,48 @@
 {
-  "name": "veicoli-app",
+  "name": "veicoli",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "android": "npm run build && npx cap sync android && npx cap open android"
+    "dev": "nuxt dev",
+    "build": "nuxt generate",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare && node scripts/copy-ocr-assets.mjs",
+    "test": "node --test tests/*.test.ts",
+    "cap:sync": "nuxt generate && cap sync android",
+    "android:open": "cap open android",
+    "apk:debug": "nuxt generate && cap sync android && cd android && ./gradlew assembleDebug",
+    "apk:release": "nuxt generate && cap sync android && cd android && ./gradlew assembleRelease"
   },
   "dependencies": {
-    "@capacitor/android": "^6.2.1",
-    "@capacitor/core": "^6.0.0",
-    "@capacitor/local-notifications": "^6.0.0",
-    "@capacitor/preferences": "^6.0.0",
-    "android": "^0.0.8",
-    "pinia": "^2.1.7",
-    "vue": "^3.4.0",
-    "vue-router": "^4.3.0"
+    "@anthropic-ai/sdk": "^0.133.0",
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/filesystem": "^8.1.4",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/local-notifications": "^8.3.1",
+    "@capacitor/preferences": "^8.0.1",
+    "@capacitor/share": "^8.0.3",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.4",
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource-variable/space-grotesk": "^5.3.0",
+    "@tesseract.js-data/ita": "^1.0.0",
+    "dexie": "^4.4.6",
+    "fflate": "^0.8.3",
+    "lucide-vue-next": "^1.0.0",
+    "nuxt": "^3.21.11",
+    "pdfjs-dist": "^4.10.38",
+    "tesseract.js": "^7.0.0",
+    "vue": "^3.5.44",
+    "vue-router": "^4.6.4"
   },
   "devDependencies": {
-    "@capacitor/cli": "^6.0.0",
-    "@vitejs/plugin-vue": "^5.0.0",
-    "sharp": "^0.34.5",
-    "vite": "^5.0.0"
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.5.3",
+    "typescript": "5.9",
+    "vue-tsc": "^3.3.13"
   }
 }
