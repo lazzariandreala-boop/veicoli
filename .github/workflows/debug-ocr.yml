@@ -1,0 +1,45 @@
+name: Debug OCR in emulatore
+on:
+  push:
+    branches: [debug-ocr]
+jobs:
+  emu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: { node-version: 22, cache: npm }
+      - uses: actions/setup-java@v5
+        with: { distribution: temurin, java-version: 21 }
+      - name: Android SDK
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0"
+          echo "sdk.dir=$ANDROID_HOME" > android/local.properties
+      - run: npm ci
+      - run: npm run build
+      - run: npx cap sync android
+      - name: Build APK
+        working-directory: android
+        run: chmod +x gradlew && ./gradlew assembleDebug
+      - name: KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+      - run: npm i --no-save playwright-core@1.56.1
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -memory 4096
+          script: |
+            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+            adb shell am start -n it.veicoli.app/.MainActivity
+            sleep 25
+            adb shell dumpsys package com.google.android.webview | grep versionName | head -2 || true
+            PID=$(adb shell pidof it.veicoli.app); echo PID=$PID; adb forward tcp:9222 localabstract:webview_devtools_remote_$PID
+            node scripts/ci/webview-ocr.cjs || (adb logcat -d | grep -iE "chromium|Capacitor|console" | tail -150; exit 1)
+            adb logcat -d | grep -iE "Capacitor|chromium" | tail -60

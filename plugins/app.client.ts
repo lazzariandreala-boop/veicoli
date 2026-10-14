@@ -7,6 +7,7 @@ import { liveQuery } from 'dexie'
 
 export default defineNuxtPlugin((nuxtApp) => {
   applyTheme(useTheme())
+  ;(window as any).__veicoliOcr = { readLibrettoOffline }
   const router = useRouter()
 
   // Riprogramma i promemoria ogni volta che cambiano veicoli, bollo, polizze o revisioni.
