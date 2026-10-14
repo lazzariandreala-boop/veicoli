@@ -1,8 +1,8 @@
 <template>
   <div class="page" style="padding-bottom: calc(var(--nav-h) + var(--safe-bottom) + 96px)">
     <header class="topbar">
-      <div class="grow"><div class="eyebrow">Costi di gestione</div><h1>Spese</h1></div>
-      <NuxtLink to="/report" class="icon-btn" aria-label="Report"><ChartLine :size="21" /></NuxtLink>
+      <h1>Spese</h1>
+      <NuxtLink to="/report" class="icon-btn" aria-label="Report"><ChartLine :size="20" /></NuxtLink>
     </header>
 
     <div class="chips" style="margin-bottom: 12px">
@@ -17,32 +17,31 @@
       <button v-for="p in PERIODS" :key="p.id" :class="{ on: period === p.id }" @click="period = p.id">{{ p.label }}</button>
     </div>
 
-    <HoloCard glow="violet" :cut="22">
-      <div class="total">
-        <div class="grow">
-          <div class="t-lbl">Spese totali</div>
-          <div class="t-num num">{{ money(total) }}</div>
-          <div v-if="delta !== null" class="delta" :class="delta > 0 ? 'up' : 'down'">
-            <component :is="delta > 0 ? TrendingUp : TrendingDown" :size="14" /> {{ delta > 0 ? '+' : '' }}{{ delta }}% <span>vs periodo prec.</span>
-          </div>
-          <div v-else class="delta"><span>{{ filtered.length }} movimenti</span></div>
+    <div class="card total">
+      <div class="grow">
+        <div class="t-lbl">Spese totali</div>
+        <div class="t-num num">{{ money(total) }}</div>
+        <div v-if="delta !== null" class="delta" :class="delta > 0 ? 'up' : 'down'">
+          <component :is="delta > 0 ? ArrowUp : ArrowDown" :size="14" /> {{ delta > 0 ? '+' : '' }}{{ delta }}%
         </div>
-        <div class="mini" aria-hidden="true">
-          <span v-for="(m, i) in months" :key="m.key" :style="{ height: Math.max(6, (m.total / maxMonth) * 64) + 'px', opacity: .45 + (i / months.length) * .55 }" />
-        </div>
+        <div class="t-sub">{{ filtered.length }} moviment{{ filtered.length === 1 ? 'o' : 'i' }} · {{ periodLabel }}</div>
       </div>
-    </HoloCard>
+      <div class="mini" aria-hidden="true">
+        <span v-for="m in months" :key="m.key" :style="{ height: Math.max(8, (m.total / maxMonth) * 86) + 'px' }"><i :style="{ height: Math.max(4, (m.total / maxMonth) * 46) + 'px' }" /></span>
+      </div>
+    </div>
 
-    <section class="section">
-      <div class="section-head"><h2>Movimenti</h2><span class="faint" style="font-size: 13px">{{ filtered.length }}</span></div>
-      <div v-if="filtered.length" class="stack" style="gap: 10px">
+    <SpeseMatrix v-if="cat === 'all' && matrix.length > 1" :items="matrix" />
+
+    <section class="section" style="margin-top: 18px">
+      <div v-if="filtered.length" class="card exp-list">
         <NuxtLink v-for="e in visible" :key="e.cat + e.id" :to="`/veicoli/${e.vehicleId}?tab=${e.tab}`" class="exp" :style="{ '--c': catOf(e.cat).color }">
           <span class="exp-ico"><component :is="ICONS[e.cat]" :size="19" /></span>
           <div class="grow" style="min-width: 0">
             <strong class="ellipsis">{{ e.title }}</strong>
-            <div class="faint ellipsis" style="font-size: 12.5px">{{ vName(e.vehicleId) }} · {{ formatDate(e.date) }}</div>
+            <div class="sub ellipsis">{{ vName(e.vehicleId) }}</div>
           </div>
-          <b class="num">{{ money(e.amount) }}</b>
+          <div class="amt"><b class="num">{{ money(e.amount) }}</b><span>{{ formatDate(e.date) }}</span></div>
         </NuxtLink>
         <button v-if="filtered.length > limit" class="btn ghost block" @click="limit += 30">Mostra altri</button>
       </div>
@@ -76,7 +75,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ChartLine, ChevronRight, ClipboardCheck, Landmark, Plus, ShieldCheck, TrendingDown, TrendingUp, TriangleAlert, Wrench } from 'lucide-vue-next'
+import { ArrowDown, ArrowUp, ChartLine, ChevronRight, ClipboardCheck, Landmark, Plus, ShieldCheck, TriangleAlert, Wrench } from 'lucide-vue-next'
 import { formatDate, vehicleName } from '~/utils/deadlines'
 import { EXPENSE_CATS, PERIODS, periodRange, type ExpenseCat, type Period } from '~/composables/expenses'
 
@@ -109,6 +108,8 @@ const months = computed(() => {
     return { key, total: scoped.value.filter((e) => e.date.startsWith(key)).reduce((s, e) => s + e.amount, 0) }
   })
 })
+const periodLabel = computed(() => PERIODS.find((p) => p.id === period.value)!.label.toLowerCase())
+const matrix = computed(() => EXPENSE_CATS.map((c) => ({ label: c.short, color: c.color, value: filtered.value.filter((e) => e.cat === c.id).reduce((s, e) => s + e.amount, 0) })).filter((x) => x.value > 0))
 const maxMonth = computed(() => Math.max(1, ...months.value.map((m) => m.total)))
 const vName = (id: string) => { const v = vehicles.value.find((x) => x.id === id); return v ? vehicleName(v) : '' }
 
@@ -135,20 +136,28 @@ function goAdd(t: (typeof ADD_TYPES)[number]) {
 }
 </script>
 <style scoped>
-.total { display: flex; align-items: flex-end; gap: 12px; padding: 18px 18px 18px 22px; }
-.t-lbl { font-size: 13px; font-weight: 600; color: rgba(220, 225, 255, .7); }
-.t-num { font-family: var(--font-display); font-size: 34px; font-weight: 700; color: #fff; letter-spacing: -.02em; margin: 4px 0 6px; text-shadow: 0 0 16px rgba(124, 92, 255, .7); }
-.delta { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; }
-.delta span { font-weight: 500; color: rgba(220, 225, 255, .6); }
-.delta.up { color: #ff7aa2; }
-.delta.down { color: #3ff0c4; }
-.mini { display: flex; align-items: flex-end; gap: 5px; height: 70px; }
-.mini span { width: 10px; border-radius: 4px 4px 2px 2px; background: linear-gradient(180deg, #22e5ff, #7c5cff); box-shadow: 0 0 10px rgba(34, 229, 255, .5); }
-.exp { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); backdrop-filter: blur(14px); }
-.exp strong { display: block; font-size: 14.5px; }
-.exp b { font-size: 15px; }
-.exp-ico { width: 40px; height: 40px; flex: none; border-radius: 12px; display: grid; place-items: center; color: var(--c); background: color-mix(in srgb, var(--c) 16%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 45%, transparent), 0 0 12px color-mix(in srgb, var(--c) 30%, transparent); }
-.add-btn { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--nav-h) + var(--safe-bottom) + 18px); z-index: 20; display: inline-flex; align-items: center; gap: 8px; padding: 13px 26px; border-radius: 99px; border: 1px solid rgba(160, 140, 255, .7); color: #fff; font-weight: 700; font-size: 15px; cursor: pointer;
-  background: linear-gradient(90deg, rgba(124, 92, 255, .85), rgba(80, 70, 220, .85)); box-shadow: 0 0 22px rgba(124, 92, 255, .6), 0 10px 24px rgba(0, 0, 0, .4); backdrop-filter: blur(12px); }
-.add-btn:active { transform: translateX(-50%) scale(.97); }
+.total { display: flex; align-items: flex-end; gap: 12px; padding: 20px 20px 18px; }
+.t-lbl { font-size: 13.5px; font-weight: 500; color: var(--text-2); }
+.t-num { font-family: var(--font-display); font-size: 34px; font-weight: 700; color: var(--title); letter-spacing: -.02em; margin: 4px 0 6px; }
+.delta { display: inline-flex; align-items: center; gap: 3px; font-size: 13px; font-weight: 700; }
+.delta.up { color: var(--danger); }
+.delta.down { color: var(--ok); }
+.t-sub { margin-top: 4px; font-size: 12px; color: var(--text-3); }
+.mini { display: flex; align-items: flex-end; gap: 6px; height: 92px; }
+.mini span { position: relative; width: 11px; border-radius: 4px; background: linear-gradient(180deg, #6d5cff, #3d5afe); box-shadow: 0 0 12px rgba(91, 77, 255, .55); overflow: hidden; }
+.mini i { position: absolute; left: 0; right: 0; bottom: 0; background: linear-gradient(180deg, #4fd2ff, #2f8cff); }
+.exp-list { padding: 4px 0; }
+.exp { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.exp:last-of-type { border-bottom: 0; }
+.exp strong { display: block; font-size: 15px; font-weight: 600; color: var(--text); }
+.exp .sub { font-size: 12.5px; color: var(--text-3); margin-top: 2px; }
+.amt { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex: none; }
+.amt b { font-size: 15px; color: var(--title); }
+.amt span { font-size: 11.5px; color: var(--text-3); }
+.exp-ico { width: 44px; height: 44px; flex: none; border-radius: 14px; display: grid; place-items: center; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); border: 1px solid color-mix(in srgb, var(--c) 40%, transparent); box-shadow: 0 0 14px color-mix(in srgb, var(--c) 25%, transparent); }
+.add-btn { position: fixed; left: 16px; right: 16px; max-width: 520px; margin: 0 auto; bottom: calc(var(--nav-h) + var(--safe-bottom) + 20px); z-index: 20; display: flex; align-items: center; justify-content: center; gap: 8px; height: 54px; border-radius: 999px; color: #fff; font-weight: 600; font-size: 16px; cursor: pointer;
+  border: 1px solid rgba(120, 150, 255, .5);
+  background: radial-gradient(120% 200% at 20% 0%, rgba(124, 92, 255, .9), transparent 55%), radial-gradient(120% 200% at 90% 100%, rgba(255, 110, 200, .55), transparent 50%), linear-gradient(90deg, #262a6a, #1b1f50);
+  box-shadow: 0 0 24px -4px rgba(124, 92, 255, .8), 0 14px 26px -10px rgba(10, 10, 40, .6); }
+.add-btn:active { transform: scale(.98); }
 </style>

@@ -2,11 +2,13 @@
   <div class="shell">
     <slot />
     <nav v-if="showNav" class="nav">
-      <svg class="nav-curve" viewBox="0 0 400 18" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M0 18 C 90 18, 120 2, 200 2 S 310 18, 400 18" fill="none" stroke="url(#navg)" stroke-width="1.4" />
+      <svg class="nav-bg" viewBox="0 0 400 96" preserveAspectRatio="none" aria-hidden="true">
         <defs>
-          <linearGradient id="navg" x1="0" x2="1"><stop offset="0" stop-color="#7c5cff" stop-opacity=".1" /><stop offset=".5" stop-color="#22e5ff" /><stop offset="1" stop-color="#7c5cff" stop-opacity=".1" /></linearGradient>
+          <linearGradient id="navfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c2148" /><stop offset="1" stop-color="#0b0e26" /></linearGradient>
+          <linearGradient id="navline" x1="0" x2="1"><stop offset="0" stop-color="#5b8cff" stop-opacity=".15" /><stop offset=".5" stop-color="#4fd2ff" /><stop offset="1" stop-color="#5b8cff" stop-opacity=".15" /></linearGradient>
         </defs>
+        <path d="M0 26 Q0 16 12 16 L130 16 C160 16 165 2 200 2 C235 2 240 16 270 16 L388 16 Q400 16 400 26 L400 96 L0 96 Z" fill="url(#navfill)" />
+        <path d="M6 18 L130 16 C160 16 165 2 200 2 C235 2 240 16 270 16 L394 18" fill="none" stroke="url(#navline)" stroke-width="1.6" vector-effect="non-scaling-stroke" />
       </svg>
       <NuxtLink v-for="t in tabs" :key="t.to" :to="t.to" class="nav-item" :class="{ on: isOn(t.to) }">
         <span class="ico"><component :is="t.icon" :size="21" :stroke-width="isOn(t.to) ? 2.3 : 1.8" /></span>
@@ -36,16 +38,12 @@ const isOn = (to: string) => route.path === to || (to === '/spese' && route.path
 .shell { min-height: 100dvh; }
 .nav {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
-  display: grid; grid-template-columns: repeat(5, 1fr);
-  height: calc(var(--nav-h) + var(--safe-bottom)); padding-bottom: var(--safe-bottom);
-  background: linear-gradient(180deg, rgba(14, 16, 44, .78), rgba(6, 8, 24, .96));
-  backdrop-filter: blur(22px) saturate(1.6); -webkit-backdrop-filter: blur(22px) saturate(1.6);
-  box-shadow: 0 -10px 30px rgba(0, 0, 0, .35);
+  display: grid; grid-template-columns: repeat(5, 1fr); align-items: end;
+  height: calc(var(--nav-h) + var(--safe-bottom)); padding: 0 6px calc(var(--safe-bottom) + 8px);
 }
-:root[data-theme='light'] .nav { background: linear-gradient(180deg, rgba(30, 30, 70, .86), rgba(16, 16, 44, .96)); }
-.nav-curve { position: absolute; left: 0; right: 0; top: -9px; width: 100%; height: 18px; filter: drop-shadow(0 0 6px rgba(34, 229, 255, .7)); pointer-events: none; }
-.nav-item { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: rgba(200, 205, 255, .55); font-size: 11px; font-weight: 600; transition: color .2s; }
-.ico { display: grid; place-items: center; width: 38px; height: 30px; border-radius: 12px; transition: background .2s, box-shadow .2s; }
-.nav-item.on { color: #fff; }
-.nav-item.on .ico { color: #fff; background: linear-gradient(135deg, rgba(124, 92, 255, .55), rgba(34, 229, 255, .25)); box-shadow: 0 0 16px rgba(124, 92, 255, .7), inset 0 0 0 1px rgba(160, 140, 255, .6); }
+.nav-bg { position: absolute; left: 0; right: 0; bottom: 0; top: -14px; width: 100%; height: calc(100% + 14px); filter: drop-shadow(0 -6px 18px rgba(20, 30, 90, .35)) drop-shadow(0 -1px 8px rgba(79, 210, 255, .25)); pointer-events: none; }
+.nav-item { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; height: 58px; color: rgba(190, 198, 240, .55); font-size: 11px; font-weight: 600; transition: color .2s; }
+.ico { display: grid; place-items: center; width: 40px; height: 32px; border-radius: 12px; transition: background .2s, box-shadow .2s, color .2s; }
+.nav-item.on { color: #b9a8ff; }
+.nav-item.on .ico { color: #c3b5ff; background: radial-gradient(circle, rgba(124, 92, 255, .38), rgba(124, 92, 255, 0) 70%); filter: drop-shadow(0 0 8px rgba(140, 110, 255, .9)); }
 </style>

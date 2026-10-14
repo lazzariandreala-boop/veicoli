@@ -1,8 +1,8 @@
 <template>
   <div class="page">
     <header class="topbar">
-      <div class="grow"><div class="eyebrow">Promemoria automatici</div><h1>Scadenze</h1></div>
-      <span class="icon-btn" aria-hidden="true"><Bell :size="21" /><i v-if="soonCount" class="dot" /></span>
+      <h1>Scadenze</h1>
+      <span class="icon-btn" aria-hidden="true"><Bell :size="20" /><i v-if="soonCount" class="dot" /></span>
     </header>
 
     <div v-if="notificationState.permission === 'denied' || notificationState.permission === 'prompt'" class="card flat warnbox" style="margin-bottom: 14px">
@@ -22,7 +22,7 @@
         </svg>
         <NuxtLink v-for="o in orbs" :key="o.d.vehicleId + o.d.kind" :to="`/veicoli/${o.d.vehicleId}?tab=scadenze`" class="orb" :class="[o.d.kind, urgency(o.d.days)]"
           :style="{ left: o.x + '%', top: o.y + 'px', width: o.size + 'px', height: o.size + 'px' }">
-          <component :is="ICONS[o.d.kind]" :size="o.size > 110 ? 26 : 20" />
+          <component :is="ICONS[o.d.kind]" :size="26" class="orb-ico" />
           <strong>{{ o.d.label }}</strong>
           <span class="ellipsis">{{ shortName(o.d) }}</span>
           <em>{{ relativeDays(o.d.days) }}</em>
@@ -84,12 +84,12 @@ const shown = computed(() => deadlines.value.filter((d) => filter.value === 'tut
 const soonCount = computed(() => deadlines.value.filter((d) => d.days <= 30).length)
 
 // Posizioni a zig-zag (x in %, y in px) per le sfere collegate
-const SLOTS = [{ x: 66, y: 74 }, { x: 28, y: 150 }, { x: 70, y: 236 }, { x: 30, y: 316 }, { x: 68, y: 392 }]
+const SLOTS = [{ x: 68, y: 92 }, { x: 28, y: 196 }, { x: 68, y: 300 }, { x: 30, y: 400 }, { x: 70, y: 500 }]
 const orbs = computed(() => shown.value.slice(0, 5).map((d, i) => {
-  const size = d.days <= 7 ? 128 : d.days <= 30 ? 112 : d.days <= 90 ? 98 : 86
+  const size = d.days <= 7 ? 156 : d.days <= 30 ? 146 : d.days <= 90 ? 136 : 128
   return { d, size, ...SLOTS[i]! }
 }))
-const orbH = computed(() => (orbs.value.length ? SLOTS[orbs.value.length - 1]!.y + 72 : 0))
+const orbH = computed(() => (orbs.value.length ? SLOTS[orbs.value.length - 1]!.y + 86 : 0))
 const shortName = (d: DeadlineView) => d.vehicle.nickname || d.vehicle.libretto.modello || d.vehicle.plate
 
 const upcoming = computed(() => notificationState.upcoming.slice(0, 8))
@@ -105,25 +105,30 @@ async function enable() {
 onMounted(() => { checkPermission(); syncReminders() })
 </script>
 <style scoped>
-.orbs { position: relative; margin: 14px 0 6px; }
+.orbs { position: relative; margin: 18px 0 6px; }
 .links { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.links line { stroke: rgba(150, 200, 255, .55); stroke-width: 1.5; vector-effect: non-scaling-stroke; filter: drop-shadow(0 0 4px rgba(34, 229, 255, .9)); }
-.orb { --c: 124, 92, 255; position: absolute; transform: translate(-50%, -50%); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; text-align: center; padding: 10px; color: #fff;
-  background: radial-gradient(circle at 32% 26%, rgba(255, 255, 255, .35), rgba(var(--c), .55) 30%, rgba(var(--c), .14) 68%, rgba(var(--c), .3));
-  border: 1.5px solid rgba(var(--c), .9); box-shadow: 0 0 22px rgba(var(--c), .65), inset 0 0 22px rgba(var(--c), .5); backdrop-filter: blur(6px); animation: float 6s ease-in-out infinite; }
+.links line { stroke: rgba(140, 150, 220, .55); stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+.orb { --c: 140, 110, 255; --c2: 220, 210, 255; position: absolute; transform: translate(-50%, -50%); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-align: center; padding: 14px; color: #1b1d3a;
+  background: radial-gradient(circle at 34% 28%, rgba(255, 255, 255, .95) 0%, rgba(var(--c2), .9) 34%, rgba(var(--c), .55) 78%, rgba(var(--c), .75) 100%);
+  border: 1.5px solid rgba(255, 255, 255, .8);
+  box-shadow: 0 0 30px rgba(var(--c), .55), 0 18px 30px -12px rgba(var(--c), .7), inset 0 -10px 24px rgba(var(--c), .45), inset 0 8px 16px rgba(255, 255, 255, .7);
+  animation: float 6s ease-in-out infinite; }
 .orb:nth-of-type(2n) { animation-delay: -3s; }
-.orb.bollo { --c: 255, 168, 32; }
-.orb.assicurazione { --c: 25, 227, 177; }
-.orb.revisione { --c: 124, 92, 255; }
-.orb.danger { box-shadow: 0 0 0 3px rgba(255, 92, 138, .7), 0 0 26px rgba(255, 92, 138, .8), inset 0 0 22px rgba(var(--c), .5); }
-.orb strong { font-family: var(--font-display); font-size: 15px; line-height: 1.1; text-shadow: 0 1px 8px rgba(0, 0, 0, .5); }
-.orb span { font-size: 10.5px; opacity: .85; max-width: 90%; }
-.orb em { font-style: normal; font-size: 11px; font-weight: 700; margin-top: 2px; }
+.orb.bollo { --c: 255, 176, 64; --c2: 255, 232, 196; }
+.orb.assicurazione { --c: 60, 214, 240; --c2: 205, 247, 255; }
+.orb.revisione { --c: 150, 120, 255; --c2: 228, 220, 255; }
+.orb .orb-ico { color: rgb(var(--c)); filter: saturate(1.4) brightness(.85); }
+.orb strong { font-family: var(--font-display); font-size: 17px; line-height: 1.1; }
+.orb span { font-size: 11px; opacity: .7; max-width: 92%; }
+.orb em { font-style: normal; font-size: 11.5px; font-weight: 700; margin-top: 2px; opacity: .85; }
+.orb.danger { box-shadow: 0 0 0 3px rgba(255, 92, 138, .7), 0 0 30px rgba(255, 92, 138, .7), inset 0 -10px 24px rgba(var(--c), .45), inset 0 8px 16px rgba(255, 255, 255, .7); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .orb { color: #fff; background: radial-gradient(circle at 34% 28%, rgba(var(--c), .32) 0%, rgba(14, 18, 44, .9) 62%, rgba(var(--c), .35) 100%); border-color: rgba(var(--c), .85); box-shadow: 0 0 26px rgba(var(--c), .55), inset 0 0 26px rgba(var(--c), .35); } }
+:root[data-theme='dark'] .orb { color: #fff; background: radial-gradient(circle at 34% 28%, rgba(var(--c), .32) 0%, rgba(14, 18, 44, .9) 62%, rgba(var(--c), .35) 100%); border-color: rgba(var(--c), .85); box-shadow: 0 0 26px rgba(var(--c), .55), inset 0 0 26px rgba(var(--c), .35); }
 @keyframes float { 50% { transform: translate(-50%, calc(-50% - 6px)); } }
-.banner { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 16px; color: #fff; font-size: 14px;
-  background: linear-gradient(90deg, rgba(124, 92, 255, .4), rgba(34, 229, 255, .18)); border: 1px solid rgba(140, 120, 255, .55); box-shadow: 0 0 18px rgba(124, 92, 255, .35); }
+.banner { display: flex; align-items: center; gap: 10px; padding: 13px 18px; border-radius: 999px; color: #fff; font-size: 14px;
+  background: var(--grad-primary); box-shadow: var(--grad-primary-glow); }
 .banner b { color: #7fe9ff; }
-.dl-row { --c: 124, 92, 255; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); border-left: 3px solid rgba(var(--c), .9); backdrop-filter: blur(14px); }
+.dl-row { --c: 124, 92, 255; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 18px; background: var(--card-bg); border: 1px solid var(--card-border); box-shadow: var(--shadow); }
 .dl-row.bollo { --c: 255, 168, 32; }
 .dl-row.assicurazione { --c: 25, 227, 177; }
 .dl-row strong { font-size: 15px; }

@@ -1,8 +1,8 @@
 <template>
   <div class="page">
     <header class="topbar">
-      <NuxtLink to="/spese" class="icon-btn" aria-label="Indietro"><ChevronLeft :size="22" /></NuxtLink>
-      <div class="grow"><div class="eyebrow">Andamento dei costi</div><h1>Report</h1></div>
+      <h1>Report</h1>
+      <NuxtLink to="/spese" class="icon-btn" aria-label="Spese"><ChevronLeft :size="22" /></NuxtLink>
     </header>
 
     <div v-if="vehicles.length > 1" class="chips" style="margin-bottom: 12px">
@@ -13,8 +13,7 @@
       <button v-for="p in PERIODS" :key="p.id" :class="{ on: period === p.id }" @click="period = p.id; sel = -1">{{ p.label }}</button>
     </div>
 
-    <HoloCard glow="cyan" :cut="22">
-      <div class="chart-card">
+    <div class="card chart-card">
         <div class="t-lbl">Spese totali</div>
         <div class="t-row">
           <span class="t-num num">{{ money(total) }}</span>
@@ -23,8 +22,8 @@
         <div class="chart" @pointermove="hover" @pointerdown="hover" @pointerleave="sel = -1">
           <svg :viewBox="`0 0 ${W} ${H}`" preserveAspectRatio="none" class="plot" aria-hidden="true">
             <defs>
-              <linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22e5ff" stop-opacity=".45" /><stop offset="1" stop-color="#7c5cff" stop-opacity="0" /></linearGradient>
-              <linearGradient id="stroke" x1="0" x2="1"><stop offset="0" stop-color="#7c5cff" /><stop offset="1" stop-color="#22e5ff" /></linearGradient>
+              <linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f8cff" stop-opacity=".6" /><stop offset=".6" stop-color="#3d5afe" stop-opacity=".18" /><stop offset="1" stop-color="#3d5afe" stop-opacity="0" /></linearGradient>
+              <linearGradient id="stroke" x1="0" x2="1"><stop offset="0" stop-color="#3d8bff" /><stop offset="1" stop-color="#4fd2ff" /></linearGradient>
             </defs>
             <line v-for="g in 3" :key="g" x1="0" :x2="W" :y1="(H - PAD) * (g / 3)" :y2="(H - PAD) * (g / 3)" class="grid" />
             <path :d="areaPath" fill="url(#area)" />
@@ -37,16 +36,18 @@
           </div>
         </div>
         <div class="xlabels"><span v-for="(b, i) in buckets" :key="i" :class="{ hide: !showLabel(i) }">{{ b.label }}</span></div>
-      </div>
-    </HoloCard>
+    </div>
 
     <section class="section">
       <div class="card donut-card">
+        <svg width="0" height="0" style="position: absolute" aria-hidden="true"><defs>
+          <linearGradient v-for="c in cats" :id="'dg-' + c.id" :key="c.id" x1="0" y1="0" x2="1" y2="1"><stop offset="0" :stop-color="c.color" /><stop offset="1" :stop-color="c.color" stop-opacity=".6" /></linearGradient>
+        </defs></svg>
         <h2 style="font-size: 17px; margin: 0 0 14px">Ripartizione spese</h2>
         <div v-if="total" class="donut-row">
           <svg viewBox="0 0 120 120" class="donut" aria-hidden="true">
             <circle cx="60" cy="60" r="44" class="track" />
-            <circle v-for="s in slices" :key="s.id" cx="60" cy="60" r="44" fill="none" :stroke="s.color" stroke-width="16"
+            <circle v-for="s in slices" :key="s.id" cx="60" cy="60" r="44" fill="none" :stroke="`url(#dg-${s.id})`" stroke-width="18"
               :stroke-dasharray="`${s.len} ${CIRC - s.len}`" :stroke-dashoffset="-s.offset" transform="rotate(-90 60 60)" />
             <text x="60" y="57" text-anchor="middle" class="d-num">{{ cats.length }}</text>
             <text x="60" y="73" text-anchor="middle" class="d-lbl">voci</text>
@@ -170,29 +171,29 @@ const slices = computed(() => {
 })
 </script>
 <style scoped>
-.chart-card { padding: 18px 16px 14px 20px; }
-.t-lbl { font-size: 13px; font-weight: 600; color: rgba(220, 225, 255, .7); }
+.chart-card { padding: 18px 16px 14px 18px; }
+.t-lbl { font-size: 13.5px; font-weight: 500; color: var(--text-2); }
 .t-row { display: flex; align-items: baseline; gap: 10px; margin: 4px 0 10px; }
-.t-num { font-family: var(--font-display); font-size: 32px; font-weight: 700; color: #fff; text-shadow: 0 0 16px rgba(34, 229, 255, .6); }
+.t-num { font-family: var(--font-display); font-size: 32px; font-weight: 700; color: var(--title); }
 .delta { font-size: 13px; font-weight: 700; }
-.delta.up { color: #ff7aa2; }
-.delta.down { color: #3ff0c4; }
+.delta.up { color: var(--danger); }
+.delta.down { color: var(--ok); }
 .chart { position: relative; height: 160px; touch-action: pan-y; }
 .plot { width: 100%; height: 100%; overflow: visible; }
-.grid { stroke: rgba(255, 255, 255, .07); stroke-width: 1; vector-effect: non-scaling-stroke; }
-.line { filter: drop-shadow(0 0 6px rgba(34, 229, 255, .9)); }
-.cursor { stroke: rgba(255, 255, 255, .35); stroke-dasharray: 3 3; vector-effect: non-scaling-stroke; }
-.pt { position: absolute; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%; background: #22e5ff; box-shadow: 0 0 8px #22e5ff; transition: transform .15s; pointer-events: none; }
+.grid { stroke: var(--line-2); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.line { filter: drop-shadow(0 0 5px rgba(60, 160, 255, .8)); }
+.cursor { stroke: var(--text-3); stroke-dasharray: 3 3; vector-effect: non-scaling-stroke; }
+.pt { position: absolute; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: #4fd2ff; border: 2px solid var(--surface-solid); box-shadow: 0 0 8px #4fd2ff; transition: transform .15s; pointer-events: none; }
 .pt.on { transform: scale(1.8); background: #fff; }
 .tip { position: absolute; top: -8px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; padding: 6px 10px; border-radius: 10px; background: rgba(10, 12, 36, .92); border: 1px solid rgba(34, 229, 255, .6); box-shadow: 0 0 12px rgba(34, 229, 255, .4); pointer-events: none; white-space: nowrap; }
 .tip b { color: #fff; font-size: 13px; }
 .tip span { font-size: 11px; color: rgba(220, 225, 255, .7); }
-.xlabels { display: flex; justify-content: space-between; margin-top: 6px; font-size: 10.5px; color: rgba(220, 225, 255, .55); }
+.xlabels { display: flex; justify-content: space-between; margin-top: 6px; font-size: 10.5px; color: var(--text-3); }
 .xlabels span { flex: 1; text-align: center; }
 .xlabels span.hide { visibility: hidden; }
 .donut-row { display: flex; align-items: center; gap: 18px; }
 .donut { width: 132px; height: 132px; flex: none; filter: drop-shadow(0 0 10px rgba(124, 92, 255, .45)); }
-.donut .track { fill: none; stroke: var(--surface-3); stroke-width: 16; }
+.donut .track { fill: none; stroke: var(--surface-3); stroke-width: 18; }
 .d-num { fill: var(--text); font-family: var(--font-display); font-size: 20px; font-weight: 700; }
 .d-lbl { fill: var(--text-3); font-size: 10px; }
 .legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; flex: 1; min-width: 0; font-size: 13.5px; }

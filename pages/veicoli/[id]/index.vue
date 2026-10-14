@@ -3,7 +3,6 @@
     <div class="hero" :class="{ photo: !!cover }">
       <img v-if="cover" :src="cover" alt="" class="cover" />
       <div class="shade" />
-      <div v-if="!cover" class="neon-wrap"><NeonVehicle :kind="v.kind" :accent="v.accent" /></div>
       <div class="hero-bar">
         <button class="glass-btn" aria-label="Indietro" @click="back"><ChevronLeft :size="22" /></button>
         <div class="row">
@@ -11,6 +10,7 @@
           <button class="glass-btn" aria-label="Altro" @click="menu = true"><Ellipsis :size="20" /></button>
         </div>
       </div>
+      <div v-if="!cover" class="neon-wrap"><VehicleArt :kind="v.kind" :accent="v.accent" /></div>
       <div class="hero-info">
         <div class="grow" style="min-width: 0">
           <div class="row" style="gap: 8px; margin-bottom: 8px">
@@ -51,6 +51,19 @@
           <div class="stat card flat"><Wallet :size="18" /><b class="num">{{ money(totals.running, true) }}</b><span>spese</span></div>
           <div class="stat card flat"><CalendarDays :size="18" /><b class="num">{{ ownedFor }}</b><span>possesso</span></div>
         </div>
+
+        <HoloCard v-if="v.status === 'attivo' && deadlines.length" glow="violet" soft :cut="30">
+          <div class="vstats">
+            <h3>Stato del veicolo</h3>
+            <div v-for="d in deadlines" :key="d.kind" class="vs-row" :class="d.kind">
+              <span class="vs-ico"><component :is="d.kind === 'bollo' ? Landmark : d.kind === 'assicurazione' ? ShieldCheck : ClipboardCheck" :size="20" /></span>
+              <div class="grow">
+                <div class="vs-top"><span>{{ d.label }}</span><b>{{ relativeDays(d.days) }}</b></div>
+                <div class="vs-bar"><i :style="{ width: lifePct(d) + '%' }" /></div>
+              </div>
+            </div>
+          </div>
+        </HoloCard>
 
         <template v-if="v.status === 'attivo'">
           <div class="section-head" style="margin: 6px 0 -4px"><h2>Scadenze</h2></div>
@@ -301,6 +314,7 @@ const deadlines = computed(() => {
 })
 const health = computed(() => vehicleHealth(v.value!, deadlines.value as any))
 const healthPct = computed(() => (deadlines.value.length ? Math.round((deadlines.value.filter((d) => d.days > 30).length / deadlines.value.length) * 100) : 100))
+const lifePct = (d: { kind: string; days: number }) => Math.round(Math.min(1, Math.max(0.03, d.days / (d.kind === 'revisione' ? 730 : 365))) * 100)
 const nextRev = computed(() => nextInspectionDate(v.value?.libretto.dataPrimaImmatricolazione, inspections.value))
 
 function deadlineAction(kind: DeadlineKind) {
@@ -401,13 +415,14 @@ async function exportSheet() {
 </script>
 
 <style scoped>
-.hero { position: relative; min-height: calc(var(--safe-top) + 370px); color: white; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;
-  background: radial-gradient(70% 60% at 50% 45%, rgba(124, 92, 255, .38), transparent 70%), radial-gradient(60% 40% at 80% 10%, rgba(34, 229, 255, .18), transparent), linear-gradient(180deg, #0c0f2e, #060818); }
-.hero::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: linear-gradient(90deg, transparent, #22e5ff, #7c5cff, transparent); box-shadow: 0 0 14px #22e5ff; }
+.hero { position: relative; min-height: calc(var(--safe-top) + 300px); color: white; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;
+  background: radial-gradient(70% 55% at 50% 38%, rgba(124, 92, 255, .5), transparent 70%), radial-gradient(60% 40% at 85% 5%, rgba(79, 160, 255, .25), transparent), linear-gradient(180deg, #151a45, #070a1f); border-radius: 0 0 28px 28px; }
+.hero::after { content: ''; position: absolute; left: 10%; right: 10%; bottom: 0; height: 2px; background: linear-gradient(90deg, transparent, #4fd2ff, #7c5cff, transparent); box-shadow: 0 0 14px #4fd2ff; }
 .hero .cover { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .hero .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(6, 8, 24, .5), transparent 30%, rgba(6, 8, 24, .2) 50%, rgba(6, 8, 24, .92)); }
-.neon-wrap { position: absolute; left: 50%; top: calc(var(--safe-top) + 40px); width: min(74%, 360px); transform: translateX(-50%); opacity: .95; }
-.neon-wrap :deep(svg) { width: 100%; height: auto; }
+.neon-wrap { position: relative; height: 200px; margin: 6px auto -6px; display: grid; place-items: center; }
+.neon-wrap :deep(img) { height: 200px; width: auto; max-width: 92%; filter: drop-shadow(0 22px 20px rgba(0, 0, 0, .55)); }
+.neon-wrap::before { content: ''; position: absolute; left: 18%; right: 18%; bottom: 2%; height: 18%; border-radius: 50%; background: radial-gradient(closest-side, rgba(140, 110, 255, .7), transparent); }
 .hero-bar { position: relative; display: flex; justify-content: space-between; padding: calc(var(--safe-top) + 12px) 16px 0; }
 .glass-btn { width: 42px; height: 42px; border-radius: 14px; border: 1px solid rgba(160, 150, 255, .35); display: grid; place-items: center; color: white; background: rgba(14, 16, 44, .55); backdrop-filter: blur(12px); cursor: pointer; box-shadow: 0 0 12px rgba(124, 92, 255, .25); }
 .hero-info { position: relative; display: flex; align-items: flex-end; gap: 12px; padding: 20px 16px 22px; max-width: 760px; width: 100%; margin: 0 auto; }
@@ -424,6 +439,16 @@ async function exportSheet() {
 .ring b { position: relative; font-family: var(--font-display); font-size: 18px; line-height: 1; }
 .ring span { position: relative; font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; opacity: .85; margin-top: 2px; }
 .tabs { top: 0; }
+.vstats { padding: 18px 18px 16px; }
+.vstats h3 { font-size: 17px; color: #fff; margin-bottom: 14px; }
+.vs-row { --c: 140, 110, 255; display: flex; align-items: center; gap: 14px; padding: 8px 0; }
+.vs-row.bollo { --c: 255, 168, 60; }
+.vs-row.assicurazione { --c: 46, 230, 168; }
+.vs-ico { width: 46px; height: 46px; flex: none; border-radius: 14px; display: grid; place-items: center; color: rgb(var(--c)); background: rgba(var(--c), .14); border: 1px solid rgba(var(--c), .45); box-shadow: 0 0 14px rgba(var(--c), .3); }
+.vs-top { display: flex; justify-content: space-between; gap: 10px; font-size: 14.5px; color: #eef0ff; margin-bottom: 7px; }
+.vs-top b { font-size: 12.5px; color: rgba(var(--c), 1); font-weight: 700; }
+.vs-bar { height: 6px; border-radius: 99px; background: rgba(255, 255, 255, .1); overflow: hidden; }
+.vs-bar i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, rgba(var(--c), .7), rgb(var(--c))); box-shadow: 0 0 10px rgba(var(--c), .8); }
 .tab .count { margin-left: 6px; font-size: 11.5px; padding: 1px 7px; border-radius: 99px; background: var(--surface-3); color: var(--text-2); }
 .stat { display: flex; flex-direction: column; gap: 2px; padding: 12px; color: var(--text-3); }
 .stat b { color: var(--text); font-size: 17px; font-family: var(--font-display); margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

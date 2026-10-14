@@ -5,75 +5,70 @@
       <div class="skeleton" style="height: 110px; margin-top: 14px" />
     </template>
 
-    <!-- Benvenuto (nessun veicolo) -->
-    <div v-else-if="!vehicles.length" class="welcome">
+    <!-- Benvenuto (nessun veicolo): schermata a tutto schermo come nel mockup -->
+    <div v-else-if="!vehicles.length" class="welcome" :class="dark ? 'w-dark' : 'w-light'">
       <div class="hex-wrap">
-        <svg class="hex" viewBox="0 0 220 240" aria-hidden="true">
+        <svg class="hex" viewBox="0 0 300 330" aria-hidden="true">
           <defs>
-            <linearGradient id="hexg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22e5ff" /><stop offset=".5" stop-color="#7c5cff" /><stop offset="1" stop-color="#ff5c8a" /></linearGradient>
-            <linearGradient id="hexf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7c5cff" stop-opacity=".22" /><stop offset="1" stop-color="#22e5ff" stop-opacity=".04" /></linearGradient>
+            <linearGradient id="hexg" x1=".5" y1="0" x2=".5" y2="1"><stop offset="0" stop-color="#ffb35c" /><stop offset=".45" stop-color="#a66bff" /><stop offset="1" stop-color="#4f8cff" /></linearGradient>
+            <linearGradient id="hexd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".35" /><stop offset=".5" stop-color="#9aa8ff" stop-opacity=".12" /><stop offset="1" stop-color="#ffffff" stop-opacity=".28" /></linearGradient>
+            <linearGradient id="hexf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".07" /><stop offset="1" stop-color="#ffffff" stop-opacity="0" /></linearGradient>
           </defs>
-          <polygon points="110,6 212,62 212,178 110,234 8,178 8,62" fill="url(#hexf)" stroke="url(#hexg)" stroke-width="3" />
-          <polygon points="110,22 198,70 198,170 110,218 22,170 22,70" fill="none" stroke="#ffffff" stroke-opacity=".12" stroke-width="1" />
+          <path d="M150 10 L282 86 Q290 91 290 100 L290 230 Q290 239 282 244 L150 320 L18 244 Q10 239 10 230 L10 100 Q10 91 18 86 Z" fill="url(#hexf)" :stroke="dark ? 'url(#hexd)' : 'url(#hexg)'" :stroke-width="dark ? 2 : 4" stroke-linejoin="round" />
         </svg>
         <div class="logo">VEICOLI</div>
       </div>
-      <NeonVehicle kind="auto" class="hero-car" />
-      <p class="tagline">Il tuo garage, sempre sotto controllo.<br /><span>Libretto, lavori, scadenze e spese in un solo posto.</span></p>
-      <NuxtLink to="/veicoli/nuovo?scan=1" class="btn neon block start"><ScanText :size="19" /> Inizia dal libretto</NuxtLink>
-      <NuxtLink to="/veicoli/nuovo" class="manual">Preferisci? <b>Inserisci a mano</b></NuxtLink>
+      <div class="hero-car"><VehicleArt :hero="dark ? 'dark' : 'light'" /></div>
+      <p class="tagline">Il tuo garage, sempre sotto controllo.</p>
+      <NuxtLink to="/veicoli/nuovo?scan=1" class="btn neon start">Inizia</NuxtLink>
+      <p class="manual">Preferisci? <NuxtLink to="/veicoli/nuovo">Inserisci a mano</NuxtLink> · <NuxtLink to="/impostazioni?backup=1">Ripristina backup</NuxtLink></p>
     </div>
 
     <!-- Dashboard -->
     <template v-else>
-      <header class="topbar">
-        <div class="grow">
-          <div class="eyebrow">{{ greeting }}</div>
-          <h1>Il tuo garage</h1>
-        </div>
-        <NuxtLink to="/scadenze" class="icon-btn" aria-label="Scadenze"><Bell :size="21" /><i v-if="urgentCount" class="dot" /></NuxtLink>
-      </header>
+      <div class="top-actions">
+        <NuxtLink to="/scadenze" class="icon-btn" aria-label="Scadenze"><Bell :size="20" /><i v-if="urgentCount" class="dot" /></NuxtLink>
+      </div>
+      <header class="topbar"><h1>Il tuo garage</h1></header>
 
       <label class="search">
-        <Search :size="18" />
         <input v-model="q" class="input" type="search" placeholder="Cerca veicolo o targa..." />
+        <Search :size="19" />
       </label>
 
-      <div class="stat-row">
-        <HoloCard glow="violet" :cut="26" class="stat">
-          <div class="stat-in">
-            <div>
-              <div class="stat-num">{{ active.length }}</div>
-              <div class="stat-lbl">{{ active.length === 1 ? 'veicolo' : 'veicoli' }} in uso</div>
-              <div class="stat-sub">{{ urgentCount ? `${urgentCount} scadenz${urgentCount === 1 ? 'a' : 'e'} entro 30 giorni` : 'Tutto in regola' }}</div>
-            </div>
-            <div class="stat-art">
-              <img v-if="cover" :src="cover" alt="" />
-              <NeonVehicle v-else :kind="featured?.kind ?? 'auto'" :accent="featured?.accent" />
-            </div>
+      <div class="hero-row">
+        <div class="stat-tile">
+          <div class="stat-num">{{ active.length }}</div>
+          <div class="stat-lbl">{{ active.length === 1 ? 'veicolo' : 'veicoli' }}</div>
+          <div class="stat-sub">{{ urgentCount ? `${urgentCount} in scadenza` : 'Tutto in regola' }}</div>
+        </div>
+        <NuxtLink v-if="featured" :to="`/veicoli/${featured.id}`" class="feat">
+          <div class="feat-art">
+            <img v-if="cover" :src="cover" alt="" class="feat-photo" />
+            <VehicleArt v-else :kind="featured.kind" :accent="featured.accent" />
           </div>
-        </HoloCard>
+        </NuxtLink>
       </div>
 
       <div class="quick">
-        <NuxtLink v-for="a in actions" :key="a.label" :to="a.to" class="qa" :class="a.tone">
-          <span class="qa-ico"><component :is="a.icon" :size="21" /></span>
+        <NuxtLink v-for="(a, i) in actions" :key="a.label" :to="a.to" class="qa" :class="[a.tone, { main: i === 0 }]">
+          <span class="qa-ico"><component :is="a.icon" :size="22" /></span>
           <span>{{ a.label }}</span>
         </NuxtLink>
       </div>
 
-      <section v-if="next" class="section">
-        <NuxtLink :to="`/veicoli/${next.vehicleId}?tab=scadenze`" class="next" :class="urgency(next.days)">
+      <section v-if="next" class="section" style="margin-top: 20px">
+        <NuxtLink :to="`/veicoli/${next.vehicleId}?tab=scadenze`" class="next card" :class="urgency(next.days)">
           <span class="pulse" />
           <div class="grow">
             <div class="eyebrow">Prossima scadenza</div>
-            <strong>{{ next.label }} · {{ vehicleName(next.vehicle) }}</strong>
+            <strong class="ellipsis" style="display: block">{{ next.label }} · {{ vehicleName(next.vehicle) }}</strong>
           </div>
           <span class="when">{{ relativeDays(next.days) }}</span>
         </NuxtLink>
       </section>
 
-      <section class="section">
+      <section class="section" style="margin-top: 22px">
         <div class="section-head"><h2>I tuoi veicoli</h2><NuxtLink to="/veicoli" class="link">Vedi tutti <ChevronRight :size="15" /></NuxtLink></div>
         <TransitionGroup name="list" tag="div" class="stack" style="gap: 14px">
           <VehicleCard v-for="v in shown" :key="v.id" :vehicle="v" :deadlines="deadlinesByVehicle.get(v.id) ?? []" />
@@ -85,10 +80,11 @@
 </template>
 
 <script setup lang="ts">
-import { Bell, CalendarClock, ChartLine, ChevronRight, Plus, ScanText, Search, Wallet } from 'lucide-vue-next'
+import { Bell, CalendarClock, ChartColumn, ChevronRight, Plus, Search, Wallet } from 'lucide-vue-next'
 import { vehicleName } from '~/utils/deadlines'
 
 const { vehicles, deadlines, deadlinesByVehicle, loading } = useGarage()
+const dark = useIsDark()
 const q = ref('')
 const active = computed(() => vehicles.value.filter((v) => v.status === 'attivo'))
 const featured = computed(() => active.value[0] ?? vehicles.value[0])
@@ -103,51 +99,61 @@ const shown = computed(() => {
 })
 const actions = [
   { label: 'Aggiungi', to: '/veicoli/nuovo', icon: Plus, tone: 'violet' },
-  { label: 'Scadenze', to: '/scadenze', icon: CalendarClock, tone: 'amber' },
-  { label: 'Spese', to: '/spese', icon: Wallet, tone: 'teal' },
-  { label: 'Report', to: '/report', icon: ChartLine, tone: 'cyan' },
+  { label: 'Scadenze', to: '/scadenze', icon: CalendarClock, tone: 'rose' },
+  { label: 'Spese', to: '/spese', icon: Wallet, tone: 'cyan' },
+  { label: 'Report', to: '/report', icon: ChartColumn, tone: 'blue' },
 ]
-const greeting = computed(() => {
-  const h = new Date().getHours()
-  return h < 13 ? 'Buongiorno' : h < 18 ? 'Buon pomeriggio' : 'Buonasera'
-})
 </script>
 
 <style scoped>
-.welcome { min-height: calc(100dvh - var(--nav-h) - var(--safe-bottom) - 60px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 6px; padding-top: 10px; }
-.hex-wrap { position: relative; width: 210px; height: 230px; display: grid; place-items: center; }
-.hex { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 0 14px rgba(124, 92, 255, .8)) drop-shadow(0 0 30px rgba(34, 229, 255, .35)); animation: breathe 4s ease-in-out infinite; }
-.logo { position: relative; font-family: var(--font-display); font-weight: 600; font-size: 34px; letter-spacing: .14em; color: #fff; text-shadow: 0 0 18px rgba(170, 150, 255, .9); padding-left: .14em; }
-.hero-car { width: min(100%, 360px); margin-top: -36px; }
-.tagline { margin: 4px 0 18px; color: #e6e8ff; font-size: 16px; font-weight: 600; line-height: 1.5; }
-.tagline span { color: rgba(210, 215, 255, .6); font-weight: 500; font-size: 14px; }
-.start { max-width: 300px; }
-.manual { margin-top: 12px; font-size: 14px; color: rgba(210, 215, 255, .6); }
-.manual b { color: #7fe9ff; }
-@keyframes breathe { 50% { filter: drop-shadow(0 0 20px rgba(124, 92, 255, 1)) drop-shadow(0 0 40px rgba(34, 229, 255, .5)); } }
+/* ---------- benvenuto ---------- */
+.welcome { position: fixed; inset: 0; z-index: 40; overflow: hidden auto; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: calc(var(--safe-top) + 24px) 24px calc(var(--safe-bottom) + 24px); }
+.w-light { background: radial-gradient(90% 55% at 50% 30%, #5a3fc4 0%, #2c1e78 45%, #140f3d 100%); }
+.w-dark { background: radial-gradient(90% 55% at 50% 30%, #1a1f3e 0%, #0b0e22 55%, #05070f 100%); }
+.hex-wrap { position: relative; width: min(74vw, 300px); aspect-ratio: 300 / 330; display: grid; place-items: center; margin-bottom: -22%; }
+.hex { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.w-light .hex { filter: drop-shadow(0 0 10px rgba(255, 170, 90, .9)) drop-shadow(0 0 26px rgba(150, 100, 255, .9)); animation: breathe 4s ease-in-out infinite; }
+.w-dark .hex { filter: drop-shadow(0 0 12px rgba(150, 170, 255, .35)); }
+.logo { position: relative; top: -6%; font-family: var(--font-display); font-weight: 600; font-size: clamp(32px, 10vw, 44px); letter-spacing: .06em; color: #fff; text-shadow: 0 0 22px rgba(200, 180, 255, .8); }
+.hero-car { position: relative; width: min(112vw, 520px); margin: 0 -10vw; }
+.hero-car::after { content: ''; position: absolute; left: 12%; right: 12%; bottom: 2%; height: 18%; border-radius: 50%; background: radial-gradient(closest-side, rgba(150, 110, 255, .55), transparent); filter: blur(6px); z-index: -1; }
+.w-dark .hero-car::after { background: radial-gradient(closest-side, rgba(120, 140, 200, .35), transparent); }
+.tagline { margin: 18px 0 26px; color: rgba(235, 236, 255, .88); font-size: 17px; font-weight: 500; }
+.start { width: min(78vw, 300px); }
+.manual { margin-top: 18px; font-size: 13.5px; color: rgba(225, 228, 255, .65); }
+.manual a { color: #7fd8ff; font-weight: 600; }
+@keyframes breathe { 50% { filter: drop-shadow(0 0 16px rgba(255, 170, 90, 1)) drop-shadow(0 0 40px rgba(150, 100, 255, 1)); } }
 
-.search { margin-bottom: 16px; }
-.stat-in { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 18px 16px 18px 22px; min-height: 128px; }
-.stat-num { font-family: var(--font-display); font-size: 46px; font-weight: 700; line-height: 1; color: #fff; text-shadow: 0 0 18px rgba(124, 92, 255, .8); }
-.stat-lbl { margin-top: 4px; font-size: 14px; font-weight: 600; color: rgba(230, 232, 255, .85); }
-.stat-sub { margin-top: 8px; font-size: 12px; color: #7fe9ff; }
-.stat-art { width: 58%; max-width: 230px; display: grid; place-items: center; }
-.stat-art img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 14px; box-shadow: 0 0 24px rgba(124, 92, 255, .5); }
-.stat-art :deep(svg) { width: 100%; height: auto; }
+/* ---------- dashboard ---------- */
+.top-actions { display: flex; justify-content: flex-end; margin-bottom: 4px; }
+.search { margin-bottom: 22px; }
+.hero-row { position: relative; display: flex; align-items: stretch; min-height: 150px; }
+.stat-tile { position: relative; z-index: 1; width: 52%; padding: 22px 20px; color: #fff;
+  border-radius: 22px 46px 46px 22px; corner-top-right-shape: bevel; corner-bottom-right-shape: bevel;
+  background: linear-gradient(150deg, #1f7c86 0%, #1b3e66 45%, #1a1d48 100%);
+  box-shadow: 0 18px 30px -14px rgba(20, 60, 110, .7), inset 0 1px 0 rgba(255, 255, 255, .18); }
+:root[data-theme='dark'] .stat-tile { background: linear-gradient(150deg, rgba(60, 40, 40, .55), rgba(20, 22, 54, .8)); border: 1.5px solid rgba(255, 150, 70, .55); box-shadow: 0 0 22px -6px rgba(255, 140, 60, .6), inset 0 1px 0 rgba(255, 255, 255, .08); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .stat-tile { background: linear-gradient(150deg, rgba(60, 40, 40, .55), rgba(20, 22, 54, .8)); border: 1.5px solid rgba(255, 150, 70, .55); box-shadow: 0 0 22px -6px rgba(255, 140, 60, .6), inset 0 1px 0 rgba(255, 255, 255, .08); } }
+.stat-num { font-family: var(--font-display); font-size: 50px; font-weight: 700; line-height: 1; }
+.stat-lbl { margin-top: 6px; font-size: 15px; color: rgba(235, 240, 255, .9); }
+.stat-sub { margin-top: 10px; font-size: 12px; color: #9ef0ff; font-weight: 600; }
+.feat { position: absolute; right: -8px; top: -14px; bottom: -6px; width: 62%; z-index: 2; display: grid; place-items: center; }
+.feat-art { width: 100%; filter: drop-shadow(0 18px 18px rgba(20, 10, 60, .45)); }
+.feat-photo { width: 92%; margin-left: auto; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 18px; }
 
-.quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 18px; }
-.qa { display: flex; flex-direction: column; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; color: var(--text-2); }
-.qa-ico { --c: 124, 92, 255; width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; color: #fff;
-  background: radial-gradient(circle at 30% 25%, rgba(var(--c), .55), rgba(var(--c), .12) 70%); border: 1px solid rgba(var(--c), .7); box-shadow: 0 0 16px rgba(var(--c), .45), inset 0 0 12px rgba(var(--c), .35); transition: transform .15s; }
+.quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 22px; }
+.qa { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; color: var(--text-2); }
+.qa-ico { --c: 124, 92, 255; width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; color: rgb(var(--c)); background: var(--surface-solid); border: 1px solid var(--line-2); box-shadow: var(--shadow), inset 0 0 14px rgba(var(--c), .18); transition: transform .15s; }
+.qa.rose .qa-ico { --c: 255, 92, 138; }
+.qa.cyan .qa-ico { --c: 34, 190, 255; }
+.qa.blue .qa-ico { --c: 90, 130, 255; }
+.qa.main .qa-ico { color: #fff; background: var(--grad-primary); border: 0; box-shadow: 0 0 22px -2px rgba(91, 77, 255, .85), inset 0 1px 0 rgba(255, 255, 255, .3); }
 .qa:active .qa-ico { transform: scale(.92); }
-.qa.amber .qa-ico { --c: 255, 168, 32; }
-.qa.teal .qa-ico { --c: 25, 227, 177; }
-.qa.cyan .qa-ico { --c: 34, 229, 255; }
 
-.next { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); backdrop-filter: blur(14px); }
+.next { display: flex; align-items: center; gap: 12px; padding: 13px 16px; }
 .next strong { font-size: 14.5px; }
-.next .when { font-size: 13px; font-weight: 700; }
-.pulse { width: 10px; height: 10px; border-radius: 50%; flex: none; background: var(--ok); box-shadow: 0 0 0 0 currentColor; animation: pulse 2s infinite; color: var(--ok); }
+.next .when { font-size: 13px; font-weight: 700; flex: none; }
+.pulse { width: 10px; height: 10px; border-radius: 50%; flex: none; background: var(--ok); color: var(--ok); animation: pulse 2s infinite; }
 .next.warn .pulse { background: var(--warn); color: var(--warn); }
 .next.danger .pulse { background: var(--danger); color: var(--danger); }
 .next.warn .when { color: var(--warn); }
