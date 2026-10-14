@@ -1,6 +1,10 @@
 <template>
   <div class="page">
-    <header class="topbar"><h1>Impostazioni</h1></header>
+    <header class="topbar"><h1>Profilo</h1></header>
+
+    <div class="eyebrow" style="margin: 4px 0 8px">Account Google</div>
+    <CloudCard />
+    <div class="eyebrow" style="margin: 22px 0 8px">Impostazioni</div>
 
     <NuxtLink to="/veicoli" class="card profile">
       <div class="avatar"><CarFront :size="24" /></div>
@@ -10,9 +14,6 @@
       </div>
       <ChevronRight :size="18" class="faint" />
     </NuxtLink>
-
-    <div class="eyebrow" style="margin: 18px 0 8px">Account e cloud</div>
-    <CloudCard />
 
     <div class="list rows">
       <component :is="r.to ? NuxtLink : 'button'" v-for="r in rows" :key="r.label" :to="r.to" class="list-item" @click="r.sheet && (sheet = r.sheet)">

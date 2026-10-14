@@ -27,7 +27,14 @@ export const cloud = reactive({
   lastSync: 0,
   error: '',
   pending: 0,
+  ready: false, // stato dell'accesso già noto (all'avvio Firebase lo recupera in modo asincrono)
 })
+
+let readyResolve: () => void
+const readyPromise = new Promise<void>((r) => { readyResolve = r })
+const setReady = () => { cloud.ready = true; readyResolve() }
+/** Aspetta di sapere se l'utente ha già fatto l'accesso (massimo qualche secondo). */
+export const whenCloudReady = () => Promise.race([readyPromise, new Promise<void>((r) => setTimeout(r, 8000))])
 
 let fb: {
   auth: Auth
@@ -49,6 +56,7 @@ async function load() {
   if (emu) { a.connectAuthEmulator(auth, `http://${emu}:9099`, { disableWarnings: true }); f.connectFirestoreEmulator(fs, emu, 8080) }
   fb = { auth, fs, a, f }
   a.onAuthStateChanged(auth, (u) => {
+    setReady()
     if (u) {
       cloud.user = { uid: u.uid, email: u.email ?? undefined, name: u.displayName ?? undefined, photo: u.photoURL ?? undefined }
       localStorage.setItem(LINKED_KEY, u.uid)
@@ -62,18 +70,43 @@ async function load() {
   return fb
 }
 
+/** Traduce gli errori di Firebase in qualcosa di comprensibile. */
+function explain(e: any): string {
+  const code = String(e?.code ?? '')
+  const msg = String(e?.message ?? e)
+  if (/does not exist|not-found/i.test(code + msg)) return 'Il database Firestore non esiste ancora: crealo nella console Firebase (Firestore Database → Crea database).'
+  if (/permission-denied|insufficient permissions/i.test(code + msg)) return 'Firestore rifiuta l\'accesso: pubblica le regole indicate nella guida (Firestore → Regole).'
+  if (/unavailable|offline|timeout|failed to get/i.test(code + msg)) return 'Non riesco a raggiungere il cloud: controlla la connessione e riprova.'
+  return msg
+}
+
 function fail(e: unknown) {
   console.error('cloud', e)
   cloud.status = 'error'
-  cloud.error = e instanceof Error ? e.message : String(e)
+  cloud.error = explain(e)
+  // l'SDK con un database inesistente riprova all'infinito: lo chiedo direttamente al servizio
+  if (/timeout|unavailable/i.test(String((e as any)?.code ?? e)) && !localStorage.getItem('veicoli.cloud.emulator')) {
+    fetch(`https://firestore.googleapis.com/v1/projects/${FIREBASE_CONFIG.projectId}/databases/(default)/documents/x/x?key=${FIREBASE_CONFIG.apiKey}`)
+      .then((r) => r.text())
+      .then((t) => { if (/does not exist/i.test(t)) cloud.error = explain({ code: 'not-found' }) })
+      .catch(() => {})
+  }
 }
 
-/** All'avvio: se l'account era collegato riprende la sincronizzazione. */
+const withTimeout = <T>(p: Promise<T>, ms: number) => Promise.race([p, new Promise<T>((_, rej) => setTimeout(() => rej(Object.assign(new Error('timeout'), { code: 'timeout' })), ms))])
+
+/** All'avvio carica Firebase e scopre se l'utente ha già fatto l'accesso. */
 export function initCloud() {
-  if (localStorage.getItem(LINKED_KEY)) {
-    cloud.status = 'connecting'
-    load().catch(fail)
-  }
+  if (localStorage.getItem(LINKED_KEY)) cloud.status = 'connecting'
+  load().catch((e) => { fail(e); setReady() })
+}
+
+/** Riprova la sincronizzazione dopo un errore. */
+export function retrySync() {
+  if (!cloud.user) return
+  cloud.error = ''
+  uid = ''
+  startSync(cloud.user.uid).catch(fail)
 }
 
 export async function signInWithGoogle() {
@@ -140,13 +173,15 @@ async function startSync(u: string) {
   stopSync()
   uid = u
   cloud.status = 'syncing'
+  cloud.error = ''
   try { known = JSON.parse(localStorage.getItem(TS_KEY) ?? '{}') } catch { known = {} }
   const { f } = fb!
   // Primo collegamento su questo telefono: scarico tutto, poi invio solo quello che il cloud non ha ancora
   const firstKey = `veicoli.cloud.linked.${u}`
   if (!localStorage.getItem(firstKey)) {
     for (const t of SYNC_TABLES) {
-      const snap = await f.getDocs(userCol(t))
+      // dal server per forza: dalla cache locale vuota sembrerebbe un account senza dati
+      const snap = await withTimeout(f.getDocsFromServer(userCol(t)), 25000)
       const remote = new Set(snap.docs.map((d) => d.id))
       await applyDocs(t, snap.docs)
       const local = await (db() as any)[t].toCollection().primaryKeys() as string[]
@@ -155,11 +190,14 @@ async function startSync(u: string) {
     localStorage.setItem(firstKey, '1')
   }
   // Modifiche fatte su altri dispositivi
+  // includeMetadataChanges: senza, una raccolta vuota non avvisa mai che il server ha risposto
+  const fromServer = new Set<string>()
   for (const t of SYNC_TABLES) {
-    unsubs.push(f.onSnapshot(userCol(t), (snap) => {
+    unsubs.push(f.onSnapshot(userCol(t), { includeMetadataChanges: true }, (snap) => {
       const changed = snap.docChanges().filter((c) => c.type !== 'removed' && !c.doc.metadata.hasPendingWrites).map((c) => c.doc)
       if (changed.length) applyDocs(t, changed).catch(fail)
-      if (!snap.metadata.fromCache && !cloud.pending) { cloud.status = 'ok'; cloud.lastSync = Date.now() }
+      if (!snap.metadata.fromCache) fromServer.add(t)
+      if (fromServer.size === SYNC_TABLES.length && !cloud.pending && cloud.status !== 'error') { cloud.status = 'ok'; cloud.lastSync = Date.now() }
     }, fail))
   }
   unsubs.push(onOutboxChange(scheduleFlush))

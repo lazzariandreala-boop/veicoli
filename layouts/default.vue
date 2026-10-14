@@ -11,7 +11,7 @@
         <path d="M6 18 L130 16 C160 16 165 2 200 2 C235 2 240 16 270 16 L394 18" fill="none" stroke="url(#navline)" stroke-width="1.6" vector-effect="non-scaling-stroke" />
       </svg>
       <NuxtLink v-for="t in tabs" :key="t.to" :to="t.to" class="nav-item" :class="{ on: isOn(t.to) }">
-        <span class="ico"><component :is="t.icon" :size="21" :stroke-width="isOn(t.to) ? 2.3 : 1.8" /></span>
+        <span class="ico"><UserAvatar v-if="t.to === '/impostazioni' && cloud.user" :size="24" /><component :is="t.icon" v-else :size="21" :stroke-width="isOn(t.to) ? 2.3 : 1.8" /></span>
         <span>{{ t.label }}</span>
       </NuxtLink>
     </nav>
@@ -27,7 +27,7 @@ const tabs = [
   { to: '/veicoli', label: 'Veicoli', icon: CarFront },
   { to: '/scadenze', label: 'Scadenze', icon: CalendarClock },
   { to: '/spese', label: 'Spese', icon: Wallet },
-  { to: '/impostazioni', label: 'Altro', icon: LayoutGrid },
+  { to: '/impostazioni', label: 'Profilo', icon: LayoutGrid },
 ]
 const NAV_PAGES = [...tabs.map((t) => t.to), '/report']
 const showNav = computed(() => NAV_PAGES.includes(route.path))

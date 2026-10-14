@@ -1,12 +1,12 @@
 <template>
   <div class="page">
-    <template v-if="loading">
+    <template v-if="loading && cloud.user">
       <div class="skeleton" style="height: 160px; margin-top: 40px" />
       <div class="skeleton" style="height: 110px; margin-top: 14px" />
     </template>
 
     <!-- Benvenuto (nessun veicolo): schermata a tutto schermo come nel mockup -->
-    <div v-else-if="!vehicles.length" class="welcome" :class="dark ? 'w-dark' : 'w-light'">
+    <div v-else-if="!cloud.user || !vehicles.length" class="welcome" :class="dark ? 'w-dark' : 'w-light'">
       <div class="hex-wrap">
         <svg class="hex" viewBox="0 0 300 330" aria-hidden="true">
           <defs>
@@ -20,19 +20,41 @@
       </div>
       <div class="hero-car"><VehicleArt :hero="dark ? 'dark' : 'light'" /></div>
       <p class="tagline">Il tuo garage, sempre sotto controllo.</p>
-      <NuxtLink to="/veicoli/nuovo?scan=1" class="btn primary start">Inizia <ArrowRight :size="22" /></NuxtLink>
-      <p class="manual">Preferisci? <NuxtLink to="/veicoli/nuovo">Inserisci a mano</NuxtLink> · <NuxtLink to="/impostazioni?backup=1">Ripristina backup</NuxtLink></p>
-      <p class="manual">
-        <span v-if="cloud.user">{{ cloud.status === 'ok' ? 'Account collegato: nessun veicolo salvato' : 'Recupero i tuoi dati dal cloud…' }}</span>
-        <template v-else>Hai già usato l'app? <button class="linkish" :disabled="signing" @click="cloudLogin">{{ signing ? 'Accesso…' : 'Accedi con Google' }}</button></template>
-      </p>
+      <!-- accesso obbligatorio -->
+      <template v-if="!cloud.ready">
+        <div class="wait"><LoaderCircle :size="22" class="spin" /></div>
+      </template>
+      <template v-else-if="!cloud.user">
+        <button class="btn start google" :disabled="signing" @click="cloudLogin">
+          <GoogleLogo />
+          {{ signing ? 'Accesso in corso…' : 'Accedi con Google' }}
+        </button>
+        <p class="manual">Serve per salvare i tuoi veicoli e ritrovarli su ogni telefono.</p>
+        <p v-if="cloud.error" class="manual w-err">{{ cloud.error }}</p>
+      </template>
+      <template v-else-if="cloud.status === 'error'">
+        <p class="manual w-err">{{ cloud.error }}</p>
+        <button class="btn primary start" @click="retrySync"><RefreshCw :size="20" /> Riprova</button>
+        <p class="manual">Accesso fatto come {{ cloud.user.email }} · <NuxtLink to="/impostazioni">Account</NuxtLink></p>
+      </template>
+      <template v-else-if="cloud.status !== 'ok' && cloud.status !== 'offline'">
+        <div class="wait"><LoaderCircle :size="22" class="spin" /> Recupero i tuoi dati dal cloud…</div>
+      </template>
+      <template v-else>
+        <NuxtLink to="/veicoli/nuovo?scan=1" class="btn primary start">Inizia <ArrowRight :size="22" /></NuxtLink>
+        <p class="manual">Preferisci? <NuxtLink to="/veicoli/nuovo">Inserisci a mano</NuxtLink> · <NuxtLink to="/impostazioni?backup=1">Ripristina backup</NuxtLink></p>
+        <p class="manual">Accesso fatto come {{ cloud.user.email }}</p>
+      </template>
     </div>
 
     <!-- Dashboard -->
     <template v-else>
       <header class="topbar">
         <h1>Il tuo garage</h1>
-        <NuxtLink to="/scadenze" class="icon-btn" aria-label="Scadenze"><Bell :size="20" /><i v-if="urgentCount" class="dot" /></NuxtLink>
+        <div class="top-actions">
+          <NuxtLink to="/scadenze" class="icon-btn" aria-label="Scadenze"><Bell :size="20" /><i v-if="urgentCount" class="dot" /></NuxtLink>
+          <NuxtLink to="/impostazioni" class="me" aria-label="Account e impostazioni"><UserAvatar :size="40" /></NuxtLink>
+        </div>
       </header>
 
       <div class="hero-row">
@@ -74,7 +96,7 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowRight, Bell, ChevronRight, ScanLine } from 'lucide-vue-next'
+import { ArrowRight, Bell, ChevronRight, LoaderCircle, RefreshCw, ScanLine } from 'lucide-vue-next'
 import { vehicleName } from '~/utils/deadlines'
 
 const { vehicles, deadlines, deadlinesByVehicle, loading } = useGarage()
@@ -113,7 +135,14 @@ async function cloudLogin() {
 .hero-car::after { content: ''; position: absolute; left: 12%; right: 12%; bottom: 2%; height: 18%; border-radius: 50%; background: radial-gradient(closest-side, rgba(150, 110, 255, .55), transparent); filter: blur(6px); z-index: -1; }
 .w-dark .hero-car::after { background: radial-gradient(closest-side, rgba(120, 140, 200, .35), transparent); }
 .tagline { margin: 18px 0 26px; color: rgba(235, 236, 255, .88); font-size: 17px; font-weight: 500; }
-.start { width: min(86vw, 360px); height: auto; min-height: 80px; padding: 28px 24px; border-radius: 20px; font-size: 19px; font-weight: 700; gap: 10px; }
+.start { width: min(86vw, 360px); height: auto; min-height: 72px; padding: 24px 24px; border-radius: 20px; font-size: 18px; font-weight: 700; gap: 12px; }
+.start.google { background: #fff; color: #1f1f1f; border: 0; box-shadow: 0 14px 34px -12px rgba(120, 90, 255, .8), 0 0 0 1px rgba(255, 255, 255, .5); }
+.wait { display: inline-flex; align-items: center; gap: 10px; min-height: 72px; color: rgba(235, 236, 255, .9); font-weight: 600; }
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg) } }
+.w-err { color: #ffb3c4; font-weight: 600; max-width: 340px; margin: 0 0 14px; }
+.top-actions { display: flex; align-items: center; gap: 10px; }
+.me { display: block; border-radius: 50%; }
 .manual { margin-top: 18px; font-size: 13.5px; color: rgba(225, 228, 255, .65); }
 .manual a, .linkish { color: #7fd8ff; font-weight: 600; }
 .linkish { background: none; border: 0; padding: 0; font: inherit; cursor: pointer; }
