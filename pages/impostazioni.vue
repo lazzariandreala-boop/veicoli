@@ -72,7 +72,7 @@
         <div class="logo"><CarFront :size="26" /></div>
         <strong>Veicoli</strong>
         <span class="faint">Versione {{ version }} · {{ count }} veicoli · {{ storage }}</span>
-        <p class="faint credits">Modello 3D dell'auto: "Car Concept" dai glTF Sample Assets di Khronos, basato sul modello di Unity Fan, licenza CC BY 4.0.</p>
+        <p class="faint credits">Modello 3D dell'auto: "Car Concept" dai glTF Sample Assets di Khronos, basato sul modello di Unity Fan, licenza CC BY 4.0. Modello 3D della moto fornito da Andrea (creato con Meshy).</p>
       </div>
     </BottomSheet>
   </div>
