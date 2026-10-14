@@ -27,13 +27,22 @@ export function matchVehicle(vehicles: Vehicle[], doc: Pick<ParsedDoc, 'plate' |
 
 const plain = <T>(x: T): T => JSON.parse(JSON.stringify(x))
 
+/** Durata della polizza: 6 o 12 mesi se lo dicono le date, altrimenti quella scelta. */
+function policyMonthsOf(d: ParsedDoc) {
+  if (d.startDate && d.endDate) {
+    const m = Math.round((new Date(d.endDate).getTime() - new Date(d.startDate).getTime()) / (30.44 * 86400000))
+    if (m === 6 || m === 12) return m
+  }
+  return d.validityMonths
+}
+
 /** Salva il documento come lavoro, polizza, revisione o bollo. Restituisce la scheda da aprire. */
 export async function saveDocument(doc: ParsedDoc, vehicle: Vehicle, files: File[], opts: { setPurchaseDate?: boolean } = {}): Promise<string> {
   const mediaIds = files.length ? await storeFiles(files) : []
   const base = { id: uid(), vehicleId: vehicle.id, createdAt: Date.now() }
   let tab = 'lavori'
   if (doc.kind === 'assicurazione') {
-    const rec: InsurancePolicy = { ...base, company: doc.company, policyNumber: doc.policyNumber, startDate: doc.startDate, endDate: doc.endDate!, price: doc.total, durationMonths: doc.validityMonths, coverage: doc.title, mediaIds }
+    const rec: InsurancePolicy = { ...base, company: doc.company, policyNumber: doc.policyNumber, startDate: doc.startDate, endDate: doc.endDate!, price: doc.total, durationMonths: policyMonthsOf(doc), coverage: doc.title, mediaIds }
     await db().policies.put(plain(rec))
     tab = 'scadenze'
   } else if (doc.kind === 'revisione') {

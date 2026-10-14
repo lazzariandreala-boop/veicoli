@@ -86,47 +86,7 @@
           </label>
         </template>
 
-        <!-- assicurazione -->
-        <template v-else-if="doc.kind === 'assicurazione'">
-          <div class="grid-2">
-            <FField v-model="doc.company" label="Compagnia" />
-            <FField v-model="doc.policyNumber" label="N° polizza" />
-            <FField v-model="doc.startDate" label="Dal" type="date" />
-            <FField v-model="doc.endDate" label="Scadenza" type="date" required />
-            <FField v-model="doc.total" label="Premio pagato" type="money" />
-            <FField v-model="doc.title" label="Coperture" placeholder="RCA, furto…" />
-          </div>
-          <div class="field"><span>Durata</span>
-            <div class="segmented">
-              <button v-for="m in [6, 12]" :key="m" type="button" :class="{ on: policyMonths === m }" @click="setPolicyMonths(m)">{{ m }} mesi</button>
-            </div>
-          </div>
-        </template>
-
-        <!-- revisione -->
-        <template v-else-if="doc.kind === 'revisione'">
-          <div class="segmented">
-            <button v-for="o in OUTCOMES" :key="o.value" type="button" :class="{ on: doc.outcome === o.value }" @click="doc.outcome = o.value">{{ o.label }}</button>
-          </div>
-          <div class="grid-2">
-            <FField v-model="doc.date" label="Fatta il" type="date" required />
-            <FField v-model="doc.nextDate" label="Prossima entro" type="date" />
-            <FField v-model="doc.km" label="Km" type="number" />
-            <FField v-model="doc.total" label="Costo" type="money" />
-          </div>
-          <FField v-model="doc.center" label="Centro revisioni" />
-        </template>
-
-        <!-- bollo -->
-        <template v-else-if="doc.kind === 'bollo'">
-          <div class="grid-2">
-            <FField v-model="doc.date" label="Pagato il" type="date" required />
-            <FField v-model="doc.total" label="Importo" type="money" />
-            <FField v-model="doc.nextDueMonth" label="Prossimo pagamento" type="month" />
-            <FField v-model="doc.validityMonths" label="Mesi coperti" type="number" />
-          </div>
-          <p v-if="doc.fromMonth && doc.toMonth" class="faint" style="margin: -4px 0 0; font-size: 13px">Sulla ricevuta: periodo da {{ monthName(doc.fromMonth) }} a {{ monthName(doc.toMonth) }}.</p>
-        </template>
+        <DocFields v-else :doc="doc" />
 
         <p v-if="duplicate" class="err dup-msg"><CircleAlert :size="18" /> {{ duplicate }}</p>
         <button class="btn primary big" :disabled="!canSave || saving || !!duplicate" @click="save"><Check :size="19" /> Salva nel veicolo</button>
@@ -139,7 +99,7 @@
 <script setup lang="ts">
 import { Camera, Check, ChevronLeft, CircleAlert, CircleCheck, ClipboardCheck, FileText, FileUp, Landmark, Plus, Repeat, ScanText, ShieldCheck, Wrench, X } from 'lucide-vue-next'
 import { DOC_LABEL, parseDocument, type DocKind, type ParsedDoc } from '~/utils/documents'
-import { addMonths, monthName, parseISO, toISO, vehicleName } from '~/utils/deadlines'
+import { vehicleName } from '~/utils/deadlines'
 import { parseLibrettoMulti } from '~/utils/libretto'
 
 const route = useRoute()
@@ -150,7 +110,6 @@ const TYPES = [
   { label: 'Bollo', icon: Landmark }, { label: 'Passaggio di proprietà', icon: Repeat }, { label: 'Libretto', icon: FileText },
 ]
 const KINDS: DocKind[] = ['fattura', 'assicurazione', 'revisione', 'bollo', 'passaggio', 'libretto']
-const OUTCOMES = [{ value: 'regolare', label: 'Regolare' }, { value: 'ripetere', label: 'Da ripetere' }, { value: 'sospeso', label: 'Sospeso' }] as const
 
 const busy = ref(false)
 const stage = ref('')
@@ -223,25 +182,9 @@ watch([doc, vehicleId], async () => {
 }, { deep: true, immediate: true })
 const librettoOwner = computed(() => (doc.value?.kind === 'libretto' ? matchVehicle(vehicles.value, doc.value).vehicle : undefined))
 
-const policyMonths = computed(() => {
-  const d = doc.value
-  if (d?.startDate && d.endDate) {
-    const m = Math.round((parseISO(d.endDate).getTime() - parseISO(d.startDate).getTime()) / (30.44 * 86400000))
-    if (m === 6 || m === 12) return m
-  }
-  return d?.validityMonths
-})
-function setPolicyMonths(m: number) {
-  if (!doc.value) return
-  doc.value.startDate ??= todayISO()
-  doc.value.validityMonths = m
-  doc.value.endDate = toISO(addMonths(parseISO(doc.value.startDate), m))
-}
-
 async function save() {
   if (!doc.value || !vehicle.value) return
   if (duplicate.value) { toast(duplicate.value, 'danger'); return }
-  if (doc.value.kind === 'assicurazione') doc.value.validityMonths = policyMonths.value
   saving.value = true
   try {
     const tab = await saveDocument(toRaw(doc.value), vehicle.value, files.value, { setPurchaseDate: setPurchaseDate.value })

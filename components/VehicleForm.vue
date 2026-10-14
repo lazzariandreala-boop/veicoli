@@ -94,6 +94,8 @@
         hint="Alcune regioni fanno pagare le moto in un mese fisso (es. gennaio). Lascia vuoto per usare la data in cui paghi." />
     </FoldSection>
 
+    <VehicleDocs v-if="isNew" v-model="pendingDocs" :plate="form.plate" />
+
     <FField v-model="form.notes" label="Note" type="textarea" placeholder="Qualsiasi cosa da ricordare" />
 
     <div class="form-actions" style="background: linear-gradient(to top, var(--bg) 70%, transparent)">
@@ -108,6 +110,7 @@ import { Check, FileText, HandCoins, History, ImagePlus, Landmark, Plus, Trash2 
 import { LIBRETTO_LABELS, plateKind, type LibrettoData } from '~/utils/libretto'
 import { vehicleName } from '~/utils/deadlines'
 import type { Vehicle } from '~/utils/types'
+import type { ParsedDoc } from '~/utils/documents'
 import type { VehicleKind } from '~/utils/libretto'
 
 const props = defineProps<{ vehicle?: Vehicle; scan?: boolean }>()
@@ -128,6 +131,8 @@ function blank(): Vehicle {
 const form = reactive<Vehicle>(props.vehicle ? structuredClone(toRaw(props.vehicle)) : blank())
 const lib = form.libretto as Record<string, any>
 const filled = reactive(new Set<string>())
+// bollo, assicurazione e revisione caricati nel modulo: si salvano dopo il veicolo
+const pendingDocs = ref<Partial<Record<'bollo' | 'assicurazione' | 'revisione', { doc: ParsedDoc; files: File[] }>>>({})
 const saving = ref(false)
 const { url: coverUrl } = useMediaUrl(() => form.coverMediaId)
 const previewName = computed(() => vehicleName(form as Vehicle) === 'Veicolo' ? 'Nuovo veicolo' : vehicleName(form as Vehicle))
@@ -218,8 +223,12 @@ async function save() {
     v.plateHistory = v.plateHistory.filter((p) => p.plate?.trim()).map((p) => ({ ...p, plate: p.plate.toUpperCase().trim() }))
     v.updatedAt = Date.now()
     if (props.vehicle?.coverMediaId && props.vehicle.coverMediaId !== v.coverMediaId) await deleteMedia([props.vehicle.coverMediaId])
+    const docs = Object.values(pendingDocs.value).filter((p) => p && (p.doc.kind === 'assicurazione' ? p.doc.endDate : p.doc.date))
+    const skipped = Object.values(pendingDocs.value).length - docs.length
     await db().vehicles.put(v)
-    toast(isNew.value ? 'Veicolo aggiunto al garage' : 'Modifiche salvate')
+    for (const p of docs) await saveDocument(JSON.parse(JSON.stringify(toRaw(p!.doc))), v, p!.files)
+    if (skipped) toast(`${skipped === 1 ? 'Un documento non è stato salvato' : skipped + ' documenti non sono stati salvati'}: manca la data`, 'danger')
+    toast(isNew.value ? `Veicolo aggiunto al garage${docs.length ? ` con ${docs.length} ${docs.length === 1 ? 'documento' : 'documenti'}` : ''}` : 'Modifiche salvate')
     emit('saved', v.id)
   } finally {
     saving.value = false
