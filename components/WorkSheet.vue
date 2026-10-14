@@ -1,10 +1,11 @@
 <template>
-  <BottomSheet :open="open" :title="record ? 'Modifica lavoro' : 'Nuovo lavoro'" @close="$emit('close')">
+  <BottomSheet :open="open" :title="record ? 'Modifica lavoro' : category === 'tagliando' ? 'Tagliando fatto' : 'Nuovo lavoro'" @close="$emit('close')">
     <div class="stack" style="gap: 12px">
       <div class="chips cats">
         <button v-for="c in WORK_CATEGORIES" :key="c.value" type="button" class="chip-btn" :class="{ on: f.category === c.value }" @click="pickCat(c.value)">{{ c.label }}</button>
       </div>
-      <FField v-model="f.title" label="Cosa è stato fatto" placeholder="es. Tagliando 20.000 km, olio e filtri" required />
+      <FField v-model="f.title" :label="f.category === 'tagliando' ? 'Titolo' : 'Cosa è stato fatto'" placeholder="es. Tagliando 20.000 km, olio e filtri" required />
+      <ServiceChecklist v-if="f.category === 'tagliando'" v-model="f.service!" />
       <div class="grid-2">
         <FField v-model="f.date" label="Data" type="date" required />
         <FField v-model="f.km" label="Km" type="number" />
@@ -26,13 +27,13 @@
 <script setup lang="ts">
 import { Check, Trash2 } from 'lucide-vue-next'
 import type { Vehicle, Work, WorkCategory } from '~/utils/types'
-const props = defineProps<{ open: boolean; vehicle: Vehicle; record?: Work | null }>()
+const props = defineProps<{ open: boolean; vehicle: Vehicle; record?: Work | null; category?: WorkCategory }>()
 const emit = defineEmits<{ close: [] }>()
 const f = reactive<Partial<Work>>({ mediaIds: [] })
 let original: string[] = []
 watch(() => props.open, (o) => {
   if (!o) return
-  Object.assign(f, { title: undefined, category: 'tagliando', date: todayISO(), km: props.vehicle.currentKm, cost: undefined, workshop: undefined, notes: undefined, mediaIds: [] }, props.record ? structuredClone(toRaw(props.record)) : {})
+  Object.assign(f, { title: props.category === 'tagliando' ? 'Tagliando' : undefined, category: props.category ?? 'tagliando', service: [], date: todayISO(), km: props.vehicle.currentKm, cost: undefined, workshop: undefined, notes: undefined, mediaIds: [] }, props.record ? structuredClone(toRaw(props.record)) : {})
   original = [...(f.mediaIds ?? [])]
 }, { immediate: true })
 function pickCat(c: WorkCategory) {
@@ -41,6 +42,7 @@ function pickCat(c: WorkCategory) {
   if (!f.title || f.title === prevLabel) f.title = workCategoryLabel(c)
 }
 async function save() {
+  if (f.category !== 'tagliando') f.service = undefined
   const rec = JSON.parse(JSON.stringify({ ...toRaw(f), id: props.record?.id ?? uid(), vehicleId: props.vehicle.id, createdAt: props.record?.createdAt ?? Date.now(), mediaIds: f.mediaIds ?? [] })) as Work
   await db().works.put(rec)
   await deleteMedia(original.filter((id) => !rec.mediaIds.includes(id)))

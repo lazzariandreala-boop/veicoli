@@ -163,7 +163,7 @@ function firstSegment(line: string) {
 const toDigit: Record<string, string> = { O: '0', Q: '0', D: '0', I: '1', L: '1', '|': '1', Z: '2', S: '5', B: '8', G: '6', T: '7', A: '4' }
 const toLetter: Record<string, string> = { '0': 'O', '1': 'I', '2': 'Z', '5': 'S', '8': 'B', '6': 'G', '7': 'T', '4': 'A' }
 
-function digits(s: string) { return s.split('').map((c) => toDigit[c] ?? c).join('') }
+export function digits(s: string) { return s.split('').map((c) => toDigit[c] ?? c).join('') }
 function letters(s: string) { return s.split('').map((c) => toLetter[c] ?? c).join('') }
 
 export function parseDate(s?: string): string | undefined {
@@ -176,7 +176,7 @@ export function parseDate(s?: string): string | undefined {
   return `${yy}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')}`
 }
 
-function parseNumber(s?: string): number | undefined {
+export function parseNumber(s?: string): number | undefined {
   if (!s) return
   const m = digits(s.toUpperCase()).match(/\d+(?:[.,]\d+)?/)
   if (!m) return
@@ -264,16 +264,22 @@ export function parseLibretto(text: string): LibrettoData {
   // Targa: compare (A) su ogni pagina; si sceglie la lettura più frequente
   const plates = get('A').map((t) => normalizePlate(t.value.split(' ')[0] + (t.value.split(' ')[1] && t.value.split(' ')[0].length < 4 ? t.value.split(' ')[1] : '')))
     .filter((p) => p.length >= 5 && p.length <= 9)
-  const plateFromLine = [...upper.matchAll(/\(A\)\s*[-—–\s|]*([A-Z0-9]{2}\s?[A-Z0-9]{3,6})/g)].map((m) => normalizePlate(m[1]))
+  // "(A)" spesso letto come "LIA)", "TA)" o "|A)"
+  const plateFromLine = [...upper.matchAll(/(?:\(A\)|(?:^|[\s|])[|(LIT1]{1,2}A\))\s*[-—–\s|]*([A-Z0-9]{2}\s?[A-Z0-9]{3,6})/g)].map((m) => normalizePlate(m[1]))
   // la targa è stampata anche accanto al N° di archivio in testa a ogni pagina
+  // (formato attuale M0xxxxxxVI26 o precedente A074468M023)
+  const ARCHIVE = /M[O0]\d{5,6}[A-Z0-9]{2,4}|\b[A-Z][O0-9]\d{5}M[O0-9]\d{2}\b/g
   const plateNearArchive = upper.split('\n')
-    .filter((l) => /M[O0]\d{5,6}[A-Z0-9]{2,4}/.test(l))
-    .flatMap((l) => [...l.replace(/M[O0]\d{5,6}[A-Z0-9]{2,4}/g, ' ').matchAll(/(?:^|[^A-Z0-9])([A-Z0-9]{2}\s?[A-Z0-9]{5})(?=$|[^A-Z0-9])/g)].map((m) => normalizePlate(m[1])))
+    .filter((l) => new RegExp(ARCHIVE.source).test(l))
+    .flatMap((l) => [...l.replace(ARCHIVE, ' ').matchAll(/(?:^|[^A-Z0-9])([A-Z0-9]{2}\s?[A-Z0-9]{5})(?=$|[^A-Z0-9])/g)].map((m) => normalizePlate(m[1])))
     .filter((p) => /^[A-Z]{2}(\d{5}|\d{3}[A-Z]{2})$/.test(p))
   out.targa = pickMostFrequent([...plates, ...plateFromLine, ...plateNearArchive].filter((p) => /^[A-Z]{2}(\d{5}|\d{3}[A-Z]{2})$/.test(p)))
     ?? pickMostFrequent([...plates, ...plateFromLine])
 
-  const archivio = [...upper.matchAll(/\b(M[O0]\d{5,6}[A-Z0-9]{2,4})\b/g)].map((m) => 'M0' + m[1].slice(2).replace(/O/g, '0'))
+  const archivio = [
+    ...[...upper.matchAll(/\b(M[O0]\d{5,6}[A-Z0-9]{2,4})\b/g)].map((m) => 'M0' + m[1].slice(2).replace(/O/g, '0')),
+    ...[...upper.matchAll(/\b([A-Z][O0-9]\d{5}M[O0-9]\d{2})\b/g)].map((m) => m[1][0] + m[1].slice(1).replace(/O/g, '0').replace(/^(\d{6})M/, '$1M')),
+  ]
   out.numeroArchivio = pickMostFrequent(archivio)
   const carta = upper.match(/\b([A-Z]{2})\s?([0-9OQ]{7})\b/g)
     ?.map((s) => s.replace(/\s/g, ''))
@@ -334,6 +340,7 @@ export function parseLibretto(text: string): LibrettoData {
   out.alimentazione = fuel ? normalizeFuel(fuel) : undefined
   out.codiceMotore = val('P.5')?.replace(/W{2,}$/, 'W')
   out.rapportoPotenzaPeso = parseNumber(val('Q'))
+  if ((out.rapportoPotenzaPeso ?? 0) > 1) out.rapportoPotenzaPeso = undefined // è in kW/kg: valori sopra 1 sono letture sbagliate
   out.posti = parseNumber(val('S.1'))
   out.postiInPiedi = parseNumber(val('S.2'))
   out.livelloSonoro = parseNumber(val('U.1'))
@@ -361,10 +368,12 @@ export function parseLibretto(text: string): LibrettoData {
   const pneAll = [...upper.replace(/R1I(\d)/g, 'R1$1').matchAll(/\b([AP])\s*:\s*(\d{2,3}\/\d{2}\s*Z?R\s?\d{2}[A-Z/]*\s*\d{2,3}[A-Z])/g)]
   const pne = ['A', 'P'].map((ax) => pneAll.find((m) => m[1] === ax)).filter(Boolean) as RegExpMatchArray[]
   if (pne.length) out.pneumatici = pne.map((m) => `${m[1] === 'A' ? 'Ant.' : 'Post.'} ${m[2].replace(/\s+/g, ' ')}`).join(' · ')
-  const pra = upper.match(/PROGRESSIVO\s+PRA\s+([0-9OI]{2}\/[0-9OI]{6,8}[A-Z]?)/)
-  if (pra) out.progressivoPra = digits(pra[1].slice(0, -1)) + pra[1].slice(-1)
+  const pra = upper.match(/PROGRESSIVO\s+PRA\s+([0-9OI]{2})\/([A-Z]?)([0-9OI]{6,8})([A-Z]?)/)
+  if (pra) out.progressivoPra = `${digits(pra[1])}/${pra[2]}${digits(pra[3])}${pra[4]}`
 
   if (out.marca && out.costruttore && out.marca.length < 3) out.marca = out.costruttore.split(' ')[0]
+  // la riga (J) a volte non si legge: le autovetture per trasporto persone sono M1
+  if (!out.categoria && /AUTOVETTURA/.test(out.usoDestinazione ?? '')) out.categoria = 'M1'
   out.tipoVeicolo = kindFromCategory(out.categoria, out.usoDestinazione, out.carrozzeria)
     ?? (out.targa ? (plateKind(out.targa) === 'moto' ? 'moto' : plateKind(out.targa) === 'auto' ? 'auto' : undefined) : undefined)
 
@@ -383,35 +392,35 @@ export function mergeLibretto(a: LibrettoData, b: LibrettoData): LibrettoData {
 
 export const LIBRETTO_LABELS: Record<keyof LibrettoData, string> = {
   targa: 'Targa (A)',
-  numeroCarta: 'N° carta di circolazione',
+  numeroCarta: 'N° carta circolazione',
   numeroArchivio: 'N° archivio',
-  dataPrimaImmatricolazione: 'Prima immatricolazione (B)',
-  dataImmatricolazione: 'Immatricolazione attuale (I)',
-  intestatarioCognome: 'Cognome / Ragione sociale (C.2.1)',
+  dataPrimaImmatricolazione: 'Prima immatric. (B)',
+  dataImmatricolazione: 'Immatricolazione (I)',
+  intestatarioCognome: 'Cognome (C.2.1)',
   intestatarioNome: 'Nome (C.2.2)',
   intestatarioNascita: 'Nascita intestatario',
   codiceFiscale: 'Codice fiscale',
   indirizzo: 'Indirizzo (C.2.3)',
   marca: 'Marca (D.1)',
   tipo: 'Tipo / Variante (D.2)',
-  modello: 'Denominazione commerciale (D.3)',
+  modello: 'Modello (D.3)',
   telaio: 'N° telaio / VIN (E)',
-  massaMaxTecnica: 'Massa max tecnica kg (F.1)',
-  massaMax: 'Massa max ammissibile kg (F.2)',
-  massaComplesso: 'Massa max complesso kg (F.3)',
-  massaInServizio: 'Massa in servizio kg (G)',
+  massaMaxTecnica: 'Massa tecnica kg (F.1)',
+  massaMax: 'Massa max kg (F.2)',
+  massaComplesso: 'Massa compl. kg (F.3)',
+  massaInServizio: 'Massa servizio kg (G)',
   categoria: 'Categoria (J)',
   usoDestinazione: 'Destinazione e uso (J.1)',
   carrozzeria: 'Carrozzeria (J.2)',
   omologazione: 'N° omologazione (K)',
   assi: 'Numero assi (L)',
-  massaRimorchiabileFrenata: 'Rimorchiabile frenata kg (O.1)',
-  massaRimorchiabileNonFrenata: 'Rimorchiabile non frenata kg (O.2)',
+  massaRimorchiabileFrenata: 'Rimorchio fren. (O.1)',
+  massaRimorchiabileNonFrenata: 'Rimorchio non fren. (O.2)',
   cilindrata: 'Cilindrata cm³ (P.1)',
   potenzaKw: 'Potenza kW (P.2)',
   alimentazione: 'Alimentazione (P.3)',
   codiceMotore: 'Codice motore (P.5)',
-  rapportoPotenzaPeso: 'Rapporto potenza/peso kW/kg (Q)',
+  rapportoPotenzaPeso: 'Potenza/peso (Q)',
   posti: 'Posti a sedere (S.1)',
   postiInPiedi: 'Posti in piedi (S.2)',
   livelloSonoro: 'Livello sonoro dB (U.1)',
@@ -449,5 +458,11 @@ export function parseLibrettoMulti(texts: string[]): LibrettoData {
   }
   const cf = parsed.map((p) => p.codiceFiscale).find(Boolean)
   if (cf) out.codiceFiscale = cf
+  // ripulisce la punteggiatura spuria lasciata dall'OCR
+  for (const k of ['costruttore', 'usoDestinazione', 'carrozzeria', 'marca', 'modello'] as const) {
+    if (out[k]) out[k] = out[k]!.replace(/\s*[:;]\s*/g, ' ').replace(/\s{2,}/g, ' ').trim()
+  }
+  if (out.codiceMotore) out.codiceMotore = out.codiceMotore.replace(/[^A-Z0-9]/gi, '')
+  if (out.direttivaAmbientale) out.direttivaAmbientale = out.direttivaAmbientale.replace(/\s+/g, '')
   return out
 }

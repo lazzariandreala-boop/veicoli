@@ -57,6 +57,7 @@ export function bolloNextDueMonth(paidDate: string, validityMonths = 12, fixedMo
 /** Prossima revisione: 4 anni dalla prima immatricolazione, poi ogni 2 anni (entro fine mese). */
 export function nextInspectionDate(firstRegistration?: string, inspections: Inspection[] = []): string | undefined {
   const done = inspections.filter((i) => i.outcome === 'regolare').sort((a, b) => b.date.localeCompare(a.date))[0]
+  if (done?.nextDate) return done.nextDate
   let base: Date
   if (done) base = addMonths(parseISO(done.date), 24)
   else if (firstRegistration) base = addMonths(parseISO(firstRegistration), 48)

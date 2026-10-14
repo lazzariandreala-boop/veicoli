@@ -46,11 +46,27 @@
           </div>
         </div>
 
+        <div class="quick-docs">
+          <NuxtLink :to="`/documento?veicolo=${v.id}`" class="btn primary"><ScanText :size="19" /> Leggi documento</NuxtLink>
+          <button class="btn" @click="editWork(null, 'tagliando')"><Wrench :size="18" /> Tagliando</button>
+        </div>
+
         <div class="grid-3">
           <div class="stat card flat"><Gauge :size="18" /><b class="num">{{ v.currentKm ? int(v.currentKm) : '—' }}</b><span>km</span></div>
           <div class="stat card flat"><Wallet :size="18" /><b class="num">{{ money(totals.running, true) }}</b><span>spese</span></div>
           <div class="stat card flat"><CalendarDays :size="18" /><b class="num">{{ ownedFor }}</b><span>possesso</span></div>
         </div>
+
+        <button v-if="lastService" class="card flat last-svc" @click="editWork(lastService)">
+          <div class="row" style="gap: 12px">
+            <div class="icon-bubble accent"><Wrench :size="19" /></div>
+            <div class="grow" style="min-width: 0; text-align: left">
+              <div class="eyebrow">Ultimo tagliando</div>
+              <strong>{{ formatDate(lastService.date) }}{{ lastService.km ? ' · ' + km(lastService.km) : '' }}</strong>
+              <div v-if="lastService.service?.length" class="svc-line">{{ lastService.service.map(tagliandoLabel).join(' · ') }}</div>
+            </div>
+          </div>
+        </button>
 
         <HoloCard v-if="v.status === 'attivo' && deadlines.length" glow="violet" soft :cut="30">
           <div class="vstats">
@@ -115,7 +131,7 @@
         </section>
         <section>
           <div class="section-head"><h2>Revisione</h2><button class="btn sm" @click="editInspection(null)"><Plus :size="16" /> Fatta</button></div>
-          <p v-if="nextRev" class="muted" style="margin: 0 0 10px">Prossima entro il <b>{{ formatDate(nextRev) }}</b> <span class="faint">(4 anni dalla prima immatricolazione, poi ogni 2)</span></p>
+          <p v-if="nextRev" class="muted" style="margin: 0 0 10px">Prossima entro il <b>{{ formatDate(nextRev) }}</b> <span class="faint">{{ inspections.some((i) => i.nextDate) ? '(dal certificato di revisione)' : '(4 anni dalla prima immatricolazione, poi ogni 2)' }}</span></p>
           <div v-if="inspections.length" class="list">
             <button v-for="i in inspections" :key="i.id" class="list-item" @click="editInspection(i)">
               <div class="icon-bubble" :class="i.outcome === 'regolare' ? 'ok' : 'warn'"><ClipboardCheck :size="19" /></div>
@@ -227,7 +243,7 @@
     <BolloSheet :open="open.bollo" :vehicle="v" :record="edit.bollo" @close="open.bollo = false" />
     <PolicySheet :open="open.policy" :vehicle="v" :record="edit.policy" :renew-from="edit.renew" @close="open.policy = false" />
     <InspectionSheet :open="open.inspection" :vehicle="v" :record="edit.inspection" @close="open.inspection = false" />
-    <WorkSheet :open="open.work" :vehicle="v" :record="edit.work" @close="open.work = false" />
+    <WorkSheet :open="open.work" :vehicle="v" :record="edit.work" :category="workCat" @close="open.work = false" />
     <IncidentSheet :open="open.incident" :vehicle="v" :record="edit.incident" @close="open.incident = false" />
     <EndSheet :open="open.end" :vehicle="v" :incidents="incidents" @close="open.end = false" />
 
@@ -250,6 +266,7 @@ import {
 } from 'lucide-vue-next'
 import { daysBetween, deadlinesFor, formatDate, monthName, nextInspectionDate, parseISO, vehicleName } from '~/utils/deadlines'
 import { LIBRETTO_LABELS, type LibrettoData } from '~/utils/libretto'
+import { tagliandoLabel } from '~/utils/documents'
 import type { BolloPayment, DeadlineKind, Fault, Incident, InsurancePolicy, Inspection, Work } from '~/utils/types'
 
 const route = useRoute()
@@ -283,7 +300,8 @@ const menu = ref(false)
 const editBollo = (r: BolloPayment | null) => { edit.bollo = r; open.bollo = true }
 const editPolicy = (r: InsurancePolicy | null, renew?: InsurancePolicy) => { edit.policy = r; edit.renew = r ? null : renew ?? null; open.policy = true }
 const editInspection = (r: Inspection | null) => { edit.inspection = r; open.inspection = true }
-const editWork = (r: Work | null) => { edit.work = r; open.work = true }
+const workCat = ref<'tagliando' | undefined>()
+const editWork = (r: Work | null, cat?: 'tagliando') => { workCat.value = cat; edit.work = r; open.work = true }
 const editIncident = (r: Incident | null) => { edit.incident = r; open.incident = true }
 // Arrivo da "Aggiungi spesa": apre direttamente il modulo richiesto
 let addDone = false
@@ -292,6 +310,7 @@ watch(loading, (l) => {
   addDone = true
   const add = route.query.add as string | undefined
   if (add === 'work') editWork(null)
+  else if (add === 'tagliando') editWork(null, 'tagliando')
   else if (add === 'bollo') editBollo(null)
   else if (add === 'policy') editPolicy(null, policies.value[0])
   else if (add === 'inspection') editInspection(null)
@@ -315,6 +334,7 @@ const deadlines = computed(() => {
 const health = computed(() => vehicleHealth(v.value!, deadlines.value as any))
 const healthPct = computed(() => (deadlines.value.length ? Math.round((deadlines.value.filter((d) => d.days > 30).length / deadlines.value.length) * 100) : 100))
 const lifePct = (d: { kind: string; days: number }) => Math.round(Math.min(1, Math.max(0.03, d.days / (d.kind === 'revisione' ? 730 : 365))) * 100)
+const lastService = computed(() => works.value.filter((w) => w.category === 'tagliando').sort((a, b) => b.date.localeCompare(a.date))[0])
 const nextRev = computed(() => nextInspectionDate(v.value?.libretto.dataPrimaImmatricolazione, inspections.value))
 
 function deadlineAction(kind: DeadlineKind) {
@@ -439,6 +459,10 @@ async function exportSheet() {
 .ring b { position: relative; font-family: var(--font-display); font-size: 18px; line-height: 1; }
 .ring span { position: relative; font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; opacity: .85; margin-top: 2px; }
 .tabs { top: 0; }
+.quick-docs { display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; }
+.quick-docs .btn { height: 54px; border-radius: 999px; }
+.last-svc { width: 100%; padding: 14px 16px; cursor: pointer; }
+.svc-line { font-size: 12.5px; font-weight: 600; color: var(--accent-2); margin-top: 3px; }
 .vstats { padding: 18px 18px 16px; }
 .vstats h3 { font-size: 17px; color: #fff; margin-bottom: 14px; }
 .vs-row { --c: 140, 110, 255; display: flex; align-items: center; gap: 14px; padding: 8px 0; }

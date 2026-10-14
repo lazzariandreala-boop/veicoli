@@ -23,6 +23,8 @@ export default defineNuxtConfig({
     pageTransition: { name: 'page', mode: 'out-in' },
   },
   router: { options: { hashMode: true } },
+  // utils/*.ts si importano tra loro con l'estensione, così i test girano con node --test
+  typescript: { tsConfig: { compilerOptions: { allowImportingTsExtensions: true } } },
   vite: {
     optimizeDeps: { include: ['dexie', 'fflate', 'pdfjs-dist'] },
     build: { target: 'es2022' },

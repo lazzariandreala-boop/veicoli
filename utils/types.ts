@@ -65,6 +65,7 @@ export interface Work {
   workshop?: string
   cost?: number
   notes?: string
+  service?: string[]      // voci del tagliando (chiavi di TAGLIANDO_ITEMS)
   mediaIds: string[]
   createdAt: number
 }
@@ -102,6 +103,7 @@ export interface BolloPayment {
   validityMonths: number  // di norma 12
   nextDueMonth: string    // 'YYYY-MM' mese in cui pagare di nuovo
   notes?: string
+  mediaIds?: string[]
   createdAt: number
 }
 
@@ -127,7 +129,9 @@ export interface Inspection {
   outcome: 'regolare' | 'ripetere' | 'sospeso'
   cost?: number
   center?: string
+  nextDate?: string       // "entro il" scritto sul certificato
   notes?: string
+  mediaIds?: string[]
   createdAt: number
 }
 

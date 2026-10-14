@@ -10,6 +10,7 @@
         <FField v-model="f.cost" label="Costo" type="money" />
         <FField v-model="f.center" label="Centro revisioni" />
       </div>
+      <FField v-model="f.nextDate" label="Prossima revisione entro" type="date" hint="Se vuoto la calcolo io: dopo 2 anni, a fine mese" />
       <FField v-model="f.notes" label="Note" type="textarea" />
       <div class="form-actions">
         <button v-if="record" class="btn danger" @click="remove"><Trash2 :size="18" /></button>
@@ -27,7 +28,7 @@ const outcomes = [{ value: 'regolare', label: 'Regolare' }, { value: 'ripetere',
 const f = reactive<Partial<Inspection>>({})
 watch(() => props.open, (o) => {
   if (!o) return
-  Object.assign(f, { date: todayISO(), km: props.vehicle.currentKm, cost: undefined, center: undefined, notes: undefined, outcome: 'regolare' }, props.record ? structuredClone(toRaw(props.record)) : {})
+  Object.assign(f, { date: todayISO(), km: props.vehicle.currentKm, cost: undefined, center: undefined, nextDate: undefined, notes: undefined, outcome: 'regolare' }, props.record ? structuredClone(toRaw(props.record)) : {})
 }, { immediate: true })
 async function save() {
   const rec = JSON.parse(JSON.stringify({ ...toRaw(f), id: props.record?.id ?? uid(), vehicleId: props.vehicle.id, createdAt: props.record?.createdAt ?? Date.now() })) as Inspection

@@ -42,6 +42,7 @@
 
     <FoldSection title="Dati del libretto" :subtitle="librettoSubtitle" :initially-open="filled.size > 0 || !isNew" tone="accent">
       <template #icon><FileText :size="20" /></template>
+      <p v-if="filled.size" class="legend"><i /> letto dal libretto: controlla i valori</p>
       <template v-for="g in groups" :key="g.title">
         <div class="eyebrow" style="margin-top: 6px">{{ g.title }}</div>
         <div class="grid-2">
@@ -186,6 +187,14 @@ async function applyLibretto(data: LibrettoData, files: File[]) {
   if (!form.purchase.date && data.dataImmatricolazione && form.purchase.condition !== 'usato') form.purchase.date = data.dataImmatricolazione
 }
 
+
+// libretto già letto dalla schermata "Leggi un documento" (subito, così la sezione del libretto si apre già compilata)
+if (pendingLibretto.value && isNew.value) {
+  const p = pendingLibretto.value
+  pendingLibretto.value = null
+  applyLibretto(p.data, p.files)
+}
+
 async function pickCover(e: Event) {
   const input = e.target as HTMLInputElement
   if (!input.files?.length) return
@@ -233,4 +242,6 @@ async function save() {
 .swatch { width: 36px; height: 36px; border-radius: 12px; border: 2px solid transparent; cursor: pointer; }
 .swatch.on { border-color: var(--text); box-shadow: 0 0 0 3px var(--bg) inset; }
 .plate-row { background: var(--surface-2); }
+.legend { display: flex; align-items: center; gap: 7px; margin: 0 0 4px; font-size: 12.5px; font-weight: 600; color: var(--accent-2); }
+.legend i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-2); box-shadow: 0 0 6px var(--accent-2); }
 </style>

@@ -20,7 +20,7 @@
       </div>
       <div class="hero-car"><VehicleArt :hero="dark ? 'dark' : 'light'" /></div>
       <p class="tagline">Il tuo garage, sempre sotto controllo.</p>
-      <NuxtLink to="/veicoli/nuovo?scan=1" class="btn neon start">Inizia</NuxtLink>
+      <NuxtLink to="/veicoli/nuovo?scan=1" class="btn primary start">Inizia <ArrowRight :size="22" /></NuxtLink>
       <p class="manual">Preferisci? <NuxtLink to="/veicoli/nuovo">Inserisci a mano</NuxtLink> · <NuxtLink to="/impostazioni?backup=1">Ripristina backup</NuxtLink></p>
     </div>
 
@@ -45,7 +45,8 @@
         </NuxtLink>
       </div>
 
-      <NuxtLink to="/veicoli/nuovo?scan=1" class="btn primary scan"><ScanLine :size="22" /> Aggiungi dal libretto</NuxtLink>
+      <NuxtLink to="/documento" class="btn primary scan"><ScanLine :size="22" /> Leggi un documento</NuxtLink>
+      <p class="scan-hint">Fatture, tagliandi, bollo, assicurazione, revisione o libretto</p>
 
       <section v-if="next" class="section" style="margin-top: 20px">
         <NuxtLink :to="`/veicoli/${next.vehicleId}?tab=scadenze`" class="next card" :class="urgency(next.days)">
@@ -69,7 +70,7 @@
 </template>
 
 <script setup lang="ts">
-import { Bell, ChevronRight, ScanLine } from 'lucide-vue-next'
+import { ArrowRight, Bell, ChevronRight, ScanLine } from 'lucide-vue-next'
 import { vehicleName } from '~/utils/deadlines'
 
 const { vehicles, deadlines, deadlinesByVehicle, loading } = useGarage()
@@ -96,7 +97,7 @@ const shown = computed(() => (active.value.length ? active.value : vehicles.valu
 .hero-car::after { content: ''; position: absolute; left: 12%; right: 12%; bottom: 2%; height: 18%; border-radius: 50%; background: radial-gradient(closest-side, rgba(150, 110, 255, .55), transparent); filter: blur(6px); z-index: -1; }
 .w-dark .hero-car::after { background: radial-gradient(closest-side, rgba(120, 140, 200, .35), transparent); }
 .tagline { margin: 18px 0 26px; color: rgba(235, 236, 255, .88); font-size: 17px; font-weight: 500; }
-.start { width: min(80vw, 320px); height: 80px; font-size: 21px; }
+.start { width: min(84vw, 340px); height: 64px; border-radius: 999px; font-size: 18px; font-weight: 700; gap: 10px; }
 .manual { margin-top: 18px; font-size: 13.5px; color: rgba(225, 228, 255, .65); }
 .manual a { color: #7fd8ff; font-weight: 600; }
 @keyframes breathe { 50% { filter: drop-shadow(0 0 16px rgba(255, 170, 90, 1)) drop-shadow(0 0 40px rgba(150, 100, 255, 1)); } }
@@ -104,6 +105,7 @@ const shown = computed(() => (active.value.length ? active.value : vehicles.valu
 /* ---------- dashboard ---------- */
 .hero-row { margin-top: 8px; }
 .scan { width: 100%; height: 60px; margin-top: 22px; font-size: 16.5px; border-radius: 999px; }
+.scan-hint { margin: 8px 0 0; text-align: center; font-size: 12.5px; color: var(--text-3); }
 .hero-row { position: relative; display: flex; align-items: stretch; min-height: 150px; }
 .stat-tile { position: relative; z-index: 1; width: 52%; padding: 22px 20px; color: #fff;
   border-radius: 22px 46px 46px 22px; corner-top-right-shape: bevel; corner-bottom-right-shape: bevel;

@@ -64,6 +64,7 @@
         <span>Veicolo</span>
         <select v-model="addVehicle" class="input"><option v-for="v in activeVehicles" :key="v.id" :value="v.id">{{ vehicleName(v) }}</option></select>
       </div>
+      <button class="btn primary block scan-doc" @click="addOpen = false; router.push(`/documento${addVehicle ? '?veicolo=' + addVehicle : ''}`)"><ScanText :size="19" /> Leggi da una foto o un PDF</button>
       <div class="list">
         <button v-for="t in ADD_TYPES" :key="t.add" class="list-item" @click="goAdd(t)">
           <span class="exp-ico" :style="{ '--c': catOf(t.cat).color }"><component :is="ICONS[t.cat]" :size="19" /></span>
@@ -75,7 +76,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ArrowDown, ArrowUp, ChartLine, ChevronRight, ClipboardCheck, Landmark, Plus, ShieldCheck, TriangleAlert, Wrench } from 'lucide-vue-next'
+import { ArrowDown, ArrowUp, ChartLine, ChevronRight, ClipboardCheck, Landmark, Plus, ScanText, ShieldCheck, TriangleAlert, Wrench } from 'lucide-vue-next'
 import { formatDate, vehicleName } from '~/utils/deadlines'
 import { EXPENSE_CATS, PERIODS, periodRange, type ExpenseCat, type Period } from '~/composables/expenses'
 
@@ -124,7 +125,8 @@ const addOpen = ref(false)
 const addVehicle = ref('')
 watchEffect(() => { if (!addVehicle.value || !vehicles.value.some((v) => v.id === addVehicle.value)) addVehicle.value = vehicleId.value !== 'all' ? vehicleId.value : activeVehicles.value[0]?.id ?? '' })
 const ADD_TYPES = [
-  { add: 'work', tab: 'lavori', cat: 'lavori', label: 'Lavoro o manutenzione', hint: 'Tagliando, gomme, riparazioni...' },
+  { add: 'tagliando', tab: 'lavori', cat: 'lavori', label: 'Tagliando', hint: 'Quando e cosa è stato fatto' },
+  { add: 'work', tab: 'lavori', cat: 'lavori', label: 'Lavoro o riparazione', hint: 'Gomme, freni, carrozzeria...' },
   { add: 'bollo', tab: 'scadenze', cat: 'bollo', label: 'Bollo pagato', hint: 'Calcolo la prossima scadenza' },
   { add: 'policy', tab: 'scadenze', cat: 'assicurazione', label: 'Assicurazione', hint: 'Promemoria a 30, 15, 1 e 0 giorni' },
   { add: 'inspection', tab: 'scadenze', cat: 'revisioni', label: 'Revisione', hint: 'Esito e costo' },
@@ -160,4 +162,5 @@ function goAdd(t: (typeof ADD_TYPES)[number]) {
   background: radial-gradient(120% 200% at 20% 0%, rgba(124, 92, 255, .9), transparent 55%), radial-gradient(120% 200% at 90% 100%, rgba(255, 110, 200, .55), transparent 50%), linear-gradient(90deg, #262a6a, #1b1f50);
   box-shadow: 0 0 24px -4px rgba(124, 92, 255, .8), 0 14px 26px -10px rgba(10, 10, 40, .6); }
 .add-btn:active { transform: scale(.98); }
+.scan-doc { margin-bottom: 14px; height: 54px; border-radius: 999px; }
 </style>

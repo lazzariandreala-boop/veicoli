@@ -50,7 +50,9 @@ export async function filesToCanvases(files: Blob[]): Promise<HTMLCanvasElement[
   return out
 }
 
-function variant(src: HTMLCanvasElement, mode: 'otsu' | 'adaptive') {
+export type OcrMode = 'otsu' | 'adaptive' | 'gray' | 'sparse'
+function variant(src: HTMLCanvasElement, mode: OcrMode) {
+  if (mode === 'gray' || mode === 'sparse') return src
   const ctx = src.getContext('2d', { willReadFrequently: true })!
   const img = ctx.getImageData(0, 0, src.width, src.height)
   const data = mode === 'otsu' ? binarizeOtsu(img.data, src.width, src.height).data : binarize(img.data, src.width, src.height)
@@ -97,10 +99,10 @@ let currentProgress: ((p: number) => void) | undefined
 let loadProgress: ((status: string, p: number) => void) | undefined
 
 /**
- * Legge il libretto sul telefono, senza connessione: due passaggi OCR
- * (soglia globale e adattiva) su ogni pagina, poi unione dei campi.
+ * Legge il testo di foto e PDF sul telefono, senza connessione: due passaggi OCR
+ * (soglia globale e adattiva) su ogni pagina. Restituisce un testo per passaggio.
  */
-export async function readLibrettoOffline(files: Blob[], onProgress: OcrProgress = () => {}): Promise<{ data: LibrettoData; text: string }> {
+export async function ocrTexts(files: Blob[], onProgress: OcrProgress = () => {}, passes: OcrMode[] = ['otsu', 'adaptive']): Promise<string[]> {
   onProgress('Preparo le immagini', 0.03)
   const pages = await filesToCanvases(files)
   if (!pages.length) throw new Error('Nessuna immagine leggibile nel file scelto.')
@@ -109,7 +111,6 @@ export async function readLibrettoOffline(files: Blob[], onProgress: OcrProgress
     if (/language|traineddata/.test(status)) onProgress('Carico il dizionario', 0.08 + 0.02 * (p || 0))
   }
   const worker = await getWorker().finally(() => { loadProgress = undefined })
-  const passes: ('otsu' | 'adaptive')[] = ['otsu', 'adaptive']
   const total = pages.length * passes.length
   const texts: string[] = Array(passes.length).fill('')
   let done = 0
@@ -118,6 +119,8 @@ export async function readLibrettoOffline(files: Blob[], onProgress: OcrProgress
       const label = `Leggo ${pages.length > 1 ? `pagina ${pages.indexOf(page) + 1}, ` : ''}passaggio ${pi + 1} di ${passes.length}`
       currentProgress = (p) => onProgress(label, 0.1 + 0.88 * ((done + p) / total))
       onProgress(label, 0.1 + 0.88 * (done / total))
+      // 'sparse': cerca testo sparso (riquadri dei moduli), senza presupporre colonne e paragrafi
+      await worker.setParameters({ tessedit_pageseg_mode: mode === 'sparse' ? '12' : '3' })
       const r = await worker.recognize(variant(page, mode))
       texts[pi] += r.data.text + '\n'
       done++
@@ -126,6 +129,12 @@ export async function readLibrettoOffline(files: Blob[], onProgress: OcrProgress
   currentProgress = undefined
   onProgress('Compilo i campi', 1)
   ;(window as any).__veicoliLastOcr = texts
+  return texts
+}
+
+/** Legge il libretto e ne ricava i campi. */
+export async function readLibrettoOffline(files: Blob[], onProgress: OcrProgress = () => {}): Promise<{ data: LibrettoData; text: string }> {
+  const texts = await ocrTexts(files, onProgress)
   return { data: parseLibrettoMulti(texts), text: texts.join('\n-----\n') }
 }
 
