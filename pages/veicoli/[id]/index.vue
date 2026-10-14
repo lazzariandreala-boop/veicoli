@@ -1,9 +1,9 @@
 <template>
   <div v-if="v" class="detail">
-    <div class="hero" :style="{ background: accentGradient(v.accent) }">
+    <div class="hero" :class="{ photo: !!cover }">
       <img v-if="cover" :src="cover" alt="" class="cover" />
       <div class="shade" />
-      <div class="ghost"><KindIcon :kind="v.kind" :size="200" /></div>
+      <div v-if="!cover" class="neon-wrap"><NeonVehicle :kind="v.kind" :accent="v.accent" /></div>
       <div class="hero-bar">
         <button class="glass-btn" aria-label="Indietro" @click="back"><ChevronLeft :size="22" /></button>
         <div class="row">
@@ -12,13 +12,19 @@
         </div>
       </div>
       <div class="hero-info">
-        <div class="row" style="gap: 8px; margin-bottom: 8px">
-          <span class="pill"><KindIcon :kind="v.kind" :size="14" /> {{ KIND_LABEL[v.kind] }}</span>
-          <span v-if="v.status !== 'attivo'" class="pill dark">{{ STATUS_LABEL[v.status] }}</span>
+        <div class="grow" style="min-width: 0">
+          <div class="row" style="gap: 8px; margin-bottom: 8px">
+            <span class="pill"><KindIcon :kind="v.kind" :size="14" /> {{ KIND_LABEL[v.kind] }}</span>
+            <span v-if="v.status !== 'attivo'" class="pill dark">{{ STATUS_LABEL[v.status] }}</span>
+          </div>
+          <h1>{{ vehicleName(v) }}</h1>
+          <p v-if="sub">{{ sub }}</p>
+          <div style="margin-top: 12px"><PlateBadge :plate="v.plate" size="lg" /></div>
         </div>
-        <h1>{{ vehicleName(v) }}</h1>
-        <p v-if="sub">{{ sub }}</p>
-        <div style="margin-top: 12px"><PlateBadge :plate="v.plate" size="lg" /></div>
+        <button v-if="v.status === 'attivo' && deadlines.length" class="ring" :class="health" :aria-label="`Scadenze in regola: ${healthPct}%`" @click="setTab('scadenze')">
+          <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="27" class="r-track" /><circle cx="32" cy="32" r="27" class="r-val" :stroke-dasharray="`${(healthPct / 100) * 169.6} 169.6`" transform="rotate(-90 32 32)" /></svg>
+          <b>{{ healthPct }}%</b><span>{{ HEALTH_LABEL[health] }}</span>
+        </button>
       </div>
     </div>
 
@@ -266,6 +272,19 @@ const editPolicy = (r: InsurancePolicy | null, renew?: InsurancePolicy) => { edi
 const editInspection = (r: Inspection | null) => { edit.inspection = r; open.inspection = true }
 const editWork = (r: Work | null) => { edit.work = r; open.work = true }
 const editIncident = (r: Incident | null) => { edit.incident = r; open.incident = true }
+// Arrivo da "Aggiungi spesa": apre direttamente il modulo richiesto
+let addDone = false
+watch(loading, (l) => {
+  if (l || !v.value || addDone) return
+  addDone = true
+  const add = route.query.add as string | undefined
+  if (add === 'work') editWork(null)
+  else if (add === 'bollo') editBollo(null)
+  else if (add === 'policy') editPolicy(null, policies.value[0])
+  else if (add === 'inspection') editInspection(null)
+  else if (add === 'incident') editIncident(null)
+  if (add) router.replace({ query: { ...route.query, add: undefined } })
+}, { immediate: true })
 
 const sub = computed(() => {
   if (!v.value) return ''
@@ -280,6 +299,8 @@ const deadlines = computed(() => {
   return deadlinesFor({ vehicle: v.value, bolli: bolli.value, policies: policies.value, inspections: inspections.value })
     .map((d) => ({ ...d, days: daysBetween(today, parseISO(d.date)) }))
 })
+const health = computed(() => vehicleHealth(v.value!, deadlines.value as any))
+const healthPct = computed(() => (deadlines.value.length ? Math.round((deadlines.value.filter((d) => d.days > 30).length / deadlines.value.length) * 100) : 100))
 const nextRev = computed(() => nextInspectionDate(v.value?.libretto.dataPrimaImmatricolazione, inspections.value))
 
 function deadlineAction(kind: DeadlineKind) {
@@ -380,18 +401,28 @@ async function exportSheet() {
 </script>
 
 <style scoped>
-.hero { position: relative; min-height: calc(var(--safe-top) + 290px); color: white; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; }
+.hero { position: relative; min-height: calc(var(--safe-top) + 370px); color: white; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;
+  background: radial-gradient(70% 60% at 50% 45%, rgba(124, 92, 255, .38), transparent 70%), radial-gradient(60% 40% at 80% 10%, rgba(34, 229, 255, .18), transparent), linear-gradient(180deg, #0c0f2e, #060818); }
+.hero::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: linear-gradient(90deg, transparent, #22e5ff, #7c5cff, transparent); box-shadow: 0 0 14px #22e5ff; }
 .hero .cover { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.hero .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.25), transparent 35%, rgba(0,0,0,.6)); }
-.hero .ghost { position: absolute; right: -40px; top: 40px; opacity: .16; transform: rotate(-10deg); }
-.cover ~ .ghost { display: none; }
+.hero .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(6, 8, 24, .5), transparent 30%, rgba(6, 8, 24, .2) 50%, rgba(6, 8, 24, .92)); }
+.neon-wrap { position: absolute; left: 50%; top: calc(var(--safe-top) + 40px); width: min(74%, 360px); transform: translateX(-50%); opacity: .95; }
+.neon-wrap :deep(svg) { width: 100%; height: auto; }
 .hero-bar { position: relative; display: flex; justify-content: space-between; padding: calc(var(--safe-top) + 12px) 16px 0; }
-.glass-btn { width: 42px; height: 42px; border-radius: 14px; border: 0; display: grid; place-items: center; color: white; background: rgba(0,0,0,.28); backdrop-filter: blur(12px); cursor: pointer; }
-.hero-info { position: relative; padding: 20px 16px 22px; max-width: 760px; width: 100%; margin: 0 auto; }
-.hero-info h1 { font-size: 32px; font-weight: 700; line-height: 1.1; text-shadow: 0 2px 16px rgba(0,0,0,.3); }
-.hero-info p { margin: 6px 0 0; opacity: .92; font-size: 14px; }
-.pill { display: inline-flex; gap: 6px; align-items: center; padding: 5px 10px; border-radius: 99px; background: rgba(0,0,0,.25); backdrop-filter: blur(8px); font-size: 12px; font-weight: 700; }
+.glass-btn { width: 42px; height: 42px; border-radius: 14px; border: 1px solid rgba(160, 150, 255, .35); display: grid; place-items: center; color: white; background: rgba(14, 16, 44, .55); backdrop-filter: blur(12px); cursor: pointer; box-shadow: 0 0 12px rgba(124, 92, 255, .25); }
+.hero-info { position: relative; display: flex; align-items: flex-end; gap: 12px; padding: 20px 16px 22px; max-width: 760px; width: 100%; margin: 0 auto; }
+.hero-info h1 { font-size: 30px; font-weight: 700; line-height: 1.1; text-shadow: 0 0 18px rgba(124, 92, 255, .7); }
+.hero-info p { margin: 6px 0 0; opacity: .85; font-size: 14px; }
+.pill { display: inline-flex; gap: 6px; align-items: center; padding: 5px 10px; border-radius: 99px; background: rgba(124, 92, 255, .25); border: 1px solid rgba(160, 150, 255, .45); backdrop-filter: blur(8px); font-size: 12px; font-weight: 700; }
 .pill.dark { background: rgba(0,0,0,.6); }
+.ring { --c: 25, 227, 177; position: relative; flex: none; width: 84px; height: 84px; border: 0; padding: 0; background: none; color: #fff; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ring.warn { --c: 255, 168, 32; }
+.ring.danger { --c: 255, 92, 138; }
+.ring svg { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 0 6px rgba(var(--c), .9)); }
+.r-track { fill: rgba(10, 12, 36, .6); stroke: rgba(255, 255, 255, .12); stroke-width: 5; }
+.r-val { fill: none; stroke: rgb(var(--c)); stroke-width: 5; stroke-linecap: round; transition: stroke-dasharray .6s; }
+.ring b { position: relative; font-family: var(--font-display); font-size: 18px; line-height: 1; }
+.ring span { position: relative; font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; opacity: .85; margin-top: 2px; }
 .tabs { top: 0; }
 .tab .count { margin-left: 6px; font-size: 11.5px; padding: 1px 7px; border-radius: 99px; background: var(--surface-3); color: var(--text-2); }
 .stat { display: flex; flex-direction: column; gap: 2px; padding: 12px; color: var(--text-3); }

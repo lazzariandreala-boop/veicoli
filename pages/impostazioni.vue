@@ -1,8 +1,29 @@
 <template>
   <div class="page">
-    <header class="topbar"><h1>Impostazioni</h1></header>
+    <header class="topbar"><div class="grow"><div class="eyebrow">Impostazioni</div><h1>Altro</h1></div></header>
 
-    <section class="section" style="margin-top: 6px">
+    <HoloCard glow="violet" :cut="20">
+      <div class="garage">
+        <div class="hexlogo"><CarFront :size="24" /></div>
+        <div class="grow">
+          <strong>Il mio garage</strong>
+          <div class="g-sub">{{ count }} {{ count === 1 ? 'veicolo' : 'veicoli' }}{{ storage ? ' · ' + storage : '' }}</div>
+        </div>
+      </div>
+    </HoloCard>
+
+    <section class="section" style="margin-top: 16px">
+      <div class="list">
+        <NuxtLink v-for="l in links" :key="l.to" :to="l.to" class="list-item">
+          <div class="icon-bubble" :class="l.tone"><component :is="l.icon" :size="19" /></div>
+          <div class="grow"><strong>{{ l.label }}</strong></div>
+          <span v-if="l.value" class="faint" style="font-size: 13px">{{ l.value }}</span>
+          <ChevronRight :size="18" class="faint" />
+        </NuxtLink>
+      </div>
+    </section>
+
+    <section class="section">
       <div class="section-head"><h2>Notifiche</h2></div>
       <div class="list">
         <div class="list-item" style="cursor: default">
@@ -53,12 +74,17 @@
   </div>
 </template>
 <script setup lang="ts">
-import { Bell, BellRing, CarFront, Download, Upload } from 'lucide-vue-next'
+import { Bell, BellRing, CalendarClock, CarFront, ChartLine, ChevronRight, Download, Upload } from 'lucide-vue-next'
 const version = '1.0.0'
 const key = ref(aiSettings.apiKey)
 const busy = ref(false)
 const { data: count } = useLive(() => db().vehicles.count(), 0)
 const storage = ref('')
+const links = computed(() => [
+  { to: '/veicoli', label: 'I miei veicoli', icon: CarFront, tone: 'accent', value: `${count.value}` },
+  { to: '/scadenze', label: 'Scadenze e notifiche', icon: CalendarClock, tone: 'warn', value: notificationState.permission === 'granted' ? 'Attive' : '' },
+  { to: '/report', label: 'Report spese', icon: ChartLine, tone: 'cyan', value: '' },
+])
 onMounted(async () => {
   checkPermission()
   const est = await navigator.storage?.estimate?.()
@@ -105,7 +131,11 @@ const theme = ref(useTheme())
 function setTheme(t: string) { theme.value = t; applyTheme(t) }
 </script>
 <style scoped>
+.garage { display: flex; align-items: center; gap: 14px; padding: 18px 18px 18px 20px; }
+.garage strong { font-family: var(--font-display); font-size: 18px; color: #fff; }
+.g-sub { font-size: 13px; color: rgba(220, 225, 255, .7); margin-top: 2px; }
+.hexlogo { width: 52px; height: 58px; flex: none; display: grid; place-items: center; color: #fff; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); background: linear-gradient(135deg, #7c5cff, #22e5ff); }
 .about { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; margin-top: 34px; }
-.logo { width: 56px; height: 56px; border-radius: 18px; display: grid; place-items: center; color: white; background: linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: 0 12px 28px -10px rgba(124, 92, 255, .8); }
+.logo { width: 56px; height: 62px; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); display: grid; place-items: center; color: white; background: linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: 0 12px 28px -10px rgba(124, 92, 255, .8); }
 .about span { font-size: 13px; }
 </style>

@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   css: [
     '@fontsource-variable/inter',
-    '@fontsource-variable/space-grotesk',
+    '@fontsource-variable/sora',
     '~/assets/css/main.css',
   ],
   app: {
@@ -15,7 +15,7 @@ export default defineNuxtConfig({
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1' },
-        { name: 'theme-color', content: '#0b0d12' },
+        { name: 'theme-color', content: '#060818' },
         { name: 'color-scheme', content: 'dark light' },
       ],
       link: [{ rel: 'icon', type: 'image/svg+xml', href: '/icon.svg' }],

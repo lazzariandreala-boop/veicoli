@@ -20,7 +20,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   if (Capacitor.isNativePlatform()) {
     StatusBar.setStyle({ style: Style.Dark }).catch(() => {})
-    StatusBar.setBackgroundColor({ color: '#0b0d12' }).catch(() => {})
+    StatusBar.setBackgroundColor({ color: '#060818' }).catch(() => {})
     LocalNotifications.addListener('localNotificationActionPerformed', (e) => {
       const id = e.notification.extra?.vehicleId
       if (id) router.push(`/veicoli/${id}`)

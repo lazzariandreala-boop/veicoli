@@ -22,3 +22,15 @@ export function useGarage() {
   })
   return { vehicles, deadlines, deadlinesByVehicle, loading, name: vehicleName }
 }
+
+export type Health = 'ok' | 'warn' | 'danger' | 'off'
+export const HEALTH_LABEL: Record<Health, string> = { ok: 'In regola', warn: 'In scadenza', danger: 'Scaduto', off: 'Archiviato' }
+export const HEALTH_GLOW = { ok: 'teal', warn: 'amber', danger: 'rose', off: 'violet' } as const
+
+/** Stato complessivo delle scadenze di un veicolo. */
+export function vehicleHealth(v: Vehicle, dls: DeadlineView[]): Health {
+  if (v.status !== 'attivo') return 'off'
+  if (dls.some((d) => d.days < 0)) return 'danger'
+  if (dls.some((d) => d.days <= 30)) return 'warn'
+  return 'ok'
+}

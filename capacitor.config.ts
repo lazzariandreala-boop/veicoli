@@ -4,7 +4,7 @@ const config: CapacitorConfig = {
   appId: 'it.veicoli.app',
   appName: 'Veicoli',
   webDir: '.output/public',
-  backgroundColor: '#0b0d12',
+  backgroundColor: '#060818',
   android: {
     allowMixedContent: false,
   },
@@ -12,7 +12,7 @@ const config: CapacitorConfig = {
     SplashScreen: {
       launchShowDuration: 1500,
       launchAutoHide: false,
-      backgroundColor: '#0b0d12',
+      backgroundColor: '#060818',
       androidScaleType: 'CENTER_CROP',
       showSpinner: false,
     },
