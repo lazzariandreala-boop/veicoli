@@ -16,6 +16,11 @@ const config: CapacitorConfig = {
       androidScaleType: 'CENTER_CROP',
       showSpinner: false,
     },
+    // Login Google nativo: il plugin restituisce solo il token, l'accesso a Firebase lo fa l'SDK web
+    FirebaseAuthentication: {
+      skipNativeAuth: true,
+      providers: ['google.com'],
+    },
     LocalNotifications: {
       smallIcon: 'ic_stat_veicoli',
       iconColor: '#7c5cff',

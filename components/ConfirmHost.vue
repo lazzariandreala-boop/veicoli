@@ -1,5 +1,5 @@
 <template>
-  <BottomSheet :open="!!confirmState" @close="answer(false)">
+  <BottomSheet :open="!!confirmState" top @close="answer(false)">
     <div v-if="confirmState" class="stack" style="gap: 14px">
       <h3 style="font-size: 20px">{{ confirmState.title }}</h3>
       <p v-if="confirmState.text" class="muted" style="margin: 0">{{ confirmState.text }}</p>

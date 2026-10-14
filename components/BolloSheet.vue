@@ -1,6 +1,7 @@
 <template>
   <BottomSheet :open="open" :title="record ? 'Modifica pagamento bollo' : 'Ho pagato il bollo'" @close="$emit('close')">
     <div class="stack" style="gap: 12px">
+      <AutofillButton v-if="!record" :vehicle-id="vehicle.id" kind="bollo" what="la ricevuta del bollo" @go="$emit('close')" />
       <div class="grid-2">
         <FField v-model="f.paidDate" label="Data di pagamento" type="date" required />
         <FField v-model="f.amount" label="Importo" type="money" />

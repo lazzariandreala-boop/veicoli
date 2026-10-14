@@ -1,6 +1,7 @@
 <template>
   <BottomSheet :open="open" :title="record ? 'Modifica lavoro' : category === 'tagliando' ? 'Tagliando fatto' : 'Nuovo lavoro'" @close="$emit('close')">
     <div class="stack" style="gap: 12px">
+      <AutofillButton v-if="!record" :vehicle-id="vehicle.id" kind="fattura" what="la fattura" @go="$emit('close')" />
       <div class="chips cats">
         <button v-for="c in WORK_CATEGORIES" :key="c.value" type="button" class="chip-btn" :class="{ on: f.category === c.value }" @click="pickCat(c.value)">{{ c.label }}</button>
       </div>

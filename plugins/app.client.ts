@@ -9,6 +9,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   applyTheme(useTheme())
   ;(window as any).__veicoliOcr = { readLibrettoOffline, ocrTexts }
   const router = useRouter()
+  initCloud()
 
   // Riprogramma i promemoria ogni volta che cambiano veicoli, bollo, polizze o revisioni.
   let timer: ReturnType<typeof setTimeout> | undefined

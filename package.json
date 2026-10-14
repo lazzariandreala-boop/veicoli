@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",
+    "@capacitor-firebase/authentication": "^8.5.2",
     "@capacitor/android": "^8.5.3",
     "@capacitor/app": "^8.1.2",
     "@capacitor/core": "^8.5.3",
@@ -33,6 +34,7 @@
     "@tesseract.js-data/ita": "^1.0.0",
     "dexie": "^4.4.6",
     "fflate": "^0.8.3",
+    "firebase": "^12.19.0",
     "lucide-vue-next": "^1.0.0",
     "nuxt": "^3.21.11",
     "pdfjs-dist": "^4.10.38",

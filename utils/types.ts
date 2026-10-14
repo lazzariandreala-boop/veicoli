@@ -115,6 +115,7 @@ export interface InsurancePolicy {
   startDate?: string
   endDate: string         // scadenza
   price?: number
+  durationMonths?: number // 6 o 12 mesi
   coverage?: string       // RCA, furto/incendio, kasko...
   notes?: string
   mediaIds: string[]

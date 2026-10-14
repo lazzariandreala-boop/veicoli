@@ -33,7 +33,7 @@ export async function saveDocument(doc: ParsedDoc, vehicle: Vehicle, files: File
   const base = { id: uid(), vehicleId: vehicle.id, createdAt: Date.now() }
   let tab = 'lavori'
   if (doc.kind === 'assicurazione') {
-    const rec: InsurancePolicy = { ...base, company: doc.company, policyNumber: doc.policyNumber, startDate: doc.startDate, endDate: doc.endDate!, price: doc.total, coverage: doc.title, mediaIds }
+    const rec: InsurancePolicy = { ...base, company: doc.company, policyNumber: doc.policyNumber, startDate: doc.startDate, endDate: doc.endDate!, price: doc.total, durationMonths: doc.validityMonths, coverage: doc.title, mediaIds }
     await db().policies.put(plain(rec))
     tab = 'scadenze'
   } else if (doc.kind === 'revisione') {
@@ -62,4 +62,32 @@ export async function saveDocument(doc: ParsedDoc, vehicle: Vehicle, files: File
   }
   if (doc.km && (!vehicle.currentKm || doc.km > vehicle.currentKm)) await db().vehicles.update(vehicle.id, { currentKm: doc.km })
   return tab
+}
+
+const sameMoney = (a?: number, b?: number) => a === undefined || b === undefined || Math.abs(a - b) < 0.01
+const fmt = (iso?: string) => (iso ? iso.split('-').reverse().join('/') : '')
+
+/** Se il documento è già stato registrato su questo veicolo restituisce una frase che lo spiega. */
+export async function findDuplicate(doc: ParsedDoc, vehicleId: string): Promise<string | undefined> {
+  const of = <T>(t: 'policies' | 'inspections' | 'bolli' | 'works') => (db() as any)[t].where('vehicleId').equals(vehicleId).toArray() as Promise<T[]>
+  if (doc.kind === 'assicurazione') {
+    if (!doc.endDate) return
+    const hit = (await of<InsurancePolicy>('policies')).find((p) => p.endDate === doc.endDate
+      || (!!doc.policyNumber && clean(p.policyNumber) === clean(doc.policyNumber) && p.startDate === doc.startDate))
+    return hit && `Questa polizza è già registrata (scadenza ${fmt(hit.endDate)}${hit.company ? ', ' + hit.company : ''}).`
+  }
+  if (!doc.date) return
+  if (doc.kind === 'revisione') {
+    const hit = (await of<Inspection>('inspections')).find((i) => i.date === doc.date)
+    return hit && `Questa revisione è già registrata (fatta il ${fmt(hit.date)}).`
+  }
+  if (doc.kind === 'bollo') {
+    const hit = (await of<BolloPayment>('bolli')).find((b) => b.paidDate === doc.date && sameMoney(b.amount, doc.total))
+    return hit && `Questo bollo è già registrato (pagato il ${fmt(hit.paidDate)}).`
+  }
+  if (doc.kind === 'libretto') return
+  const num = doc.number && clean(doc.number)
+  const hit = (await of<Work>('works')).find((w) => (w.date === doc.date && sameMoney(w.cost, doc.total) && (doc.total !== undefined || w.title === doc.title))
+    || (!!num && num.length >= 3 && w.date === doc.date && clean(w.notes).includes('FATTURAN' + num)))
+  return hit && `Questo documento è già registrato: «${hit.title}» del ${fmt(hit.date)}.`
 }

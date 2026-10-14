@@ -52,7 +52,11 @@ export async function importBackup(file: Blob, mode: 'replace' | 'merge' = 'repl
   if (parsed.app !== 'veicoli') throw new Error('Il file non è un backup di Veicoli.')
   const d = db()
   await d.transaction('rw', [d.vehicles, d.works, d.incidents, d.bolli, d.policies, d.inspections, d.media], async () => {
-    if (mode === 'replace') for (const t of [...TABLES, 'media']) await (d as any)[t].clear()
+    if (mode === 'replace') for (const t of [...TABLES, 'media']) {
+      // anche nel cloud: quello che sparisce col ripristino va cancellato
+      markDirty(t, await (d as any)[t].toCollection().primaryKeys())
+      await (d as any)[t].clear()
+    }
     for (const t of TABLES) await (d as any)[t].bulkPut(parsed.data[t] ?? [])
     for (const m of parsed.data.media ?? []) {
       const bytes = entries[`media/${m.id}`]

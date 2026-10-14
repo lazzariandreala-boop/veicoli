@@ -10,5 +10,6 @@ android/.gradle
 android/local.properties
 android/app/src/main/assets/public
 *.keystore
+!android/app/veicoli-debug.keystore
 *.jks
 keystore.properties

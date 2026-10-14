@@ -22,6 +22,10 @@
       <p class="tagline">Il tuo garage, sempre sotto controllo.</p>
       <NuxtLink to="/veicoli/nuovo?scan=1" class="btn primary start">Inizia <ArrowRight :size="22" /></NuxtLink>
       <p class="manual">Preferisci? <NuxtLink to="/veicoli/nuovo">Inserisci a mano</NuxtLink> · <NuxtLink to="/impostazioni?backup=1">Ripristina backup</NuxtLink></p>
+      <p class="manual">
+        <span v-if="cloud.user">{{ cloud.status === 'ok' ? 'Account collegato: nessun veicolo salvato' : 'Recupero i tuoi dati dal cloud…' }}</span>
+        <template v-else>Hai già usato l'app? <button class="linkish" :disabled="signing" @click="cloudLogin">{{ signing ? 'Accesso…' : 'Accedi con Google' }}</button></template>
+      </p>
     </div>
 
     <!-- Dashboard -->
@@ -81,6 +85,18 @@ const { url: cover } = useMediaUrl(() => featured.value?.coverMediaId)
 const urgentCount = computed(() => deadlines.value.filter((d) => d.days <= 30 && d.vehicle.status === 'attivo').length)
 const next = computed(() => deadlines.value.find((d) => d.vehicle.status === 'attivo'))
 const shown = computed(() => (active.value.length ? active.value : vehicles.value).slice(0, 4))
+const signing = ref(false)
+async function cloudLogin() {
+  signing.value = true
+  try {
+    await signInWithGoogle()
+  } catch (e) {
+    console.error(e)
+    toast(e instanceof Error ? e.message : 'Accesso non riuscito', 'danger')
+  } finally {
+    signing.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -97,9 +113,11 @@ const shown = computed(() => (active.value.length ? active.value : vehicles.valu
 .hero-car::after { content: ''; position: absolute; left: 12%; right: 12%; bottom: 2%; height: 18%; border-radius: 50%; background: radial-gradient(closest-side, rgba(150, 110, 255, .55), transparent); filter: blur(6px); z-index: -1; }
 .w-dark .hero-car::after { background: radial-gradient(closest-side, rgba(120, 140, 200, .35), transparent); }
 .tagline { margin: 18px 0 26px; color: rgba(235, 236, 255, .88); font-size: 17px; font-weight: 500; }
-.start { width: min(84vw, 340px); height: 64px; border-radius: 999px; font-size: 18px; font-weight: 700; gap: 10px; }
+.start { width: min(86vw, 360px); height: auto; min-height: 80px; padding: 28px 24px; border-radius: 20px; font-size: 19px; font-weight: 700; gap: 10px; }
 .manual { margin-top: 18px; font-size: 13.5px; color: rgba(225, 228, 255, .65); }
-.manual a { color: #7fd8ff; font-weight: 600; }
+.manual a, .linkish { color: #7fd8ff; font-weight: 600; }
+.linkish { background: none; border: 0; padding: 0; font: inherit; cursor: pointer; }
+.manual + .manual { margin-top: 8px; }
 @keyframes breathe { 50% { filter: drop-shadow(0 0 16px rgba(255, 170, 90, 1)) drop-shadow(0 0 40px rgba(150, 100, 255, 1)); } }
 
 /* ---------- dashboard ---------- */

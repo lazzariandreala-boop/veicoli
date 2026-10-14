@@ -107,7 +107,7 @@
       <!-- SCADENZE -->
       <div v-else-if="tab === 'scadenze'" class="stack" style="gap: 18px">
         <section>
-          <div class="section-head"><h2>Bollo</h2><button class="btn sm" @click="editBollo(null)"><Plus :size="16" /> Pagato</button></div>
+          <div class="section-head"><h2>Bollo</h2><span class="head-actions"><button class="btn sm ghost" aria-label="Compila da foto o PDF" @click="scanDoc('bollo')"><ScanText :size="16" /> Da foto</button><button class="btn sm" @click="editBollo(null)"><Plus :size="16" /> Pagato</button></span></div>
           <p v-if="v.bolloExempt" class="chip ok">Veicolo esente</p>
           <div v-if="bolli.length" class="list">
             <button v-for="b in bolli" :key="b.id" class="list-item" @click="editBollo(b)">
@@ -119,7 +119,7 @@
           <p v-else class="faint">Nessun pagamento registrato.</p>
         </section>
         <section>
-          <div class="section-head"><h2>Assicurazione</h2><button class="btn sm" @click="editPolicy(null, policies[0])"><Plus :size="16" /> {{ policies.length ? 'Rinnova' : 'Aggiungi' }}</button></div>
+          <div class="section-head"><h2>Assicurazione</h2><span class="head-actions"><button class="btn sm ghost" aria-label="Compila da foto o PDF" @click="scanDoc('assicurazione')"><ScanText :size="16" /> Da foto</button><button class="btn sm" @click="policyAction"><Plus :size="16" /> {{ !policies.length ? 'Aggiungi' : policyToComplete ? 'Completa' : 'Rinnova' }}</button></span></div>
           <div v-if="policies.length" class="list">
             <button v-for="p in policies" :key="p.id" class="list-item" @click="editPolicy(p)">
               <div class="icon-bubble accent"><ShieldCheck :size="19" /></div>
@@ -130,7 +130,7 @@
           <p v-else class="faint">Nessuna polizza registrata.</p>
         </section>
         <section>
-          <div class="section-head"><h2>Revisione</h2><button class="btn sm" @click="editInspection(null)"><Plus :size="16" /> Fatta</button></div>
+          <div class="section-head"><h2>Revisione</h2><span class="head-actions"><button class="btn sm ghost" aria-label="Compila da foto o PDF" @click="scanDoc('revisione')"><ScanText :size="16" /> Da foto</button><button class="btn sm" @click="editInspection(null)"><Plus :size="16" /> Fatta</button></span></div>
           <p v-if="nextRev" class="muted" style="margin: 0 0 10px">Prossima entro il <b>{{ formatDate(nextRev) }}</b> <span class="faint">{{ inspections.some((i) => i.nextDate) ? '(dal certificato di revisione)' : '(4 anni dalla prima immatricolazione, poi ogni 2)' }}</span></p>
           <div v-if="inspections.length" class="list">
             <button v-for="i in inspections" :key="i.id" class="list-item" @click="editInspection(i)">
@@ -299,6 +299,14 @@ const edit = reactive<{ bollo: BolloPayment | null; policy: InsurancePolicy | nu
 const menu = ref(false)
 const editBollo = (r: BolloPayment | null) => { edit.bollo = r; open.bollo = true }
 const editPolicy = (r: InsurancePolicy | null, renew?: InsurancePolicy) => { edit.policy = r; edit.renew = r ? null : renew ?? null; open.policy = true }
+// Polizza in corso: se manca il premio o non è vicina alla scadenza si modifica quella, altrimenti si rinnova.
+const policyToComplete = computed(() => {
+  const p = policies.value[0]
+  if (!p) return null
+  return p.price === undefined || daysBetween(new Date(), parseISO(p.endDate)) > 45 ? p : null
+})
+const policyAction = () => (policyToComplete.value ? editPolicy(policyToComplete.value) : editPolicy(null, policies.value[0]))
+const scanDoc = (kind: string) => router.push(`/documento?veicolo=${id.value}&tipo=${kind}`)
 const editInspection = (r: Inspection | null) => { edit.inspection = r; open.inspection = true }
 const workCat = ref<'tagliando' | undefined>()
 const editWork = (r: Work | null, cat?: 'tagliando') => { workCat.value = cat; edit.work = r; open.work = true }
@@ -312,7 +320,7 @@ watch(loading, (l) => {
   if (add === 'work') editWork(null)
   else if (add === 'tagliando') editWork(null, 'tagliando')
   else if (add === 'bollo') editBollo(null)
-  else if (add === 'policy') editPolicy(null, policies.value[0])
+  else if (add === 'policy') policyAction()
   else if (add === 'inspection') editInspection(null)
   else if (add === 'incident') editIncident(null)
   if (add) router.replace({ query: { ...route.query, add: undefined } })
@@ -339,7 +347,7 @@ const nextRev = computed(() => nextInspectionDate(v.value?.libretto.dataPrimaImm
 
 function deadlineAction(kind: DeadlineKind) {
   if (kind === 'bollo') editBollo(null)
-  else if (kind === 'assicurazione') editPolicy(null, policies.value[0])
+  else if (kind === 'assicurazione') policyAction()
   else editInspection(null)
 }
 
@@ -435,6 +443,7 @@ async function exportSheet() {
 </script>
 
 <style scoped>
+.head-actions { display: inline-flex; gap: 6px; align-items: center; }
 .hero { position: relative; min-height: calc(var(--safe-top) + 300px); color: white; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;
   background: radial-gradient(70% 55% at 50% 38%, rgba(124, 92, 255, .5), transparent 70%), radial-gradient(60% 40% at 85% 5%, rgba(79, 160, 255, .25), transparent), linear-gradient(180deg, #151a45, #070a1f); border-radius: 0 0 28px 28px; }
 .hero::after { content: ''; position: absolute; left: 10%; right: 10%; bottom: 0; height: 2px; background: linear-gradient(90deg, transparent, #4fd2ff, #7c5cff, transparent); box-shadow: 0 0 14px #4fd2ff; }

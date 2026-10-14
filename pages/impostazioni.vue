@@ -11,6 +11,9 @@
       <ChevronRight :size="18" class="faint" />
     </NuxtLink>
 
+    <div class="eyebrow" style="margin: 18px 0 8px">Account e cloud</div>
+    <CloudCard />
+
     <div class="list rows">
       <component :is="r.to ? NuxtLink : 'button'" v-for="r in rows" :key="r.label" :to="r.to" class="list-item" @click="r.sheet && (sheet = r.sheet)">
         <component :is="r.icon" :size="21" class="row-ico" />
@@ -63,7 +66,8 @@
           <div class="grow"><strong>Ripristina backup</strong><div class="faint" style="font-size: 13px">Sostituisce i dati attuali con quelli del file</div></div>
           <input type="file" accept=".zip,application/zip" hidden @change="doImport" /></label>
       </div>
-      <p class="faint" style="font-size: 13px">I dati restano solo su questo telefono: fai un backup ogni tanto, soprattutto prima di cambiare telefono.</p>
+      <p v-if="cloud.user" class="faint" style="font-size: 13px">I dati sono salvati anche nel cloud con il tuo account Google: il backup serve solo per avere una copia in più.</p>
+      <p v-else class="faint" style="font-size: 13px">Senza account i dati restano solo su questo telefono: accedi con Google oppure fai un backup ogni tanto.</p>
     </BottomSheet>
 
     <!-- Info -->

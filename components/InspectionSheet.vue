@@ -1,6 +1,7 @@
 <template>
   <BottomSheet :open="open" :title="record ? 'Modifica revisione' : 'Revisione fatta'" @close="$emit('close')">
     <div class="stack" style="gap: 12px">
+      <AutofillButton v-if="!record" :vehicle-id="vehicle.id" kind="revisione" what="il certificato di revisione" @go="$emit('close')" />
       <div class="segmented">
         <button v-for="o in outcomes" :key="o.value" type="button" :class="{ on: f.outcome === o.value }" @click="f.outcome = o.value">{{ o.label }}</button>
       </div>

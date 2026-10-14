@@ -37,7 +37,12 @@
       </div>
 
       <template v-if="doc.kind === 'libretto'">
-        <div class="card">
+        <div v-if="librettoOwner" class="card dup">
+          <strong><CircleAlert :size="18" /> Questo libretto è già registrato</strong>
+          <p class="muted" style="margin: 4px 0 14px; font-size: 14px">Appartiene a {{ vehicleName(librettoOwner) }}{{ librettoOwner.plate ? ' · ' + librettoOwner.plate : '' }}: non creo un doppione.</p>
+          <NuxtLink :to="`/veicoli/${librettoOwner.id}`" class="btn primary block">Apri il veicolo</NuxtLink>
+        </div>
+        <div v-else class="card">
           <strong>È un libretto di circolazione</strong>
           <p class="muted" style="margin: 4px 0 14px; font-size: 14px">Creo un nuovo veicolo con i dati letti{{ doc.plate ? ` (targa ${doc.plate})` : '' }}.</p>
           <button class="btn primary block" @click="newFromLibretto"><Plus :size="18" /> Crea il veicolo</button>
@@ -91,6 +96,11 @@
             <FField v-model="doc.total" label="Premio pagato" type="money" />
             <FField v-model="doc.title" label="Coperture" placeholder="RCA, furto…" />
           </div>
+          <div class="field"><span>Durata</span>
+            <div class="segmented">
+              <button v-for="m in [6, 12]" :key="m" type="button" :class="{ on: policyMonths === m }" @click="setPolicyMonths(m)">{{ m }} mesi</button>
+            </div>
+          </div>
         </template>
 
         <!-- revisione -->
@@ -118,7 +128,8 @@
           <p v-if="doc.fromMonth && doc.toMonth" class="faint" style="margin: -4px 0 0; font-size: 13px">Sulla ricevuta: periodo da {{ monthName(doc.fromMonth) }} a {{ monthName(doc.toMonth) }}.</p>
         </template>
 
-        <button class="btn primary big" :disabled="!canSave || saving" @click="save"><Check :size="19" /> Salva nel veicolo</button>
+        <p v-if="duplicate" class="err dup-msg"><CircleAlert :size="18" /> {{ duplicate }}</p>
+        <button class="btn primary big" :disabled="!canSave || saving || !!duplicate" @click="save"><Check :size="19" /> Salva nel veicolo</button>
       </template>
       <button class="btn ghost" @click="reset">Leggi un altro documento</button>
     </div>
@@ -128,7 +139,7 @@
 <script setup lang="ts">
 import { Camera, Check, ChevronLeft, CircleAlert, CircleCheck, ClipboardCheck, FileText, FileUp, Landmark, Plus, Repeat, ScanText, ShieldCheck, Wrench, X } from 'lucide-vue-next'
 import { DOC_LABEL, parseDocument, type DocKind, type ParsedDoc } from '~/utils/documents'
-import { monthName, vehicleName } from '~/utils/deadlines'
+import { addMonths, monthName, parseISO, toISO, vehicleName } from '~/utils/deadlines'
 import { parseLibrettoMulti } from '~/utils/libretto'
 
 const route = useRoute()
@@ -165,7 +176,7 @@ async function onPick(e: Event) {
     // tre letture diverse: testo pulito, colori originali e testo sparso nei riquadri dei moduli
     texts.value = await ocrTexts(picked, (s, p) => { stage.value = s; pct.value = p }, ['otsu', 'gray', 'sparse'])
     files.value = picked
-    apply(parseDocument(texts.value))
+    apply(parseDocument(texts.value, forcedKind()))
     if (doc.value?.kind === 'sconosciuto') doc.value.kind = 'fattura'
   } catch (err) {
     console.error(err)
@@ -173,6 +184,14 @@ async function onPick(e: Event) {
   } finally {
     busy.value = false
   }
+}
+
+/** Aperto da una scheda (bollo, assicurazione…): il tipo è già noto, a meno che il documento dica chiaramente altro. */
+function forcedKind(): DocKind | undefined {
+  const t = route.query.tipo as DocKind | undefined
+  if (!t || !KINDS.includes(t)) return
+  const auto = parseDocument(texts.value).kind
+  return auto === 'sconosciuto' || auto === 'fattura' ? t : undefined
 }
 
 function apply(d: ParsedDoc) {
@@ -196,8 +215,33 @@ const canSave = computed(() => {
   return !!d.date
 })
 
+// Stesso documento letto due volte: lo segnalo e non lo salvo di nuovo
+const duplicate = ref<string>()
+watch([doc, vehicleId], async () => {
+  const d = doc.value
+  duplicate.value = d && vehicleId.value ? await findDuplicate(toRaw(d), vehicleId.value) : undefined
+}, { deep: true, immediate: true })
+const librettoOwner = computed(() => (doc.value?.kind === 'libretto' ? matchVehicle(vehicles.value, doc.value).vehicle : undefined))
+
+const policyMonths = computed(() => {
+  const d = doc.value
+  if (d?.startDate && d.endDate) {
+    const m = Math.round((parseISO(d.endDate).getTime() - parseISO(d.startDate).getTime()) / (30.44 * 86400000))
+    if (m === 6 || m === 12) return m
+  }
+  return d?.validityMonths
+})
+function setPolicyMonths(m: number) {
+  if (!doc.value) return
+  doc.value.startDate ??= todayISO()
+  doc.value.validityMonths = m
+  doc.value.endDate = toISO(addMonths(parseISO(doc.value.startDate), m))
+}
+
 async function save() {
   if (!doc.value || !vehicle.value) return
+  if (duplicate.value) { toast(duplicate.value, 'danger'); return }
+  if (doc.value.kind === 'assicurazione') doc.value.validityMonths = policyMonths.value
   saving.value = true
   try {
     const tab = await saveDocument(toRaw(doc.value), vehicle.value, files.value, { setPurchaseDate: setPurchaseDate.value })
@@ -233,6 +277,8 @@ function reset() {
 .big { height: 58px; border-radius: 999px; font-size: 16.5px; }
 .err { display: flex; gap: 8px; align-items: flex-start; color: var(--danger); font-weight: 600; font-size: 14px; margin: 0; }
 .kinds, .cats { flex-wrap: wrap; overflow: visible; }
+.dup strong { display: inline-flex; align-items: center; gap: 8px; color: var(--danger); }
+.dup-msg { padding: 12px 14px; border-radius: 14px; background: color-mix(in srgb, var(--danger) 12%, transparent); border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent); }
 .match { display: inline-flex; align-items: center; gap: 6px; color: var(--ok); font-weight: 600; }
 .items { padding: 12px 14px; }
 .item { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-top: 1px solid var(--line); font-size: 13.5px; }

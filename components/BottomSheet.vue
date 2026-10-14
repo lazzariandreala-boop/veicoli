@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <Transition name="sheet">
-      <div v-if="open" class="sheet-backdrop" @click.self="$emit('close')">
+      <div v-if="open" class="sheet-backdrop" :class="{ top }" @click.self="$emit('close')">
         <div class="sheet" role="dialog" aria-modal="true">
           <div class="grip" />
           <div v-if="title" class="sheet-head">
@@ -16,7 +16,7 @@
 </template>
 <script setup lang="ts">
 import { X } from 'lucide-vue-next'
-const props = defineProps<{ open: boolean; title?: string }>()
+const props = defineProps<{ open: boolean; title?: string; top?: boolean }>()
 defineEmits<{ close: [] }>()
 watch(() => props.open, (o) => { document.body.style.overflow = o ? 'hidden' : '' })
 onBeforeUnmount(() => { document.body.style.overflow = '' })
@@ -24,6 +24,7 @@ onBeforeUnmount(() => { document.body.style.overflow = '' })
 <style scoped>
 .sheet-backdrop { position: fixed; inset: 0; z-index: 60; background: rgba(5, 7, 12, .62); backdrop-filter: blur(4px); display: flex; align-items: flex-end; justify-content: center; }
 .sheet { width: 100%; max-width: 640px; max-height: 92dvh; background: var(--surface-solid); border-radius: 26px 26px 0 0; border: 1px solid var(--line-2); border-bottom: 0; display: flex; flex-direction: column; box-shadow: 0 -20px 60px -20px rgba(0,0,0,.7); }
+.sheet-backdrop.top { z-index: 80; }
 .grip { width: 40px; height: 5px; border-radius: 99px; background: var(--line-2); margin: 10px auto 2px; flex: none; }
 .sheet-head { display: flex; align-items: center; justify-content: space-between; padding: 8px 18px 6px; gap: 10px; }
 .sheet-head h3 { font-size: 20px; }
