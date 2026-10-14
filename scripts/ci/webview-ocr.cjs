@@ -49,7 +49,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
   console.log('UA', await evalAsync('navigator.userAgent'))
   console.log('PROBE', JSON.stringify(await evalAsync(`(async () => {
     const out = {}
-    for (const f of ['ocr/worker.min.js', 'ocr/core/tesseract-core-simd-lstm.wasm.js', 'ocr/core/tesseract-core-relaxedsimd-lstm.wasm.js', 'ocr/lang/ita.traineddata.gz']) {
+    for (const f of ['ocr/worker.min.js', 'ocr/core/tesseract-core-simd-lstm.wasm.js', 'ocr/core/tesseract-core-relaxedsimd-lstm.wasm.js', 'ocr/lang/ita.traineddata']) {
       try { const r = await fetch(f); const b = await r.arrayBuffer(); out[f] = [r.status, r.headers.get('content-type'), r.headers.get('content-encoding'), b.byteLength, Array.from(new Uint8Array(b.slice(0, 2)))] } catch (e) { out[f] = String(e) }
     }
     out.wasmSimd = typeof WebAssembly === 'object' && WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,0,0,1,5,1,96,0,1,123,3,2,1,0,10,10,1,8,0,65,0,253,15,253,98,11]))

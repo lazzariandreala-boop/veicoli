@@ -21,8 +21,8 @@ async function canvasFromImage(file: Blob): Promise<HTMLCanvasElement> {
 }
 
 async function canvasesFromPdf(file: Blob): Promise<HTMLCanvasElement[]> {
-  const pdfjs = await import('pdfjs-dist')
-  const workerUrl = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default
+  const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs')
+  const workerUrl = (await import('pdfjs-dist/legacy/build/pdf.worker.min.mjs?url')).default
   pdfjs.GlobalWorkerOptions.workerSrc = workerUrl
   const pdf = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()) }).promise
   const out: HTMLCanvasElement[] = []
