@@ -5,6 +5,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   apk:
     runs-on: ubuntu-latest
@@ -51,3 +54,14 @@ jobs:
         with:
           name: veicoli-apk
           path: android/app/build/outputs/apk/**/*.apk
+      # Pubblica l'APK di prova sempre allo stesso link:
+      # https://github.com/lazzariandreala-boop/veicoli/releases/latest/download/veicoli.apk
+      - name: Pubblica l'APK
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk veicoli.apk
+          gh release delete ultima --yes --cleanup-tag || true
+          gh release create ultima veicoli.apk --latest --title "Veicoli – ultima versione" \
+            --notes "APK compilato da ${GITHUB_SHA::7} il $(date -u '+%d/%m/%Y %H:%M') UTC. Scaricalo dal telefono e installalo sopra quello vecchio."
