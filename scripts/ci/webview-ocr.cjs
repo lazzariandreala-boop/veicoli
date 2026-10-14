@@ -60,12 +60,23 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
     const c = document.createElement('canvas'); c.width = 1400; c.height = 500
     const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, 1400, 500); g.fillStyle = '#000'; g.font = '48px sans-serif'
     g.fillText('A) FX74364   B) 30/04/2026', 40, 120); g.fillText('D.1) CFMOTO  D.3) 800MT EXPLORE', 40, 240); g.fillText('E) LCEPEYLM8S8018621', 40, 360)
-    const blob = await new Promise((r) => c.toBlob(r, 'image/png'))
+    const png = await new Promise((r) => c.toBlob(r, 'image/png'))
+    // PDF minimale con testo vero, come quello del libretto digitale
+    const lines = ['A) FX74364   B) 30/04/2026', 'D.1) CFMOTO  D.3) 800MT EXPLORE', 'E) LCEPEYLM8S8018621']
+    const content = 'BT /F1 28 Tf 40 700 Td ' + lines.map((l, i) => (i ? '0 -60 Td ' : '') + '(' + l.replace(/[()]/g, '\\\\$&') + ') Tj').join(' ') + ' ET'
+    const objs = ['<< /Type /Catalog /Pages 2 0 R >>', '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+      '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 842 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>',
+      '<< /Length ' + content.length + ' >>\\nstream\\n' + content + '\\nendstream', '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>']
+    let pdf = '%PDF-1.4\\n'; const offs = []
+    objs.forEach((o, i) => { offs.push(pdf.length); pdf += (i + 1) + ' 0 obj\\n' + o + '\\nendobj\\n' })
+    const xref = pdf.length
+    pdf += 'xref\\n0 ' + (objs.length + 1) + '\\n0000000000 65535 f \\n' + offs.map((o) => String(o).padStart(10, '0') + ' 00000 n \\n').join('') + 'trailer\\n<< /Size ' + (objs.length + 1) + ' /Root 1 0 R >>\\nstartxref\\n' + xref + '\\n%%EOF'
+    const blob = new File([pdf], 'libretto.pdf', { type: 'application/pdf' })
     const t0 = Date.now()
     const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error('TIMEOUT 150s')), 150000))
     try {
       const r = await Promise.race([window.__veicoliOcr.readLibrettoOffline([blob], (s, p) => log.push(Date.now() - t0 + 'ms ' + s + ' ' + Math.round(p * 100) + '%')), timeout])
-      return { ok: true, ms: Date.now() - t0, data: r.data, log }
+      return { ok: true, ms: Date.now() - t0, data: r.data, text: r.text.slice(0, 400), log }
     } catch (e) { return { ok: false, err: String(e && (e.stack || e)), log } }
   })()`)
   console.log('RESULT', JSON.stringify(res, null, 2))

@@ -71,19 +71,30 @@ async function getWorker(onProgress?: (p: number) => void) {
         workerPath: `${base}ocr/worker.min.js`,
         corePath: `${base}ocr/core`,
         langPath: `${base}ocr/lang`,
-        gzip: true,
+        gzip: false,
         cacheMethod: 'none',
         workerBlobURL: false,
-        logger: (m: any) => { if (m.status === 'recognizing text') currentProgress?.(m.progress) },
+        logger: (m: any) => {
+          if (m.status === 'recognizing text') currentProgress?.(m.progress)
+          else loadProgress?.(m.status, m.progress)
+        },
+        errorHandler: (e: any) => console.error('[ocr worker]', e),
       })
       await w.setParameters({ preserve_interword_spaces: '1' })
       return w
     })()
-    workerPromise.catch(() => { workerPromise = null })
+    // Se il lettore non parte (WebView senza supporto, file mancanti) meglio un errore chiaro che una barra ferma.
+    const started = workerPromise
+    workerPromise = Promise.race([
+      started,
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Il lettore di testo non si è avviato. Riprova o usa la lettura avanzata.')), 60000)),
+    ])
+    workerPromise.catch(() => { workerPromise = null; started.then((w: any) => w.terminate()).catch(() => {}) })
   }
   return workerPromise
 }
 let currentProgress: ((p: number) => void) | undefined
+let loadProgress: ((status: string, p: number) => void) | undefined
 
 /**
  * Legge il libretto sul telefono, senza connessione: due passaggi OCR
@@ -94,7 +105,10 @@ export async function readLibrettoOffline(files: Blob[], onProgress: OcrProgress
   const pages = await filesToCanvases(files)
   if (!pages.length) throw new Error('Nessuna immagine leggibile nel file scelto.')
   onProgress('Avvio il lettore di testo', 0.08)
-  const worker = await getWorker()
+  loadProgress = (status, p) => {
+    if (/language|traineddata/.test(status)) onProgress('Carico il dizionario', 0.08 + 0.02 * (p || 0))
+  }
+  const worker = await getWorker().finally(() => { loadProgress = undefined })
   const passes: ('otsu' | 'adaptive')[] = ['otsu', 'adaptive']
   const total = pages.length * passes.length
   const texts: string[] = Array(passes.length).fill('')

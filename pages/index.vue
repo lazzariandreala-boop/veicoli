@@ -26,15 +26,10 @@
 
     <!-- Dashboard -->
     <template v-else>
-      <div class="top-actions">
+      <header class="topbar">
+        <h1>Il tuo garage</h1>
         <NuxtLink to="/scadenze" class="icon-btn" aria-label="Scadenze"><Bell :size="20" /><i v-if="urgentCount" class="dot" /></NuxtLink>
-      </div>
-      <header class="topbar"><h1>Il tuo garage</h1></header>
-
-      <label class="search">
-        <input v-model="q" class="input" type="search" placeholder="Cerca veicolo o targa..." />
-        <Search :size="19" />
-      </label>
+      </header>
 
       <div class="hero-row">
         <div class="stat-tile">
@@ -50,12 +45,7 @@
         </NuxtLink>
       </div>
 
-      <div class="quick">
-        <NuxtLink v-for="(a, i) in actions" :key="a.label" :to="a.to" class="qa" :class="[a.tone, { main: i === 0 }]">
-          <span class="qa-ico"><component :is="a.icon" :size="22" /></span>
-          <span>{{ a.label }}</span>
-        </NuxtLink>
-      </div>
+      <NuxtLink to="/veicoli/nuovo?scan=1" class="btn primary scan"><ScanLine :size="22" /> Aggiungi dal libretto</NuxtLink>
 
       <section v-if="next" class="section" style="margin-top: 20px">
         <NuxtLink :to="`/veicoli/${next.vehicleId}?tab=scadenze`" class="next card" :class="urgency(next.days)">
@@ -69,40 +59,27 @@
       </section>
 
       <section class="section" style="margin-top: 22px">
-        <div class="section-head"><h2>I tuoi veicoli</h2><NuxtLink to="/veicoli" class="link">Vedi tutti <ChevronRight :size="15" /></NuxtLink></div>
+        <div class="section-head"><h2>I tuoi veicoli</h2><NuxtLink v-if="vehicles.length > shown.length" to="/veicoli" class="link">Vedi tutti <ChevronRight :size="15" /></NuxtLink></div>
         <TransitionGroup name="list" tag="div" class="stack" style="gap: 14px">
           <VehicleCard v-for="v in shown" :key="v.id" :vehicle="v" :deadlines="deadlinesByVehicle.get(v.id) ?? []" />
         </TransitionGroup>
-        <div v-if="!shown.length" class="empty"><p>Nessun veicolo corrisponde a "{{ q }}".</p></div>
       </section>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Bell, CalendarClock, ChartColumn, ChevronRight, Plus, Search, Wallet } from 'lucide-vue-next'
+import { Bell, ChevronRight, ScanLine } from 'lucide-vue-next'
 import { vehicleName } from '~/utils/deadlines'
 
 const { vehicles, deadlines, deadlinesByVehicle, loading } = useGarage()
 const dark = useIsDark()
-const q = ref('')
 const active = computed(() => vehicles.value.filter((v) => v.status === 'attivo'))
 const featured = computed(() => active.value[0] ?? vehicles.value[0])
 const { url: cover } = useMediaUrl(() => featured.value?.coverMediaId)
 const urgentCount = computed(() => deadlines.value.filter((d) => d.days <= 30 && d.vehicle.status === 'attivo').length)
 const next = computed(() => deadlines.value.find((d) => d.vehicle.status === 'attivo'))
-const shown = computed(() => {
-  const s = q.value.trim().toLowerCase().replace(/\s+/g, '')
-  const list = s ? vehicles.value : active.value.length ? active.value : vehicles.value
-  if (!s) return list.slice(0, 4)
-  return list.filter((v) => (vehicleName(v) + v.plate + v.plateHistory.map((p) => p.plate).join('')).toLowerCase().replace(/\s+/g, '').includes(s))
-})
-const actions = [
-  { label: 'Aggiungi', to: '/veicoli/nuovo', icon: Plus, tone: 'violet' },
-  { label: 'Scadenze', to: '/scadenze', icon: CalendarClock, tone: 'rose' },
-  { label: 'Spese', to: '/spese', icon: Wallet, tone: 'cyan' },
-  { label: 'Report', to: '/report', icon: ChartColumn, tone: 'blue' },
-]
+const shown = computed(() => (active.value.length ? active.value : vehicles.value).slice(0, 4))
 </script>
 
 <style scoped>
@@ -119,14 +96,14 @@ const actions = [
 .hero-car::after { content: ''; position: absolute; left: 12%; right: 12%; bottom: 2%; height: 18%; border-radius: 50%; background: radial-gradient(closest-side, rgba(150, 110, 255, .55), transparent); filter: blur(6px); z-index: -1; }
 .w-dark .hero-car::after { background: radial-gradient(closest-side, rgba(120, 140, 200, .35), transparent); }
 .tagline { margin: 18px 0 26px; color: rgba(235, 236, 255, .88); font-size: 17px; font-weight: 500; }
-.start { width: min(78vw, 300px); }
+.start { width: min(80vw, 320px); height: 80px; font-size: 21px; }
 .manual { margin-top: 18px; font-size: 13.5px; color: rgba(225, 228, 255, .65); }
 .manual a { color: #7fd8ff; font-weight: 600; }
 @keyframes breathe { 50% { filter: drop-shadow(0 0 16px rgba(255, 170, 90, 1)) drop-shadow(0 0 40px rgba(150, 100, 255, 1)); } }
 
 /* ---------- dashboard ---------- */
-.top-actions { display: flex; justify-content: flex-end; margin-bottom: 4px; }
-.search { margin-bottom: 22px; }
+.hero-row { margin-top: 8px; }
+.scan { width: 100%; height: 60px; margin-top: 22px; font-size: 16.5px; border-radius: 999px; }
 .hero-row { position: relative; display: flex; align-items: stretch; min-height: 150px; }
 .stat-tile { position: relative; z-index: 1; width: 52%; padding: 22px 20px; color: #fff;
   border-radius: 22px 46px 46px 22px; corner-top-right-shape: bevel; corner-bottom-right-shape: bevel;
@@ -140,15 +117,6 @@ const actions = [
 .feat { position: absolute; right: -8px; top: -14px; bottom: -6px; width: 62%; z-index: 2; display: grid; place-items: center; }
 .feat-art { width: 100%; filter: drop-shadow(0 18px 18px rgba(20, 10, 60, .45)); }
 .feat-photo { width: 92%; margin-left: auto; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 18px; }
-
-.quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 22px; }
-.qa { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; color: var(--text-2); }
-.qa-ico { --c: 124, 92, 255; width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; color: rgb(var(--c)); background: var(--surface-solid); border: 1px solid var(--line-2); box-shadow: var(--shadow), inset 0 0 14px rgba(var(--c), .18); transition: transform .15s; }
-.qa.rose .qa-ico { --c: 255, 92, 138; }
-.qa.cyan .qa-ico { --c: 34, 190, 255; }
-.qa.blue .qa-ico { --c: 90, 130, 255; }
-.qa.main .qa-ico { color: #fff; background: var(--grad-primary); border: 0; box-shadow: 0 0 22px -2px rgba(91, 77, 255, .85), inset 0 1px 0 rgba(255, 255, 255, .3); }
-.qa:active .qa-ico { transform: scale(.92); }
 
 .next { display: flex; align-items: center; gap: 12px; padding: 13px 16px; }
 .next strong { font-size: 14.5px; }
