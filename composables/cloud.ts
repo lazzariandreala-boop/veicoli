@@ -4,8 +4,8 @@ import type { Firestore, QueryDocumentSnapshot } from 'firebase/firestore'
 import { SYNC_TABLES, applyRemote, db, markDirty, onOutboxChange, outboxClear, outboxDone, outboxHas, outboxSnapshot, type SyncTable } from '~/composables/db'
 
 // Account Google e copia dei dati su Firestore: users/{uid}/{tabella}/{id}.
-// I file (foto, PDF) stanno in users/{uid}/media (dati) + users/{uid}/mediaChunks (contenuto a pezzi da ~600 KB),
-// perché Firebase Storage richiede il piano a pagamento.
+// Le foto dei veicoli stanno in users/{uid}/media (dati) + users/{uid}/mediaChunks (contenuto a pezzi da ~600 KB),
+// perché Firebase Storage richiede il piano a pagamento. I documenti restano solo sul telefono.
 export const FIREBASE_CONFIG = {
   apiKey: 'AIzaSyBCZDcFg5eo0r0zLNgU6jFYObaJEwf40tg',
   authDomain: 'veicoli-personali.firebaseapp.com',
@@ -236,14 +236,23 @@ export async function flush() {
       if (ops + 1 > 400 || bytes + size > 6_000_000) { commits.push(batch.commit()); batch = f.writeBatch(fs); ops = 0; bytes = 0 }
       fn(batch); ops++; bytes += size
     }
+    // Nel cloud vanno solo le foto dei veicoli; i documenti (libretto, fatture, polizze…) restano sul telefono
+    const covers = new Set((await db().vehicles.toArray()).map((v) => v.coverMediaId).filter(Boolean) as string[])
+    const later: string[] = []
     for (const [key] of items) {
       const [t, id] = key.split(':') as [SyncTable, string]
       const ts = Date.now()
       const ref = f.doc(userCol(t), id)
       const rec = await (db() as any)[t].get(id)
       if (t === 'media') {
+        const cover = covers.has(id)
         const old = known[key] !== undefined ? await f.getDocs(f.query(userCol('mediaChunks'), f.where('mediaId', '==', id))).catch(() => null) : null
         old?.docs.forEach((d) => add((b) => b.delete(d.ref)))
+        if (rec && !cover) {
+          // documento: se era già stato caricato lo tolgo dal cloud senza cancellarlo dagli altri telefoni
+          if (known[key] !== undefined) { add((b) => b.delete(ref)); delete known[key] }
+          continue
+        }
         if (rec && rec.blob.size <= MAX_MEDIA) {
           const data = await toBase64(rec.blob)
           const n = Math.ceil(data.length / CHUNK) || 1
@@ -252,6 +261,8 @@ export async function flush() {
         } else if (!rec) add((b) => b.set(ref, { _deleted: true, _ts: ts }))
       } else {
         add((b) => b.set(ref, rec ? { ...JSON.parse(JSON.stringify(rec)), _ts: ts } : { _deleted: true, _ts: ts }))
+        // foto del veicolo salvata prima del veicolo stesso: la carico al giro dopo
+        if (t === 'vehicles' && rec?.coverMediaId && known[`media:${rec.coverMediaId}`] === undefined) later.push(rec.coverMediaId)
       }
       known[key] = ts
     }
@@ -260,6 +271,7 @@ export async function flush() {
     // Offline Firestore tiene le scritture in coda da sé: dopo qualche secondo le considero affidate
     const ok = await Promise.race([Promise.all(commits).then(() => true), new Promise<boolean>((r) => setTimeout(() => r(false), 8000))])
     outboxDone(items)
+    if (later.length) markDirty('media', later)
     cloud.pending = outboxSnapshot().length
     cloud.status = ok ? 'ok' : 'offline'
     if (ok) cloud.lastSync = Date.now()

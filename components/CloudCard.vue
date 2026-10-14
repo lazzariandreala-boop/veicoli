@@ -14,7 +14,7 @@
       <div class="avatar"><CloudUpload :size="22" /></div>
       <div class="grow">
         <strong>Salva i dati nel cloud</strong>
-        <div class="faint" style="font-size: 13px">Accedi con Google: veicoli, scadenze e documenti tornano da soli se reinstalli l'app o cambi telefono.</div>
+        <div class="faint" style="font-size: 13px">Accedi con Google: veicoli, scadenze, spese e foto dei veicoli tornano da soli se reinstalli l'app o cambi telefono. I file dei documenti restano sul telefono.</div>
         <p v-if="cloud.error" class="err">{{ cloud.error }}</p>
       </div>
     </template>

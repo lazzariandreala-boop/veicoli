@@ -66,7 +66,7 @@
           <div class="grow"><strong>Ripristina backup</strong><div class="faint" style="font-size: 13px">Sostituisce i dati attuali con quelli del file</div></div>
           <input type="file" accept=".zip,application/zip" hidden @change="doImport" /></label>
       </div>
-      <p v-if="cloud.user" class="faint" style="font-size: 13px">I dati sono salvati anche nel cloud con il tuo account Google: il backup serve solo per avere una copia in più.</p>
+      <p v-if="cloud.user" class="faint" style="font-size: 13px">I dati e le foto dei veicoli sono nel cloud; i file dei documenti (foto e PDF) restano solo qui: il backup li salva tutti.</p>
       <p v-else class="faint" style="font-size: 13px">Senza account i dati restano solo su questo telefono: accedi con Google oppure fai un backup ogni tanto.</p>
     </BottomSheet>
 

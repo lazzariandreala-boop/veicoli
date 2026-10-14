@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "968907722695",
+    "project_id": "veicoli-personali",
+    "storage_bucket": "veicoli-personali.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:968907722695:android:d8ea5e1bbdb90684c353e2",
+        "android_client_info": {
+          "package_name": "it.veicoli.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "968907722695-jckthb2lfl8m8h7tr4eg06dj1so5dnlf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "it.veicoli.app",
+            "certificate_hash": "c91aa233e2c94bf5b7cba06af9777b2bc6a7a2b9"
+          }
+        },
+        {
+          "client_id": "968907722695-mg5eke9fdjidotrnnphj51k3hvi3m89r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCaVtZtdT4rxMcWCgpGtz7ZmKroAuwaKEk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "968907722695-mg5eke9fdjidotrnnphj51k3hvi3m89r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
