@@ -69,6 +69,7 @@
   </div>
 </template>
 <script setup lang="ts">
+definePageMeta({ premium: 'report', premiumTitle: 'Report' })
 import { ChevronLeft } from 'lucide-vue-next'
 import { monthName, vehicleName } from '~/utils/deadlines'
 import { EXPENSE_CATS, PERIODS, periodRange, type Period } from '~/composables/expenses'

@@ -1,6 +1,8 @@
 <template>
   <div class="shell">
-    <slot />
+    <!-- pagina Premium senza abbonamento: la copro invece di smontarla, così il cambio di pagina resta stabile -->
+    <PremiumLock v-if="lock" :feature="lock" :title="String(route.meta.premiumTitle ?? '')" page :back="!showNav" />
+    <div v-show="!lock" class="slot"><slot /></div>
     <nav v-if="showNav" class="nav">
       <svg class="nav-bg" viewBox="0 0 400 96" preserveAspectRatio="none" aria-hidden="true">
         <defs>
@@ -20,6 +22,7 @@
 
 <script setup lang="ts">
 import { CalendarClock, CarFront, House, LayoutGrid, Wallet } from 'lucide-vue-next'
+import type { PremiumFeature } from '~/composables/premium'
 
 const route = useRoute()
 const tabs = [
@@ -31,11 +34,13 @@ const tabs = [
 ]
 const NAV_PAGES = [...tabs.map((t) => t.to), '/report']
 const showNav = computed(() => NAV_PAGES.includes(route.path))
+const lock = computed(() => (route.meta.premium && !isPremium.value ? route.meta.premium as PremiumFeature : null))
 const isOn = (to: string) => route.path === to || (to === '/spese' && route.path === '/report')
 </script>
 
 <style scoped>
 .shell { min-height: 100dvh; }
+.slot { display: contents; }
 .nav {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
   display: grid; grid-template-columns: repeat(5, 1fr); align-items: end;

@@ -10,7 +10,7 @@ export default defineNuxtConfig({
   ],
   app: {
     head: {
-      title: 'Veicoli',
+      title: 'Veicoli Personali',
       htmlAttrs: { lang: 'it' },
       meta: [
         { charset: 'utf-8' },

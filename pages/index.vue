@@ -16,7 +16,7 @@
           </defs>
           <path d="M150 10 L282 86 Q290 91 290 100 L290 230 Q290 239 282 244 L150 320 L18 244 Q10 239 10 230 L10 100 Q10 91 18 86 Z" fill="url(#hexf)" :stroke="dark ? 'url(#hexd)' : 'url(#hexg)'" :stroke-width="dark ? 2 : 4" stroke-linejoin="round" />
         </svg>
-        <div class="logo">VEICOLI</div>
+        <div class="logo">VEICOLI<small>PERSONALI</small></div>
       </div>
       <div class="hero-car"><VehicleArt :hero="dark ? 'dark' : 'light'" /></div>
       <p class="tagline">Il tuo garage, sempre sotto controllo.</p>
@@ -30,6 +30,7 @@
           {{ signing ? 'Accesso in corso…' : 'Accedi con Google' }}
         </button>
         <p class="manual">Serve per salvare i tuoi veicoli e ritrovarli su ogni telefono.</p>
+        <p class="manual legal">Accedendo accetti i <NuxtLink to="/termini">Termini</NuxtLink> e l'<NuxtLink to="/privacy">Informativa privacy</NuxtLink>.</p>
         <p v-if="cloud.error" class="manual w-err">{{ cloud.error }}</p>
       </template>
       <template v-else-if="cloud.status === 'error'">
@@ -61,7 +62,7 @@
         <div class="stat-tile">
           <div class="stat-num">{{ active.length }}</div>
           <div class="stat-lbl">{{ active.length === 1 ? 'veicolo' : 'veicoli' }}</div>
-          <div class="stat-sub">{{ urgentCount ? `${urgentCount} in scadenza` : 'Tutto in regola' }}</div>
+          <div class="stat-sub">{{ !isPremium ? 'Piano gratuito' : urgentCount ? `${urgentCount} in scadenza` : 'Tutto in regola' }}</div>
         </div>
         <NuxtLink v-if="featured" :to="`/veicoli/${featured.id}`" class="feat">
           <div class="feat-art">
@@ -71,8 +72,18 @@
         </NuxtLink>
       </div>
 
-      <NuxtLink to="/documento" class="btn primary scan"><ScanLine :size="22" /> Leggi un documento</NuxtLink>
-      <p class="scan-hint">Fatture, tagliandi, bollo, assicurazione, revisione o libretto</p>
+      <template v-if="isPremium">
+        <NuxtLink to="/documento" class="btn primary scan"><ScanLine :size="22" /> Leggi un documento</NuxtLink>
+        <p class="scan-hint">Fatture, tagliandi, bollo, assicurazione, revisione o libretto</p>
+      </template>
+      <button v-else class="card upsell" @click="openPaywall()">
+        <div class="up-ico"><Crown :size="22" /></div>
+        <div class="grow">
+          <strong>Passa a Premium</strong>
+          <span>Scadenze con notifiche, lavori, spese e veicoli illimitati a {{ premium.price }}</span>
+        </div>
+        <ChevronRight :size="18" />
+      </button>
 
       <section v-if="next" class="section" style="margin-top: 20px">
         <NuxtLink :to="`/veicoli/${next.vehicleId}?tab=scadenze`" class="next card" :class="urgency(next.days)">
@@ -88,7 +99,7 @@
       <section class="section" style="margin-top: 22px">
         <div class="section-head"><h2>I tuoi veicoli</h2><NuxtLink v-if="vehicles.length > shown.length" to="/veicoli" class="link">Vedi tutti <ChevronRight :size="15" /></NuxtLink></div>
         <TransitionGroup name="list" tag="div" class="stack" style="gap: 14px">
-          <VehicleCard v-for="v in shown" :key="v.id" :vehicle="v" :deadlines="deadlinesByVehicle.get(v.id) ?? []" />
+          <VehicleCard v-for="v in shown" :key="v.id" :vehicle="v" :deadlines="isPremium ? deadlinesByVehicle.get(v.id) ?? [] : []" />
         </TransitionGroup>
       </section>
     </template>
@@ -96,7 +107,7 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowRight, Bell, ChevronRight, LoaderCircle, RefreshCw, ScanLine } from 'lucide-vue-next'
+import { ArrowRight, Bell, ChevronRight, Crown, LoaderCircle, RefreshCw, ScanLine } from 'lucide-vue-next'
 import { vehicleName } from '~/utils/deadlines'
 
 const { vehicles, deadlines, deadlinesByVehicle, loading } = useGarage()
@@ -104,8 +115,8 @@ const dark = useIsDark()
 const active = computed(() => vehicles.value.filter((v) => v.status === 'attivo'))
 const featured = computed(() => active.value[0] ?? vehicles.value[0])
 const { url: cover } = useMediaUrl(() => featured.value?.coverMediaId)
-const urgentCount = computed(() => deadlines.value.filter((d) => d.days <= 30 && d.vehicle.status === 'attivo').length)
-const next = computed(() => deadlines.value.find((d) => d.vehicle.status === 'attivo'))
+const urgentCount = computed(() => !isPremium.value ? 0 : deadlines.value.filter((d) => d.days <= 30 && d.vehicle.status === 'attivo').length)
+const next = computed(() => (isPremium.value ? deadlines.value.find((d) => d.vehicle.status === 'attivo') : undefined))
 const shown = computed(() => (active.value.length ? active.value : vehicles.value).slice(0, 4))
 const signing = ref(false)
 async function cloudLogin() {
@@ -130,7 +141,8 @@ async function cloudLogin() {
 .hex { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .w-light .hex { filter: drop-shadow(0 0 10px rgba(255, 170, 90, .9)) drop-shadow(0 0 26px rgba(150, 100, 255, .9)); animation: breathe 4s ease-in-out infinite; }
 .w-dark .hex { filter: drop-shadow(0 0 12px rgba(150, 170, 255, .35)); }
-.logo { position: relative; top: -6%; font-family: var(--font-display); font-weight: 600; font-size: clamp(32px, 10vw, 44px); letter-spacing: .06em; color: #fff; text-shadow: 0 0 22px rgba(200, 180, 255, .8); }
+.logo { position: relative; top: -6%; display: flex; flex-direction: column; align-items: center; font-family: var(--font-display); font-weight: 600; font-size: clamp(32px, 10vw, 44px); line-height: 1; letter-spacing: .06em; color: #fff; text-shadow: 0 0 22px rgba(200, 180, 255, .8); }
+.logo small { margin-top: 10px; font-size: .36em; font-weight: 500; letter-spacing: .42em; padding-left: .42em; color: rgba(235, 228, 255, .85); }
 .hero-car { position: relative; width: min(112vw, 520px); margin: 0 -10vw; }
 .hero-car::after { content: ''; position: absolute; left: 12%; right: 12%; bottom: 2%; height: 18%; border-radius: 50%; background: radial-gradient(closest-side, rgba(150, 110, 255, .55), transparent); filter: blur(6px); z-index: -1; }
 .w-dark .hero-car::after { background: radial-gradient(closest-side, rgba(120, 140, 200, .35), transparent); }
@@ -150,6 +162,11 @@ async function cloudLogin() {
 @keyframes breathe { 50% { filter: drop-shadow(0 0 16px rgba(255, 170, 90, 1)) drop-shadow(0 0 40px rgba(150, 100, 255, 1)); } }
 
 /* ---------- dashboard ---------- */
+.legal { font-size: 12px; }
+.upsell { display: flex; align-items: center; gap: 14px; width: 100%; margin-top: 22px; padding: 14px 16px; text-align: left; cursor: pointer; font: inherit; color: #fff; border: 0; background: var(--grad-primary); box-shadow: var(--grad-primary-glow); }
+.upsell strong { display: block; font-size: 16px; }
+.upsell span { display: block; font-size: 12.5px; opacity: .88; margin-top: 2px; }
+.up-ico { width: 42px; height: 42px; flex: none; border-radius: 13px; display: grid; place-items: center; background: rgba(255, 255, 255, .18); }
 .hero-row { margin-top: 8px; }
 .scan { width: 100%; height: 60px; margin-top: 22px; font-size: 16.5px; border-radius: 999px; }
 .scan-hint { margin: 8px 0 0; text-align: center; font-size: 12.5px; color: var(--text-3); }

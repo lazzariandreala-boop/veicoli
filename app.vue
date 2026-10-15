@@ -4,4 +4,6 @@
   </NuxtLayout>
   <AppToast />
   <ConfirmHost />
+  <PaywallSheet />
+  <OnboardingSlides />
 </template>

@@ -70,6 +70,7 @@
   </div>
 </template>
 <script setup lang="ts">
+definePageMeta({ premium: 'spese', premiumTitle: 'Spese' })
 import { ArrowDown, ArrowUp, ChartLine, ChevronRight, ClipboardCheck, Landmark, Plus, ScanText, ShieldCheck, TriangleAlert, Wrench } from 'lucide-vue-next'
 import { formatDate, vehicleName } from '~/utils/deadlines'
 import { EXPENSE_CATS, PERIODS, periodRange, type ExpenseCat, type Period } from '~/composables/expenses'

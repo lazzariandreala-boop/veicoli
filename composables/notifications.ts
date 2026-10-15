@@ -56,6 +56,8 @@ export async function syncReminders() {
   if (pending.notifications.length) {
     await LocalNotifications.cancel({ notifications: pending.notifications.map((n) => ({ id: n.id })) })
   }
+  // i promemoria sono una funzione Premium: senza abbonamento non ne programmo
+  if (!isPremium.value) { notificationState.scheduled = 0; return }
   // Android accetta al massimo ~500 allarmi per app: teniamo i più vicini
   const batch = reminders.slice(0, 400)
   if (batch.length) {
@@ -77,16 +79,17 @@ export async function syncReminders() {
 }
 
 export async function sendTestNotification() {
+  if (!requirePremium('notifiche')) return false
   if (!isNative()) {
     if ('Notification' in window) {
       const p = await Notification.requestPermission()
-      if (p === 'granted') new Notification('Veicoli', { body: 'Le notifiche funzionano.' })
+      if (p === 'granted') new Notification('Veicoli Personali', { body: 'Le notifiche funzionano.' })
     }
     return
   }
   if ((await requestPermission()) !== 'granted') return
   await ensureChannel()
   await LocalNotifications.schedule({
-    notifications: [{ id: 1, title: 'Veicoli', body: 'Le notifiche funzionano: riceverai così i promemoria delle scadenze.', channelId: CHANNEL, smallIcon: 'ic_stat_veicoli', iconColor: '#7c5cff', schedule: { at: new Date(Date.now() + 3000), allowWhileIdle: true } }],
+    notifications: [{ id: 1, title: 'Veicoli Personali', body: 'Le notifiche funzionano: riceverai così i promemoria delle scadenze.', channelId: CHANNEL, smallIcon: 'ic_stat_veicoli', iconColor: '#7c5cff', schedule: { at: new Date(Date.now() + 3000), allowWhileIdle: true } }],
   })
 }

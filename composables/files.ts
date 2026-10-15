@@ -12,7 +12,7 @@ async function blobToBase64(blob: Blob): Promise<string> {
 }
 
 /** Condivide (Android) o scarica (browser) un file. */
-export async function shareBlob(blob: Blob, filename: string, title = 'Veicoli') {
+export async function shareBlob(blob: Blob, filename: string, title = 'Veicoli Personali') {
   if (Capacitor.isNativePlatform()) {
     const res = await Filesystem.writeFile({ path: filename, data: await blobToBase64(blob), directory: Directory.Cache })
     await Share.share({ title, url: res.uri, dialogTitle: title })

@@ -67,6 +67,7 @@
   </div>
 </template>
 <script setup lang="ts">
+definePageMeta({ premium: 'scadenze', premiumTitle: 'Scadenze' })
 import { Bell, BellOff, CalendarCheck, ClipboardCheck, Landmark, ShieldCheck, Sparkles } from 'lucide-vue-next'
 import { vehicleName } from '~/utils/deadlines'
 import type { DeadlineView } from '~/composables/garage'

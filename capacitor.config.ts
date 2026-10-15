@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {
   appId: 'it.veicoli.app',
-  appName: 'Veicoli',
+  appName: 'Veicoli Personali',
   webDir: '.output/public',
   backgroundColor: '#060818',
   android: {

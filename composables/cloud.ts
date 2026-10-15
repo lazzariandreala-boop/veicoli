@@ -62,9 +62,11 @@ async function load() {
     if (u) {
       cloud.user = { uid: u.uid, email: u.email ?? undefined, name: u.displayName ?? undefined, photo: u.photoURL ?? undefined }
       localStorage.setItem(LINKED_KEY, u.uid)
+      premiumLogin(u.uid)
       startSync(u.uid).catch(fail)
     } else {
       cloud.user = null
+      premiumLogout()
       stopSync()
       cloud.status = 'off'
     }
@@ -152,6 +154,57 @@ export async function signOutCloud() {
   outboxClear()
 }
 
+/** Ripete l'accesso con Google: Firebase chiede un accesso recente prima di eliminare l'account. */
+async function reauthenticate() {
+  const { auth, a } = await load()
+  const u = auth.currentUser!
+  if (localStorage.getItem('veicoli.cloud.emulator')) return
+  if (Capacitor.isNativePlatform()) {
+    const { FirebaseAuthentication } = await import('@capacitor-firebase/authentication')
+    const r = await FirebaseAuthentication.signInWithGoogle()
+    const idToken = r.credential?.idToken
+    if (!idToken) throw new Error('Google non ha restituito le credenziali')
+    await a.reauthenticateWithCredential(u, a.GoogleAuthProvider.credential(idToken))
+  } else {
+    await a.reauthenticateWithPopup(u, new a.GoogleAuthProvider())
+  }
+}
+
+/**
+ * Elimina l'account: i dati nel cloud, l'utente Firebase e tutto quello che c'è su questo telefono.
+ * L'abbonamento invece va disdetto dallo store (Google Play o App Store).
+ */
+export async function deleteAccount(progress?: (s: string) => void) {
+  const { auth, a, f, fs } = await load()
+  const u = auth.currentUser
+  if (!u) throw new Error('Nessun account collegato')
+  progress?.('Conferma il tuo account Google…')
+  await reauthenticate()
+  stopSync()
+  progress?.('Elimino i dati dal cloud…')
+  for (const t of [...SYNC_TABLES, 'mediaChunks']) {
+    const col = f.collection(fs, 'users', u.uid, t)
+    for (;;) {
+      const snap = await f.getDocs(f.query(col, f.limit(200)))
+      if (snap.empty) break
+      const batch = f.writeBatch(fs)
+      snap.docs.forEach((d) => batch.delete(d.ref))
+      await batch.commit()
+    }
+  }
+  progress?.('Elimino l\'account…')
+  await premiumLogout()
+  await a.deleteUser(u)
+  if (Capacitor.isNativePlatform()) {
+    const { FirebaseAuthentication } = await import('@capacitor-firebase/authentication')
+    await FirebaseAuthentication.signOut().catch(() => {})
+  }
+  progress?.('Elimino i dati dal telefono…')
+  outboxClear()
+  await applyRemote(async () => { for (const t of db().tables) await t.clear() })
+  for (const k of Object.keys(localStorage)) if (k.startsWith('veicoli.') && k !== 'veicoli.theme') localStorage.removeItem(k)
+}
+
 // ---------- sincronizzazione ----------
 
 let unsubs: (() => void)[] = []
@@ -179,6 +232,17 @@ async function startSync(u: string) {
   if (localStorage.getItem('veicoli.cloud.db') !== FIRESTORE_DB) { localStorage.removeItem(TS_KEY); localStorage.setItem('veicoli.cloud.db', FIRESTORE_DB) }
   try { known = JSON.parse(localStorage.getItem(TS_KEY) ?? '{}') } catch { known = {} }
   const { f } = fb!
+  // Premium assegnato a mano dal proprietario dell'app: grants/{uid} con premium = true
+  unsubs.push(f.onSnapshot(f.doc(fb!.fs, 'grants', u), (s) => {
+    const g = s.data()
+    setGrant(!!g?.premium && (!g.until || new Date(g.until).getTime() > Date.now()))
+  }, (e) => console.warn('grant', e)))
+  // appena diventa Premium carico le foto dei veicoli rimaste sul telefono
+  unsubs.push(watch(isPremium, async (on) => {
+    if (!on) return
+    const ids = (await db().vehicles.toArray()).map((v) => v.coverMediaId).filter((id) => id && known[`media:${id}`] === undefined)
+    markDirty('media', ids)
+  }))
   // Primo collegamento su questo telefono: scarico tutto, poi invio solo quello che il cloud non ha ancora
   // legato anche al nome del database: le versioni precedenti scrivevano su "(default)", che non esiste
   const firstKey = `veicoli.cloud.linked.${FIRESTORE_DB}.${u}`
@@ -279,7 +343,8 @@ export async function flush() {
       fn(batch); ops++; bytes += size
     }
     // Nel cloud vanno solo le foto dei veicoli; i documenti (libretto, fatture, polizze…) restano sul telefono
-    const covers = new Set((await db().vehicles.toArray()).map((v) => v.coverMediaId).filter(Boolean) as string[])
+    // e solo con Premium: nel piano gratuito anche la foto resta sul telefono
+    const covers = new Set(isPremium.value ? (await db().vehicles.toArray()).map((v) => v.coverMediaId).filter(Boolean) as string[] : [])
     const later: string[] = []
     for (const [key] of items) {
       const [t, id] = key.split(':') as [SyncTable, string]

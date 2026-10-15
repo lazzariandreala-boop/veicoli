@@ -21,7 +21,7 @@
           <p v-if="sub">{{ sub }}</p>
           <div style="margin-top: 12px"><PlateBadge :plate="v.plate" size="lg" /></div>
         </div>
-        <button v-if="v.status === 'attivo' && deadlines.length" class="ring" :class="health" :aria-label="`Scadenze in regola: ${healthPct}%`" @click="setTab('scadenze')">
+        <button v-if="isPremium && v.status === 'attivo' && deadlines.length" class="ring" :class="health" :aria-label="`Scadenze in regola: ${healthPct}%`" @click="setTab('scadenze')">
           <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="27" class="r-track" /><circle cx="32" cy="32" r="27" class="r-val" :stroke-dasharray="`${(healthPct / 100) * 169.6} 169.6`" transform="rotate(-90 32 32)" /></svg>
           <b>{{ healthPct }}%</b><span>{{ HEALTH_LABEL[health] }}</span>
         </button>
@@ -31,15 +31,22 @@
     <div class="page" style="padding-top: 0">
       <nav class="tabs">
         <button v-for="t in tabs" :key="t.id" class="tab" :class="{ on: tab === t.id }" @click="setTab(t.id)">
-          {{ t.label }}<span v-if="t.count" class="count">{{ t.count }}</span>
+          {{ t.label }}<Lock v-if="t.lock && !isPremium" :size="12" class="tab-lock" /><span v-else-if="t.count" class="count">{{ t.count }}</span>
         </button>
       </nav>
 
+      <PremiumLock v-if="tabLock" :feature="tabLock" :title="tabs.find((t) => t.id === tab)?.label ?? ''" />
+
       <!-- PANORAMICA -->
-      <div v-if="tab === 'panoramica'" class="stack" style="gap: 14px">
+      <div v-else-if="tab === 'panoramica'" class="stack" style="gap: 14px">
+        <template v-if="!isPremium">
+          <PremiumLock feature="scadenze" title="Scadenze" />
+          <PremiumLock feature="lavori" title="Tagliandi e lavori" />
+        </template>
+        <template v-else>
         <div v-if="route.query.nuovo && v.status === 'attivo' && !bolli.length && !policies.length" class="card next-steps">
           <strong>Imposta le scadenze</strong>
-          <p class="muted" style="margin: 4px 0 12px; font-size: 14px">Registra bollo e assicurazione: Veicoli calcola le date e ti avvisa per tempo.</p>
+          <p class="muted" style="margin: 4px 0 12px; font-size: 14px">Registra bollo e assicurazione: l'app calcola le date e ti avvisa per tempo.</p>
           <div class="grid-2">
             <button class="btn sm" @click="open.bollo = true"><Landmark :size="16" /> Bollo pagato</button>
             <button class="btn sm" @click="open.policy = true"><ShieldCheck :size="16" /> Assicurazione</button>
@@ -102,6 +109,7 @@
           <WorkRow v-for="w in works.slice(0, 3)" :key="w.id" :w="w" @click="editWork(w)" />
         </div>
         <button class="btn block" @click="editWork(null)"><Wrench :size="18" /> Aggiungi un lavoro</button>
+        </template>
       </div>
 
       <!-- SCADENZE -->
@@ -262,8 +270,9 @@
 <script setup lang="ts">
 import {
   CalendarDays, ChevronLeft, ClipboardCheck, Ellipsis, Flag, Gauge, HandCoins, History, Landmark, Pencil, Plus,
-  ScanText, Share2, ShieldCheck, Siren, Trash2, Wallet, Wrench,
+  Lock, ScanText, Share2, ShieldCheck, Siren, Trash2, Wallet, Wrench,
 } from 'lucide-vue-next'
+import type { PremiumFeature } from '~/composables/premium'
 import { daysBetween, deadlinesFor, formatDate, monthName, nextInspectionDate, parseISO, vehicleName } from '~/utils/deadlines'
 import { LIBRETTO_LABELS, type LibrettoData } from '~/utils/libretto'
 import { tagliandoLabel } from '~/utils/documents'
@@ -285,18 +294,24 @@ const tab = ref<string>((route.query.tab as string) || 'panoramica')
 const setTab = (t: string) => { tab.value = t; router.replace({ query: { ...route.query, tab: t, nuovo: undefined } }) }
 const tabs = computed(() => [
   { id: 'panoramica', label: 'Panoramica' },
-  { id: 'scadenze', label: 'Scadenze' },
-  { id: 'lavori', label: 'Lavori', count: works.value.length },
-  { id: 'incidenti', label: 'Incidenti', count: incidents.value.length },
+  { id: 'scadenze', label: 'Scadenze', lock: 'scadenze' },
+  { id: 'lavori', label: 'Lavori', count: works.value.length, lock: 'lavori' },
+  { id: 'incidenti', label: 'Incidenti', count: incidents.value.length, lock: 'incidenti' },
   { id: 'libretto', label: 'Libretto' },
-  { id: 'storia', label: 'Storia e costi' },
-])
+  { id: 'storia', label: 'Storia e costi', lock: 'storia' },
+] as { id: string; label: string; count?: number; lock?: PremiumFeature }[])
+const tabLock = computed(() => (isPremium.value ? null : tabs.value.find((t) => t.id === tab.value)?.lock ?? null))
 
 const open = reactive({ bollo: false, policy: false, inspection: false, work: false, incident: false, end: false })
 const edit = reactive<{ bollo: BolloPayment | null; policy: InsurancePolicy | null; renew: InsurancePolicy | null; inspection: Inspection | null; work: Work | null; incident: Incident | null }>({
   bollo: null, policy: null, renew: null, inspection: null, work: null, incident: null,
 })
 const menu = ref(false)
+// Piano gratuito: libretto e foto. Ogni modulo Premium, da qualunque pulsante arrivi, apre l'abbonamento.
+const GATE = { bollo: 'scadenze', policy: 'scadenze', inspection: 'scadenze', work: 'lavori', incident: 'incidenti', end: 'storia' } as const
+watch(open, (o) => {
+  for (const k of Object.keys(GATE) as (keyof typeof GATE)[]) if (o[k] && !requirePremium(GATE[k])) o[k] = false
+}, { deep: true, flush: 'sync' })
 const editBollo = (r: BolloPayment | null) => { edit.bollo = r; open.bollo = true }
 const editPolicy = (r: InsurancePolicy | null, renew?: InsurancePolicy) => { edit.policy = r; edit.renew = r ? null : renew ?? null; open.policy = true }
 // Polizza in corso: se manca il premio o non è vicina alla scadenza si modifica quella, altrimenti si rinnova.
@@ -412,6 +427,7 @@ const librettoGroups = computed(() => {
 })
 
 const fabAction = computed(() => {
+  if (tabLock.value) return null
   if (tab.value === 'lavori') return { label: 'Nuovo lavoro', run: () => editWork(null) }
   if (tab.value === 'incidenti') return { label: 'Nuovo incidente', run: () => editIncident(null) }
   return null
@@ -443,6 +459,7 @@ async function exportSheet() {
 </script>
 
 <style scoped>
+.tab-lock { margin-left: 5px; opacity: .7; vertical-align: -1px; }
 .head-actions { display: inline-flex; gap: 6px; align-items: center; }
 .hero { position: relative; min-height: calc(var(--safe-top) + 300px); color: var(--hero-text); overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;
   background: var(--hero-bg); border-radius: 0 0 28px 28px; }

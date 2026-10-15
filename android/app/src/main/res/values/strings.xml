@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Veicoli</string>
-    <string name="title_activity_main">Veicoli</string>
+    <string name="app_name">Veicoli Personali</string>
+    <string name="title_activity_main">Veicoli Personali</string>
     <string name="package_name">it.veicoli.app</string>
     <string name="custom_url_scheme">it.veicoli.app</string>
 </resources>

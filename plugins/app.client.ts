@@ -11,6 +11,12 @@ export default defineNuxtPlugin((nuxtApp) => {
   const router = useRouter()
   initCloud()
 
+  // Errori JavaScript → Crashlytics (nell'app); gli arresti nativi li raccoglie il plugin
+  nuxtApp.vueApp.config.errorHandler = (e, _vm, info) => { console.error(e); reportCrash(e, 'vue: ' + info) }
+  window.addEventListener('error', (ev) => reportCrash(ev.error ?? ev.message, 'window'))
+  window.addEventListener('unhandledrejection', (ev) => reportCrash(ev.reason, 'promise'))
+  watch(() => cloud.user?.uid, (u) => setCrashUser(u ?? ''))
+
   // Riprogramma i promemoria ogni volta che cambiano veicoli, bollo, polizze o revisioni.
   let timer: ReturnType<typeof setTimeout> | undefined
   liveQuery(() => loadAllVehicleData()).subscribe({
@@ -19,6 +25,9 @@ export default defineNuxtPlugin((nuxtApp) => {
       timer = setTimeout(() => syncReminders().catch((e) => console.error('promemoria', e)), 400)
     },
   })
+
+  // abbonamento attivato o scaduto: riprogrammo (o tolgo) i promemoria
+  watch(isPremium, () => syncReminders().catch(() => {}))
 
   if (Capacitor.isNativePlatform()) {
     StatusBar.setStyle({ style: Style.Dark }).catch(() => {})
@@ -34,7 +43,8 @@ export default defineNuxtPlugin((nuxtApp) => {
     App.addListener('resume', () => syncReminders().catch(() => {}))
     nuxtApp.hook('app:mounted', () => {
       setTimeout(() => SplashScreen.hide().catch(() => {}), 150)
-      checkPermission().then((p) => { if (p === 'prompt') requestPermission() })
+      // il permesso lo chiedo solo a chi può usare le notifiche
+      checkPermission().then((p) => { if (p === 'prompt' && isPremium.value) requestPermission() })
     })
   }
 })

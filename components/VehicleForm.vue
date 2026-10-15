@@ -94,7 +94,8 @@
         hint="Alcune regioni fanno pagare le moto in un mese fisso (es. gennaio). Lascia vuoto per usare la data in cui paghi." />
     </FoldSection>
 
-    <VehicleDocs v-if="isNew" v-model="pendingDocs" :plate="form.plate" />
+    <VehicleDocs v-if="isNew && isPremium" v-model="pendingDocs" :plate="form.plate" />
+    <PremiumLock v-else-if="isNew" feature="scadenze" title="Bollo, assicurazione e revisione" />
 
     <FField v-model="form.notes" label="Note" type="textarea" placeholder="Qualsiasi cosa da ricordare" />
 

@@ -97,6 +97,7 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({ premium: 'documenti', premiumTitle: 'Leggi documento' })
 import { Camera, Check, ChevronLeft, CircleAlert, CircleCheck, ClipboardCheck, FileText, FileUp, Landmark, Plus, Repeat, ScanText, ShieldCheck, Wrench, X } from 'lucide-vue-next'
 import { DOC_LABEL, parseDocument, type DocKind, type ParsedDoc } from '~/utils/documents'
 import { vehicleName } from '~/utils/deadlines'
